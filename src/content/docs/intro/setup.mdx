@@ -1,0 +1,80 @@
+---
+title: Set-Up the ghqc Ecosystem
+description: Set-up ghqc using `ghqc_example_setup` for exploration and a first project.
+---
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+:::tip
+On this page, we will walk through an accelerated set-up of the ghqc ecosystem. For more detailed, configurable installation, 
+please refer to the [installation instruction](../../installation)
+:::
+
+### 1. Install `ghqc`
+Installation steps are provided for both base R and [`rv`](https://a2-ai.github.io/a2-ai/ghqc-docs), A2-Ai's package manager.
+
+<Tabs syncKey="rv">
+    <TabItem label = "R">
+        <Steps>
+        1. Add a repository containing `ghqc` and `ghqc.app` to the `repos` option
+            ```r
+            options("repos" = c(
+                "ghqc-eco" = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc-eco/v3",
+                getOption("repos)
+            ))
+            ```
+        2. Install the package
+
+            We recommend installing all of the dependencies to install [`pak`](https://pak.r-lib.org/) and [`gert`](https://docs.ropensci.org/gert/),
+            but it is not required.
+            <Tabs syncKey="suggested_dep">
+                <TabItem label = "Suggested Dependencies">
+                        ```r
+                    install.packages("ghqc", dependencies = TRUE)
+                    ```
+                </TabItem>
+                <TabItem label = "No Suggested Dependencies">
+                    ```r 
+                    install.packages("ghqc")
+                    ```
+                </TabItem>
+            </Tabs>
+        </Steps>
+    </TabItem>
+    <TabItem label = "rv">
+        <Steps>
+        1. Add the following to your `rproject.toml`
+            ```toml ins={6, 11}
+            // rproject.toml
+            [project]
+            name = "ghqc example"
+            r_version = "4.5"
+            repositories = [
+                { alias = "ghqc-eco", url = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc-eco/v3" },
+                { alias = "PRISM", url = "https://prism.a2-ai.cloud/rpkgs/nimbus/2025.09" },
+            ]
+
+            dependencies = [
+                { name = "ghqc", install_suggestions = true },
+            ]
+            ```
+        2. Sync the project
+            
+            ```bash
+            rv sync
+            ```
+
+        3. Restart r
+            After installing `ghqc`, users should restart their R session to have the changes propagate into their R session.
+
+        </Steps>
+    </TabItem>
+</Tabs>
+
+### 2. Set-up Configuration Repository and Install `ghqc.app`
+
+Run the following command to clone the [example configuration repository]("https://github.com/a2-ai/ghqc.example_config_repo") 
+and install `ghqc.app` and its dependencies to the default directory.
+
+```r 
+ghqc::ghqc_example_setup()
+```

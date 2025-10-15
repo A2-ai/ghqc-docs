@@ -1,0 +1,296 @@
+---
+title: ghqc Installation
+description: How to install ghqc
+---
+
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The ghqc ecosystem is composed of 3 components:
+
+1. **ghqc** - A lightweight R package to launch the Shiny apps
+2. **ghqc.app** - A high dependency R package containing the Shiny apps
+3. **Configuration** - A configuration directory/repository used to configure the behavior of the ecosystem
+
+On this page, we will walk through the basics of how to install the `ghqc` ecosystem.
+
+## Installation Steps
+
+Installation steps will be provided for both base R and [`rv`](https://a2-ai.github.io/a2-ai/ghqc-docs), A2-Ai's package manager.
+
+### 1. Install `ghqc`
+    <Tabs syncKey="rv">
+        <TabItem label = "R">
+            <Steps>
+            1. Add a repository containing `ghqc` and `ghqc.app` to the `repos` option
+                ```r
+                options("repos" = c(
+                    "ghqc-eco" = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc-eco/v3",
+                    getOption("repos)
+                ))
+                ```
+            2. Install the package
+
+                We recommend installing all of the dependencies to install [`pak`](https://pak.r-lib.org/) and [`gert`](https://docs.ropensci.org/gert/),
+                but it is not required.
+                <Tabs syncKey="suggested_dep">
+                    <TabItem label = "Suggested Dependencies">
+                         ```r
+                        install.packages("ghqc", dependencies = TRUE)
+                        ```
+                    </TabItem>
+                    <TabItem label = "No Suggested Dependencies">
+                        ```r 
+                        install.packages("ghqc")
+                        ```
+                    </TabItem>
+                </Tabs>
+            </Steps>
+        </TabItem>
+        <TabItem label = "rv">
+            <Steps>
+            1. Add a repository containing `ghqc` and `ghqc.app` to **start** of the `repositories` field in the `rproject.toml`
+                ```toml ins={6}
+                // rproject.toml
+                [project]
+                name = "ghqc example"
+                r_version = "4.5"
+                repositories = [
+                    { alias = "ghqc-eco", url = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc-eco/v3" },
+                    { alias = "PRISM", url = "https://prism.a2-ai.cloud/rpkgs/nimbus/2025.09" },
+                ]
+                ```
+
+            2. Add `ghqc` to the `dependencies` field in the `rproject.toml` and sync.
+                <Tabs syncKey="suggested_dep">
+                    <TabItem label = "Suggested Dependencies">
+                        a. Add `{ name = "ghqc", install_suggestions = true }` to the `rproject.toml`
+                            ```toml ins={8}
+                            //rproject.toml
+                            ...
+                            repositories = [
+                                { alias = "ghqc-eco", url = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc-eco/v3" },
+                                { alias = "PRISM", url = "https://prism.a2-ai.cloud/rpkgs/nimbus/2025.09" },
+                            ]
+                            dependencies = [
+                                { name = "ghqc", install_suggestions = true },
+                            ]
+                            ```
+                        b. Sync the dependencies
+                        ```bash
+                        rv sync
+                        ```
+                    </TabItem>
+                    <TabItem label = "No Suggested Dependencies">
+                        If you wish to not install the suggested dependencies, simply run:
+                        ```bash
+                        rv add ghqc
+                        ```
+                    </TabItem>
+                </Tabs>
+            </Steps>
+
+            After installing `ghqc`, users should restart their R session to have the changes propagate into their R session.
+        </TabItem>
+    </Tabs>
+    :::note
+    PRISM is A2-Ai's package distribution and documentation hub. 
+    It has both [production](https://prism.a2-ai.cloud) and [development](https://prism.dev.a2-ai.cloud) services, both safe for use
+    in projects.
+    
+    For more info, please reach out or visit [PRISM](https://prism.a2-ai.cloud).
+    :::
+
+### 2. Start Ecosystem Set-up
+
+    `ghqc` provides helper functions to help users finish the set-up. The following will help you interactively set-up the ecosystem.
+    
+    ```r
+    library(ghqc)
+    ghqc_setup()
+    ```
+
+### 3. Configuration Repository Set-up
+
+<Steps>
+    1. Set the `GHQC_CONFIG_REPO` environment variable
+        ```ansi ins={5}
+        [36m--- [0mGHQC RENVIRON SETUP [36m-----------------------------------------------------
+
+        [0mGHQC_CONFIG_REPO is not set in your ~/.Renviron
+        [35mProvide URL to custom configuration repository: 
+        https://github.com/A2-ai/ghqc.example_config_repo
+        ```
+        :::note
+        `https://github.com/a2-ai/ghqc.example_config_repo` is an example repository that can be used during exploration, 
+        but should be replaced by your organization's custom configuration repository URL.
+        :::
+    
+    2. Set the clone destination directory
+        <Tabs syncKey="suggested_dep">
+            <TabItem label = "Suggested Dependencies">
+                
+            </TabItem>
+            <TabItem label = "No Suggested Dependencies">
+                :::caution
+                `gert` is required to clone down the custom configuration repository. If you chose to not install the suggested dependencies you will
+                be prompted with the following:
+                ```ansi
+                [38;5;226m![0m Package `gert` is not found in your project package library
+                The custom configuration repository cannot be downloaded 
+                unless this package is present
+                [35mWould you like to install `gert` to continue? (y/N) [2my 
+                ```
+                :::
+            </TabItem>
+        </Tabs>
+
+        By default, `ghqc` will clone the configuration repository to `$XDG_DATA_HOME/<repo name>`. 
+        It is highly recommended to input `y` to clone to the default location.
+
+        ```ansi
+        [36m--- [0mCUSTOM CONFIGURATION REPOSITORY [36m--------------------------------------
+
+        [35mDownload custom configuration repository to path: 
+        ~/.local/share/ghqc/ghqc.example_config_repo (y/N) [2my 
+        ```
+
+    3. Clone the Configuration Repository
+
+        Next, a prompt will appear to confirm you'd like to clone the Configuration Repository to the destination. Input `y` to download.
+
+        ```ansi
+        [38;5;160mx[0m Custom configuration repository ghqc.example_config_repo is not found locally
+        [35mWould you like to download the repository (y/N)? [2;35my
+        ```
+
+        After a successful download, the repository is verified for its structure and compatibility with the ghqc ecosystem
+        ```ansi
+        [32m✔ [35mlogo.png[0m successfully found
+
+        [32m✔ [35moptions.yaml[0m successfully found
+            [32m✔[0m prepended_checklist_note:
+
+            [3;0m“Note: Please modify checklist items to insert relevant QC context.”
+            — [0m
+            
+        [32m✔ [35mChecklist directory[0m successfully found
+            [32m✔[0m advanced_checklist.yaml
+            [32m✔[0m simple_checklist.yaml
+        ```
+        
+</Steps>
+
+### 4. `ghqc.app` Installation
+
+    `ghqc.app` has over 100 dependencies, with restrictive dependency constraints. To ensure the `ghqc.app` dependencies do not interfere with project work,
+    `ghqc.app` and its dependencies are installed in an isolated directory outside the QCed project. 
+
+    To get started with installation, the user will be prompted with the following:
+    ```ansi
+    [36m--- [0mGHQC.APP DEPENDENCY INSTALLATION [36m----------------------------------------
+    [0mWould you like to INSTALL new packages form Posit Package Manager or LINK to a 
+    previously installed package library?
+    1. INSTALL
+    2. LINK
+    3. Neither
+    [35mInput: 
+    ```
+
+    <Tabs>
+        <TabItem label = "1. INSTALL">
+            <Tabs syncKey="suggested_dep">
+                <TabItem label = "Suggested Dependencies">
+                    
+                </TabItem>
+                <TabItem label = "No Suggested Dependencies">
+                    :::note
+                    `pak` is highly recommended to improve package installation performance. While not required, it has no dependencies
+                    and should not influence project work. If you chose not to install the suggested dependencies you will be prompted with the following:
+                    ```ansi
+                    [35mPackage `pak` is not found in your project package library. 
+                    To improve performance, would you like to install pak? (y/N) [2my
+                    ```
+                    :::
+                </TabItem>
+            </Tabs>
+
+            By inputting `1`, users choose to install `ghqc.app` and its dependencies into the isolate dependency directory.
+
+            <Steps>
+                1. Set the installation destination directory
+
+                    By default, `ghqc` will install the dependencies to `$XDG_DATA_HOME/ghqc/rpkgs/<OS>/<R VERSION>/<ARCH>`. 
+                    It is highly recommend to input `y` to install to the default location.
+
+                     ```ansi
+                    [35mInstall ghqc.app dependencies to path: 
+                    ~/.local/share/ghqc/rpkgs/linux-ubuntu-jammy/R-4.4/x86_64-pc-linux-gnu (y/N) [2my
+                    ```
+
+                2. Install the packages
+
+                    Users will be prompted with the following:
+                    ```ansi
+                    [38;5;160mx[0m No packages found in ~/.local/share/ghqc/rpkgs
+                    [35mWould you like to install the ghqc.app dependencies (y/N)? [2my
+                    ```
+
+                    Input `y` to install `ghqc.app` and its dependencies.
+            </Steps>
+            :::note
+            `ghqc` does not install the dependencies of `ghqc.app` from the repositories set in the `repos` option, 
+            but rather from `https://packagemanager.posit.co/cran/2025-03-01`. 
+            This is the dependency version set the Shiny apps were developed against, therefore for best consistency is set by default.
+
+            On the other hand, `ghqc.app` IS installed from a repository in the `repos` option to allow for organizations to 
+            choose the source and version of the package. It can be manually installed via:
+            ```r
+            utils::install.packages("ghqc.app", lib = ghqc::ghqc_libpath(), repos = <REPO_URL>)
+            ```
+            :::
+        </TabItem>
+        <TabItem label = "2. LINK">
+            By inputting `2`, users choose to symlink the dependencies of `ghqc.app` to the isolated dependency directory.
+            This is the most efficient method, but should only be used if there exists a package library previously installed 
+            which contains all of the package versions required.
+
+            <Steps>
+                1. Provide the directory where the packages should be symlinked *from*:
+                    ```ansi
+                    [35mPath to previously installed package library from which to link:
+                    ```
+
+                2. Set the dependency destination directory
+                    
+                    By default, `ghqc` will install the dependencies to `$XDG_DATA_HOME/ghqc/rpkgs/<OS>/<R VERSION>/<ARCH>`. 
+                    It is highly recommend to input `y` to install to the default location.
+
+                     ```ansi
+                    [35mPath to link the ghqc.app dependencies:
+                    ~/.local/share/ghqc/rpkgs/linux-ubuntu-jammy/R-4.4/x86_64-pc-linux-gnu (y/N) [2my
+                    ```
+
+                    In order to prevent errors, the current content in the destination is deleted and then the symlink occurs.
+
+                3. Install `ghqc.app`
+
+                    After `ghqc.app` dependency linkage, `ghqc.app` will not be present and the user will see the following:
+                    ```ansi
+                    [38;5;226m![0m NOTE: ghqc.app is not installed in ~/.local/share/ghqc/rpkgs/linux-ubuntu-jammy/R-4.4/x86_64-pc-linux-gnu. 
+                    Please install before running any ghqc apps
+                    ```
+
+                    To install `ghqc.app` from the repository added in [1.1](#1-install-ghqc), run the following command:
+                    ```r
+                    utils::install.packages("ghqc.app", lib = ghqc::ghqc_libpath())
+                    ```
+            </Steps>
+        </TabItem>
+        <TabItem label = "3. NEITHER">
+            By inputting `3`, users choose to not install `ghqc.app` or any of its dependencies.
+
+            A helper function `ghqc_libpath()` exists to create and output the string to the default dependency directory.
+        </TabItem>
+    </Tabs>
+
+
