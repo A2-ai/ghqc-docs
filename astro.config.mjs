@@ -26,6 +26,13 @@ export default defineConfig({
 						{ label: '4. Record', slug: 'intro/record' },
 					],
 				},
+				{
+					label: 'Workflow',
+					items: [
+						{ label: 'Introduction', slug: 'workflow/introduction' },
+						{ label: 'Assign Files for QC', slug: 'workflow/assign' },
+					]
+				}
 			],
 		}),
 	],
