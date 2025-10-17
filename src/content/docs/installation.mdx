@@ -25,7 +25,7 @@ Installation steps will be provided for both base R and [`rv`](https://a2-ai.git
                 ```r
                 options("repos" = c(
                     "ghqc-eco" = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc-eco/v3",
-                    getOption("repos)
+                    getOption("repos")
                 ))
                 ```
             2. Install the package
@@ -48,7 +48,7 @@ Installation steps will be provided for both base R and [`rv`](https://a2-ai.git
         </TabItem>
         <TabItem label = "rv">
             <Steps>
-            1. Add a repository containing `ghqc` and `ghqc.app` to **start** of the `repositories` field in the `rproject.toml`
+            1. Add a repository containing `ghqc` and `ghqc.app` to the **start** of the `repositories` field in the `rproject.toml`
                 ```toml ins={6}
                 // rproject.toml
                 [project]
@@ -214,13 +214,13 @@ Installation steps will be provided for both base R and [`rv`](https://a2-ai.git
                 </TabItem>
             </Tabs>
 
-            By inputting `1`, users choose to install `ghqc.app` and its dependencies into the isolate dependency directory.
+            By inputting `1`, users choose to install `ghqc.app` and its dependencies into the isolated dependency directory.
 
             <Steps>
                 1. Set the installation destination directory
 
                     By default, `ghqc` will install the dependencies to `$XDG_DATA_HOME/ghqc/rpkgs/<OS>/<R VERSION>/<ARCH>`. 
-                    It is highly recommend to input `y` to install to the default location.
+                    It is highly recommended to input `y` to install to the default location.
 
                      ```ansi
                     [35mInstall ghqc.app dependencies to path: 
@@ -263,7 +263,7 @@ Installation steps will be provided for both base R and [`rv`](https://a2-ai.git
                 2. Set the dependency destination directory
                     
                     By default, `ghqc` will install the dependencies to `$XDG_DATA_HOME/ghqc/rpkgs/<OS>/<R VERSION>/<ARCH>`. 
-                    It is highly recommend to input `y` to install to the default location.
+                    It is highly recommended to input `y` to install to the default location.
 
                      ```ansi
                     [35mPath to link the ghqc.app dependencies:

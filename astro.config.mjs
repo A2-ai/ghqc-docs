@@ -26,6 +26,24 @@ export default defineConfig({
 						{ label: '4. Record', slug: 'intro/record' },
 					],
 				},
+				{
+					label: 'Workflow',
+					items: [
+						{ label: 'Introduction', slug: 'workflow/introduction' },
+						{ label: 'Assign Files for QC', slug: 'workflow/assign' },
+						{ label: 'Review QC Files', slug: 'workflow/review' },
+						{ label: 'Notify File Changes', slug: 'workflow/notify' },
+						{ label: 'Approve QCed Files', slug: 'workflow/approve' },
+					]
+				},
+				{
+					label: 'Admin Guide',
+					collapsed: true,
+					items: [
+						{ label: 'Ecosystem Architecture', slug: 'admin_guide/ecosystem_arch' },
+						{ label: 'Configuration Repository', slug: 'admin_guide/configuration' },
+					]
+				}
 			],
 		}),
 	],

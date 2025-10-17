@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QC Notification Comment</title>
+
+    <!-- Starlight Theme Detection Script -->
+    <script>
+        // Sync with Starlight's theme system
+        const getThemePreference = () => {
+            if (typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme')) {
+                return localStorage.getItem('starlight-theme');
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const isDark = getThemePreference() === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+
+        // Listen for theme changes
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'starlight-theme') {
+                document.documentElement.dataset.theme = e.newValue;
+            }
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('starlight-theme')) {
+                document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+            }
+        });
+    </script>
+
+    <!-- GitHub CSS Files -->
+    <link rel="stylesheet" href="issue_thread_files/primer-7218ee22ec7c.css">
+    <link rel="stylesheet" href="issue_thread_files/github-6b526e0b63fc.css">
+    <link rel="stylesheet" href="issue_thread_files/global-6988ccc16eb5.css">
+    <link rel="stylesheet" href="issue_thread_files/light-0eace2597ca3.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Starlight-compatible color variables */
+        :root {
+            --sl-color-white: #ffffff;
+            --sl-color-gray-1: #f6f8fa;
+            --sl-color-gray-2: #d1d9e0;
+            --sl-color-gray-3: #656d76;
+            --sl-color-gray-6: #1f2328;
+            --sl-color-black: #000000;
+            --sl-color-accent: #0969da;
+            --sl-color-green: #1a7f37;
+            --sl-color-purple: #8250df;
+        }
+
+        [data-theme='dark'] {
+            --sl-color-white: #0d1117;
+            --sl-color-gray-1: #21262d;
+            --sl-color-gray-2: #30363d;
+            --sl-color-gray-3: #7d8590;
+            --sl-color-gray-6: #e6edf3;
+            --sl-color-black: #ffffff;
+            --sl-color-accent: #58a6ff;
+            --sl-color-green: #3fb950;
+            --sl-color-purple: #a5a3ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--sl-color-gray-6);
+            background-color: var(--sl-color-white);
+            margin: 0;
+            padding: 0;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--sl-color-gray-3);
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .timeline-item-content {
+            flex: 1;
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            transition: border-color 0.2s;
+        }
+
+        .timeline-item-header {
+            background-color: var(--sl-color-gray-1);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px 6px 0 0;
+            font-size: 12px;
+            color: var(--sl-color-gray-3);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .timeline-item-body {
+            padding: 16px;
+        }
+
+        .markdown-body {
+            color: var(--sl-color-gray-6);
+        }
+
+        .markdown-body h1 {
+            font-size: 2em;
+            font-weight: 600;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .markdown-body h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .markdown-body ul {
+            padding-left: 2em;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body li {
+            margin-bottom: 4px;
+        }
+
+        .markdown-body a {
+            color: var(--sl-color-accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+
+        .markdown-body code {
+            background-color: #afb8c133;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 85%;
+        }
+
+        .markdown-body p {
+            margin-bottom: 16px;
+        }
+
+        /* GitHub diff integration */
+        .highlight {
+            margin-bottom: 16px;
+        }
+
+        /* Dark mode overrides for code blocks */
+        [data-theme='dark'] .highlight {
+            background-color: var(--sl-color-gray-1);
+        }
+
+        [data-theme='dark'] .highlight pre {
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
+        }
+
+        [data-theme='dark'] .highlight code {
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
+        }
+
+        /* Dark mode diff colors */
+        [data-theme='dark'] .pl-md {
+            background-color: rgba(248, 81, 73, 0.15);
+            color: #ff7b72;
+        }
+
+        [data-theme='dark'] .pl-mi1 {
+            background-color: rgba(63, 185, 80, 0.15);
+            color: #7ee787;
+        }
+
+        [data-theme='dark'] .pl-mdr {
+            color: #a5a3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="timeline-item">
+            <div class="timeline-item-avatar">
+                <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+            </div>
+            <div class="timeline-item-content">
+                <div class="timeline-item-header">
+                    <strong>QCer</strong> commented
+                </div>
+                <div class="timeline-item-body">
+                    <div class="markdown-body">
+                        <h1>QC Notification</h1>
+
+                        <p><strong><u>@Author</u></strong></p>
+                        <p>Answering your question around plots</p>
+
+                        <h2>Metadata</h2>
+                        <ul>
+                            <li>current commit: <a href="#"><code>a7f2b1c</code></a></li>
+                            <li>previous commit: <a href="#"><code>d148535</code></a></li>
+                            <li><a href="#">commit comparison</a></li>
+                        </ul>
+
+                        <h2>File Difference</h2>
+                        <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto">
+                            <pre class="notranslate"><code><span class="pl-mdr">@@ -12,7 +12,7 @@</span>
+# Data analysis
+df <- read_data()
+# NOTE: Include plot?
+<span class="pl-mi1"><span class="pl-mi1">+</span># QC: Yes, let's include it</span>
+# plot(df$x, df$y)
+
+# Process results
+save_output(df)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

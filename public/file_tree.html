@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Tree Selector</title>
+
+    <!-- Starlight Theme Detection Script -->
+    <script>
+        // Sync with Starlight's theme system
+        const getThemePreference = () => {
+            if (typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme')) {
+                return localStorage.getItem('starlight-theme');
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const isDark = getThemePreference() === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+
+        // Listen for theme changes
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'starlight-theme') {
+                document.documentElement.dataset.theme = e.newValue;
+            }
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('starlight-theme')) {
+                document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+            }
+        });
+    </script>
+    <style>
+        /* Starlight-compatible color variables */
+        :root {
+            --sl-color-white: #ffffff;
+            --sl-color-gray-1: #f6f8fa;
+            --sl-color-gray-2: #d1d9e0;
+            --sl-color-gray-3: #656d76;
+            --sl-color-gray-6: #1f2328;
+            --sl-color-black: #000000;
+            --sl-color-accent: #0969da;
+            --sl-color-green: #1a7f37;
+            --sl-color-purple: #8250df;
+        }
+
+        [data-theme='dark'] {
+            --sl-color-white: #0d1117;
+            --sl-color-gray-1: #21262d;
+            --sl-color-gray-2: #30363d;
+            --sl-color-gray-3: #7d8590;
+            --sl-color-gray-6: #e6edf3;
+            --sl-color-black: #ffffff;
+            --sl-color-accent: #58a6ff;
+            --sl-color-green: #3fb950;
+            --sl-color-purple: #a5a3ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .main-row {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .left-column {
+            width: 40%;
+            min-width: 300px;
+            align-self: flex-start;
+            position: sticky;
+            top: 20px;
+        }
+
+        .milestone-input-section {
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .milestone-input-label {
+            font-weight: 600;
+            color: var(--sl-color-gray-6);
+            margin-bottom: 8px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .milestone-input {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 4px;
+            background-color: var(--sl-color-white);
+            color: var(--sl-color-gray-6);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .milestone-input:focus {
+            outline: none;
+            border-color: var(--sl-color-accent);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        [data-theme='light'] .milestone-input:focus {
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+        }
+
+        .milestone-input::placeholder {
+            color: var(--sl-color-gray-3);
+        }
+
+        .file-tree {
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .directory {
+            margin-bottom: 8px;
+        }
+
+        .directory-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--sl-color-gray-3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .directory-icon {
+            width: 16px;
+            height: 16px;
+            fill: var(--sl-color-accent);
+        }
+
+        .file-list {
+            padding-left: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .file-item:hover {
+            background-color: var(--sl-color-gray-1);
+        }
+
+        .file-item.selected {
+            background-color: var(--sl-color-accent);
+            color: var(--sl-color-white);
+        }
+
+        .file-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .file-icon {
+            width: 16px;
+            height: 16px;
+            fill: var(--sl-color-gray-3);
+        }
+
+        .file-item.selected .file-icon {
+            fill: var(--sl-color-white);
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+        }
+
+        .selected-files {
+            width: 60%;
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .issues-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 275px;
+        }
+
+        .selected-files h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            padding-bottom: 8px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .file-div {
+            background-color: var(--sl-color-gray-1);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 14px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .file-div-header {
+            font-weight: 600;
+            color: var(--sl-color-accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .no-selection {
+            color: var(--sl-color-gray-3);
+            font-style: italic;
+            text-align: center;
+            padding: 40px;
+            transition: color 0.2s;
+        }
+
+        .clear-btn {
+            background-color: var(--sl-color-gray-1);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: background-color 0.15s ease, border-color 0.2s;
+        }
+
+        .clear-btn:hover {
+            background-color: var(--sl-color-gray-2);
+        }
+
+        .issue-field {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: var(--sl-color-gray-6);
+            font-size: 12px;
+            min-width: 60px;
+            flex-shrink: 0;
+            transition: color 0.2s;
+        }
+
+        .field-value {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 14px;
+            color: var(--sl-color-gray-3);
+            transition: color 0.2s;
+        }
+
+        .field-dropdown {
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 14px;
+            color: var(--sl-color-gray-6);
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .field-dropdown:focus {
+            outline: none;
+            border-color: var(--sl-color-accent);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        [data-theme='light'] .field-dropdown:focus {
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+        }
+
+        .field-code {
+            background-color: #afb8c133;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 12px;
+            color: var(--sl-color-gray-6);
+            transition: color 0.2s;
+        }
+
+        .assign-btn {
+            background-color: var(--sl-color-green);
+            color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-green);
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.15s ease, border-color 0.2s;
+        }
+
+        .assign-btn:hover {
+            opacity: 0.9;
+        }
+
+        .assign-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+            z-index: 1000;
+            min-width: 300px;
+            text-align: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(140, 149, 159, 0.2);
+            z-index: 999;
+        }
+
+        .popup-message {
+            color: var(--sl-color-gray-6);
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: color 0.2s;
+        }
+
+        .popup-close-btn {
+            background-color: var(--sl-color-accent);
+            color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-accent);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .popup-close-btn:hover {
+            opacity: 0.9;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-row">
+            <div class="left-column">
+                <div class="milestone-input-section">
+                    <div class="milestone-input-label">Milestone</div>
+                    <input type="text" class="milestone-input" id="milestone-input" placeholder="Enter milestone name...">
+                </div>
+
+                <div class="file-tree">
+                    <div class="directory">
+                        <div class="directory-name">
+                            <svg class="directory-icon" viewBox="0 0 16 16">
+                                <path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path>
+                            </svg>
+                            my_analysis
+                        </div>
+                        <div class="file-list">
+                            <div class="file-item" data-filename="file_1.qmd">
+                                <input type="checkbox" class="file-checkbox">
+                                <svg class="file-icon" viewBox="0 0 16 16">
+                                    <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path>
+                                </svg>
+                                <span class="file-name">file_1.qmd</span>
+                            </div>
+                            <div class="file-item" data-filename="file_2.qmd">
+                                <input type="checkbox" class="file-checkbox">
+                                <svg class="file-icon" viewBox="0 0 16 16">
+                                    <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path>
+                                </svg>
+                                <span class="file-name">file_2.qmd</span>
+                            </div>
+                            <div class="file-item" data-filename="file_3.qmd">
+                                <input type="checkbox" class="file-checkbox">
+                                <svg class="file-icon" viewBox="0 0 16 16">
+                                    <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path>
+                                </svg>
+                                <span class="file-name">file_3.qmd</span>
+                            </div>
+                            <div class="file-item" data-filename="file_4.qmd">
+                                <input type="checkbox" class="file-checkbox">
+                                <svg class="file-icon" viewBox="0 0 16 16">
+                                    <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path>
+                                </svg>
+                                <span class="file-name">file_4.qmd</span>
+                            </div>
+                            <div class="file-item" data-filename="file_5.qmd">
+                                <input type="checkbox" class="file-checkbox">
+                                <svg class="file-icon" viewBox="0 0 16 16">
+                                    <path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path>
+                                </svg>
+                                <span class="file-name">file_5.qmd</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selected-files">
+                <h3 id="issues-header">Milestone Issues</h3>
+                <div class="issues-scroll-container">
+                    <div id="file-divs">
+                        <div class="no-selection">Select files from the tree to see them here</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="assign-btn" id="assign-btn" onclick="assignQCIssues()">Assign QC Files</button>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay hidden" id="popup-overlay" onclick="closePopup()"></div>
+    <div class="popup hidden" id="popup">
+        <div class="popup-message" id="popup-message"></div>
+        <button class="popup-close-btn" onclick="closePopup()">OK</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileItems = document.querySelectorAll('.file-item');
+            const fileDivsContainer = document.getElementById('file-divs');
+            const milestoneInput = document.getElementById('milestone-input');
+            const issuesHeader = document.getElementById('issues-header');
+            let selectedFiles = []; // Track order of selected files
+
+            // Handle milestone input changes
+            milestoneInput.addEventListener('input', function() {
+                updateIssuesHeader();
+            });
+
+            function updateIssuesHeader() {
+                const milestoneName = milestoneInput.value.trim();
+                if (milestoneName) {
+                    issuesHeader.textContent = `${milestoneName} Issues`;
+                } else {
+                    issuesHeader.textContent = 'Milestone Issues';
+                }
+            }
+
+            // Auto-select file_1.qmd on load
+            function autoSelectFile1() {
+                const file1Item = document.querySelector('[data-filename="file_1.qmd"]');
+                const file1Checkbox = file1Item.querySelector('.file-checkbox');
+
+                if (file1Item && file1Checkbox) {
+                    file1Checkbox.checked = true;
+                    handleFileSelection(file1Item, true);
+                }
+            }
+
+            // Call auto-select after setting up event listeners
+            autoSelectFile1();
+
+            fileItems.forEach(item => {
+                const checkbox = item.querySelector('.file-checkbox');
+
+                // Handle clicking on the file item
+                item.addEventListener('click', function(e) {
+                    if (e.target !== checkbox && !e.target.classList.contains('field-dropdown')) {
+                        checkbox.checked = !checkbox.checked;
+                        handleFileSelection(item, checkbox.checked);
+                    }
+                });
+
+                // Handle checkbox changes
+                checkbox.addEventListener('change', function() {
+                    handleFileSelection(item, this.checked);
+                });
+            });
+
+            function handleFileSelection(item, isSelected) {
+                const filename = item.getAttribute('data-filename');
+
+                if (isSelected) {
+                    item.classList.add('selected');
+                    selectedFiles.push(filename);
+                    createFileDiv(filename);
+                } else {
+                    item.classList.remove('selected');
+                    selectedFiles = selectedFiles.filter(f => f !== filename);
+                    removeFileDiv(filename);
+                }
+
+                // Renumber all issues
+                renumberIssues();
+                updateNoSelectionMessage();
+            }
+
+            function createFileDiv(filename) {
+                const existingDiv = document.getElementById(`div-${filename}`);
+                if (existingDiv) return;
+
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'file-div';
+                fileDiv.id = `div-${filename}`;
+                fileDiv.setAttribute('data-filename', filename);
+
+                const issueNumber = selectedFiles.indexOf(filename) + 1;
+
+                fileDiv.innerHTML = `
+                    <div class="file-div-header">
+                        <svg class="file-icon" viewBox="0 0 16 16" width="16" height="16">
+                            <path fill="#0969da" d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path>
+                            <path fill="#0969da" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"></path>
+                        </svg>
+                        <span class="issue-number">${filename} <span style="color: var(--sl-color-gray-3); font-weight: normal;">#${issueNumber}</span></span>
+                    </div>
+
+                    <div class="issue-field">
+                        <div class="field-label">Checklist</div>
+                        <select class="field-dropdown checklist-dropdown">
+                            <option value="Report">Report</option>
+                            <option value="Analysis">Analysis</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="issue-field">
+                        <div class="field-label">QCer</div>
+                        <select class="field-dropdown qcer-dropdown">
+                            <option value="" selected></option>
+                            <option value="QCer">QCer</option>
+                            <option value="Reviewer">Reviewer</option>
+                        </select>
+                    </div>
+
+                    <div class="issue-field">
+                        <div class="field-label">Branch</div>
+                        <div class="field-value">
+                            <code class="field-code">analysis</code>
+                        </div>
+                    </div>
+
+                    <div class="issue-field">
+                        <div class="field-label">Commit</div>
+                        <div class="field-value">
+                            <code class="field-code">d148e35</code>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-field">
+                        <div class="field-label">Author</div>
+                        <div class="field-value">
+                            <code class="field-code">Author</code>
+                        </dive>
+                    </div>
+                `;
+
+                // Remove no-selection message if it exists
+                const noSelection = fileDivsContainer.querySelector('.no-selection');
+                if (noSelection) {
+                    noSelection.remove();
+                }
+
+                fileDivsContainer.appendChild(fileDiv);
+            }
+
+            function removeFileDiv(filename) {
+                const fileDiv = document.getElementById(`div-${filename}`);
+                if (fileDiv) {
+                    fileDiv.remove();
+                }
+            }
+
+            function renumberIssues() {
+                selectedFiles.forEach((filename, index) => {
+                    const fileDiv = document.getElementById(`div-${filename}`);
+                    if (fileDiv) {
+                        const issueNumber = index + 1;
+                        const issueNumberSpan = fileDiv.querySelector('.issue-number');
+                        if (issueNumberSpan) {
+                            issueNumberSpan.innerHTML = `${filename} <span style="color: var(--sl-color-gray-3); font-weight: normal;">#${issueNumber}</span>`;
+                        }
+                    }
+                });
+            }
+
+            function updateNoSelectionMessage() {
+                const selectedFileDivs = document.querySelectorAll('.file-div');
+                if (selectedFileDivs.length === 0) {
+                    const noSelection = document.createElement('div');
+                    noSelection.className = 'no-selection';
+                    noSelection.textContent = 'Select files from the tree to see them here';
+                    fileDivsContainer.appendChild(noSelection);
+                }
+            }
+
+            // Global function for clear button
+            window.clearAllSelections = function() {
+                fileItems.forEach(item => {
+                    const checkbox = item.querySelector('.file-checkbox');
+                    checkbox.checked = false;
+                    item.classList.remove('selected');
+                });
+
+                // Clear selected files array and file divs
+                selectedFiles = [];
+                fileDivsContainer.innerHTML = '';
+                updateNoSelectionMessage();
+            };
+
+            // Global functions for popup and assign button
+            window.assignQCIssues = function() {
+                if (selectedFiles.length === 0) {
+                    showPopup('No files selected. Please select files to assign QC issues.');
+                    return;
+                }
+
+                const fileList = selectedFiles.join(', ');
+                showPopup(`Issues for ${fileList} posted to GitHub`);
+            };
+
+            window.showPopup = function(message) {
+                const popup = document.getElementById('popup');
+                const popupOverlay = document.getElementById('popup-overlay');
+                const popupMessage = document.getElementById('popup-message');
+
+                popupMessage.textContent = message;
+                popup.classList.remove('hidden');
+                popupOverlay.classList.remove('hidden');
+            };
+
+            window.closePopup = function() {
+                const popup = document.getElementById('popup');
+                const popupOverlay = document.getElementById('popup-overlay');
+
+                popup.classList.add('hidden');
+                popupOverlay.classList.add('hidden');
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 name: Deploy Preview to Netlify
 
 on:
-  workflow_dispatch:
+  pull_request:
 permissions:
   statuses: write
   contents: write

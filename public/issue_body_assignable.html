@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>file_1.qmd · Issue #1 · my_organization/my_analysis</title>
+
+    <!-- Starlight Theme Detection Script -->
+    <script>
+        // Sync with Starlight's theme system
+        const getThemePreference = () => {
+            if (typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme')) {
+                return localStorage.getItem('starlight-theme');
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const isDark = getThemePreference() === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+
+        // Listen for theme changes
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'starlight-theme') {
+                document.documentElement.dataset.theme = e.newValue;
+            }
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('starlight-theme')) {
+                document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+            }
+        });
+    </script>
+
+    <!-- GitHub CSS Files -->
+    <link rel="stylesheet" href="issue_thread_files/primer-7218ee22ec7c.css">
+    <link rel="stylesheet" href="issue_thread_files/github-6b526e0b63fc.css">
+    <link rel="stylesheet" href="issue_thread_files/global-6988ccc16eb5.css">
+    <link rel="stylesheet" href="issue_thread_files/light-0eace2597ca3.css">
+
+    <!-- Basic GitHub styling -->
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Starlight-compatible color variables */
+        :root {
+            --sl-color-white: #ffffff;
+            --sl-color-gray-1: #f6f8fa;
+            --sl-color-gray-2: #d1d9e0;
+            --sl-color-gray-3: #656d76;
+            --sl-color-gray-6: #1f2328;
+            --sl-color-black: #000000;
+            --sl-color-accent: #0969da;
+            --sl-color-green: #1a7f37;
+            --sl-color-purple: #8250df;
+        }
+
+        [data-theme='dark'] {
+            --sl-color-white: #0d1117;
+            --sl-color-gray-1: #21262d;
+            --sl-color-gray-2: #30363d;
+            --sl-color-gray-3: #7d8590;
+            --sl-color-gray-6: #e6edf3;
+            --sl-color-black: #ffffff;
+            --sl-color-accent: #58a6ff;
+            --sl-color-green: #3fb950;
+            --sl-color-purple: #a5a3ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--sl-color-gray-6);
+            background-color: var(--sl-color-white);
+            margin: 0;
+            padding: 0;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 24px;
+        }
+
+        .issue-content {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .sidebar {
+            width: 180px;
+            flex-shrink: 0;
+        }
+
+        .header {
+            background-color: #24292f;
+            color: #f0f6fc;
+            padding: 16px 0;
+            margin-bottom: 24px;
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
+            color: #f0f6fc;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .breadcrumb {
+            color: var(--sl-color-accent);
+            text-decoration: none;
+            margin-right: 8px;
+            transition: color 0.2s;
+        }
+
+        .issue-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+
+        .issue-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            line-height: 1.125;
+            color: var(--sl-color-gray-6);
+        }
+
+        .issue-number {
+            color: var(--sl-color-gray-3);
+            font-weight: 400;
+        }
+
+        .issue-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--sl-color-gray-3);
+            margin-top: 8px;
+        }
+
+        .state-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .state-closed {
+            background-color: var(--sl-color-purple);
+            color: var(--sl-color-white);
+        }
+
+        .state-open {
+            background-color: var(--sl-color-green);
+            color: var(--sl-color-white);
+        }
+
+        .avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #656d76;
+        }
+
+        .timeline {
+            margin-top: 24px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--sl-color-gray-3);
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+
+        .timeline-item-content {
+            flex: 1;
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            transition: border-color 0.2s;
+        }
+
+        .timeline-item-header {
+            background-color: var(--sl-color-gray-1);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px 6px 0 0;
+            font-size: 12px;
+            color: var(--sl-color-gray-3);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .timeline-item-body {
+            padding: 16px;
+        }
+
+        .markdown-body {
+            color: var(--sl-color-gray-6);
+        }
+
+        .markdown-body h1 {
+            font-size: 2em;
+            font-weight: 600;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+        }
+
+        .markdown-body h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+        }
+
+        .markdown-body h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+        }
+
+        .markdown-body ul {
+            padding-left: 2em;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body li {
+            margin-bottom: 4px;
+        }
+
+        .markdown-body a {
+            color: var(--sl-color-accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+
+        .markdown-body code {
+            background-color: #afb8c133;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 85%;
+        }
+
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .task-list-item {
+            position: relative;
+            padding-left: 1.5em;
+        }
+
+        .task-list-item-checkbox {
+            position: absolute;
+            left: 0;
+            top: 0.15em;
+        }
+
+        .closed-banner {
+            background-color: var(--sl-color-purple);
+            color: var(--sl-color-white);
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comment-box {
+            background-color: var(--sl-color-gray-1);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            transition: border-color 0.2s;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-section h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--sl-color-gray-3);
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .assignee-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .assignee-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .assignee-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--sl-color-gray-6);
+            transition: color 0.2s;
+        }
+
+        .labels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 7px;
+            height: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .label-ghqc {
+            background-color: #FFCB05;
+            color: #000;
+        }
+
+        .label-main {
+            background-color: #00274C;
+            color: #fff;
+        }
+
+        .milestone-none {
+            color: var(--sl-color-gray-3);
+            font-style: italic;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .milestone-name {
+            color: var(--sl-color-gray-6);
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .add-comment-section {
+            margin-top: 24px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .comment-form-container {
+            flex: 1;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 8px 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--sl-color-gray-6);
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+        }
+
+        .comment-textarea:focus {
+            border-color: var(--sl-color-accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+        }
+
+        [data-theme='dark'] .comment-textarea:focus {
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        .comment-textarea::placeholder {
+            color: var(--sl-color-gray-3);
+        }
+
+        .comment-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+            gap: 8px;
+        }
+
+        .btn-comment {
+            padding: 5px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            color: #ffffff;
+            background-color: var(--sl-color-green);
+            border: 1px solid var(--sl-color-green);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .btn-comment:hover {
+            opacity: 0.9;
+        }
+
+        .btn-comment:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Assignee functionality styles */
+        .no-assignee {
+            color: var(--sl-color-gray-3);
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .assign-link {
+            color: var(--sl-color-accent);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .assign-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Grayout effect for highlighting assignees section */
+        .grayout-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 998;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .grayout-overlay.active {
+            opacity: 1;
+        }
+
+        .sidebar-section.highlighted {
+            position: relative;
+            z-index: 999;
+            background-color: var(--sl-color-white);
+            border: 2px solid var(--sl-color-accent);
+            border-radius: 8px;
+            padding: 16px;
+            margin: -8px;
+            box-shadow: 0 8px 24px rgba(9, 105, 218, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme='dark'] .sidebar-section.highlighted {
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Grayout overlay -->
+    <div class="grayout-overlay" id="grayout-overlay"></div>
+
+    <div class="container">
+        <div style="margin-bottom: 16px;">
+            <a href="#" class="breadcrumb">my_organization</a> /
+            <a href="#" class="breadcrumb">my_analysis</a> /
+            <span>Issues</span> /
+            <span>#1</span>
+        </div>
+
+        <div class="main-content">
+            <div class="issue-content">
+                <div class="issue-header">
+            <h1 class="issue-title">
+                file_1.qmd
+                <span class="issue-number">#1</span>
+            </h1>
+
+            <div class="issue-meta">
+                <span class="state-badge state-open">
+                    ● Open
+                </span>
+                <span>Author opened this issue now</span>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <!-- Initial Issue Comment -->
+            <div class="timeline-item">
+                <div class="timeline-item-avatar">
+                    <img src="issue_thread_files/Author.png" alt="Author" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="timeline-item-content">
+                    <div class="timeline-item-header">
+                        <strong>Author</strong> commented
+                    </div>
+                    <div class="timeline-item-body">
+                        <div class="markdown-body">
+                            <h1>Metadata</h1>
+                            <ul>
+                                <li>initial qc commit: <a href="#"><code>d148e35</code></a></li>
+                                <li>git branch: <a href="#">analysis</a></li>
+                                <li>author: Author <a href="mailto:author@a2-ai.com">author@a2-ai.com</a></li>
+                                <li><a href="#">file contents at initial qc commit</a></li>
+                            </ul>
+
+                            <h1>Report</h1>
+                            <h3>Table of Contents</h3>
+                            <ul class="task-list">
+                                <li class="task-list-item">
+                                    <input type="checkbox" class="task-list-item-checkbox" enabled unchecked> Does the file run without error?
+                                </li>
+                                <li class="task-list-item">
+                                    <input type="checkbox" class="task-list-item-checkbox" enabled unchecked> Are the results sensible?
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Comment Section -->
+            <div class="add-comment-section">
+                <div class="comment-avatar">
+                    <img src="issue_thread_files/QCer.png" alt="Your avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="comment-form-container">
+                    <textarea class="comment-textarea" placeholder="Leave a comment" disabled></textarea>
+                    <div class="comment-actions">
+                        <button class="btn-comment" disabled>Comment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section" id="assignees-section">
+                    <h3>Assignees</h3>
+                    <div id="assignee-content">
+                        <div class="no-assignee">
+                            No one - <a href="#" class="assign-link" onclick="assignYourself()">Assign yourself</a>
+                        </div>
+                        <div class="assignee-item hidden" id="assigned-item">
+                            <img src="issue_thread_files/QCer.png" alt="QCer" class="assignee-avatar">
+                            <span class="assignee-name">QCer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Labels</h3>
+                    <div class="labels-container">
+                        <span class="label label-ghqc">ghqc</span>
+                        <span class="label label-main">main</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Milestone</h3>
+                    <span class="milestone-name">Milestone 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight assignees section on page load
+            highlightAssigneesSection();
+        });
+
+        function assignYourself() {
+            const noAssigneeDiv = document.querySelector('.no-assignee');
+            const assignedItem = document.getElementById('assigned-item');
+
+            // Hide the "No one - Assign yourself" message
+            noAssigneeDiv.classList.add('hidden');
+
+            // Show the assigned QCer
+            assignedItem.classList.remove('hidden');
+
+            // Remove highlighting after assignment
+            removeHighlight();
+        }
+
+        function highlightAssigneesSection() {
+            const assigneesSection = document.getElementById('assignees-section');
+            const grayoutOverlay = document.getElementById('grayout-overlay');
+
+            // Add highlighting classes
+            assigneesSection.classList.add('highlighted');
+            grayoutOverlay.classList.add('active');
+        }
+
+        function removeHighlight() {
+            const assigneesSection = document.getElementById('assignees-section');
+            const grayoutOverlay = document.getElementById('grayout-overlay');
+
+            // Remove highlighting classes
+            assigneesSection.classList.remove('highlighted');
+            grayoutOverlay.classList.remove('active');
+        }
+    </script>
+</body>
+</html>

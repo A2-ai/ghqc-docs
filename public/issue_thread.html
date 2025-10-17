@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scripts/qc2.qmd · Issue #28 · ghqc-example/ghqc-docs-repo</title>
+
+    <!-- GitHub CSS Files -->
+    <link rel="stylesheet" href="issue_thread_files/primer-7218ee22ec7c.css">
+    <link rel="stylesheet" href="issue_thread_files/github-6b526e0b63fc.css">
+    <link rel="stylesheet" href="issue_thread_files/global-6988ccc16eb5.css">
+    <link rel="stylesheet" href="issue_thread_files/light-0eace2597ca3.css">
+
+    <!-- Basic GitHub styling -->
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #1f2328;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 32px;
+        }
+
+        .issue-content {
+            flex: 1;
+            max-width: 768px;
+        }
+
+        .sidebar {
+            width: 256px;
+            flex-shrink: 0;
+        }
+
+        .header {
+            background-color: #24292f;
+            color: #f0f6fc;
+            padding: 16px 0;
+            margin-bottom: 24px;
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title {
+            color: #f0f6fc;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .breadcrumb {
+            color: #7c3aed;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+
+        .issue-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+
+        .issue-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            line-height: 1.125;
+        }
+
+        .issue-number {
+            color: #656d76;
+            font-weight: 400;
+        }
+
+        .issue-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #656d76;
+            margin-top: 8px;
+        }
+
+        .state-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .state-closed {
+            background-color: #8250df;
+            color: #ffffff;
+        }
+
+        .avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #656d76;
+        }
+
+        .timeline {
+            margin-top: 24px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item-avatar {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #656d76;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .timeline-item-avatar::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            width: 2px;
+            height: 100px;
+            background-color: #d1d9e0;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .timeline-item:last-child .timeline-item-avatar::before {
+            display: none;
+        }
+
+        .timeline-item-content {
+            flex: 1;
+            border: 1px solid #d1d9e0;
+            border-radius: 6px;
+        }
+
+        .timeline-item-header {
+            background-color: #f6f8fa;
+            padding: 8px 16px;
+            border-bottom: 1px solid #d1d9e0;
+            border-radius: 6px 6px 0 0;
+            font-size: 12px;
+            color: #656d76;
+        }
+
+        .timeline-item-body {
+            padding: 16px;
+        }
+
+        .markdown-body {
+            color: #1f2328;
+        }
+
+        .markdown-body h1 {
+            font-size: 2em;
+            font-weight: 600;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid #d1d9e0;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            padding-bottom: 0.3em;
+            border-bottom: 1px solid #d1d9e0;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body ul {
+            padding-left: 2em;
+            margin-bottom: 16px;
+        }
+
+        .markdown-body li {
+            margin-bottom: 4px;
+        }
+
+        .markdown-body a {
+            color: #0969da;
+            text-decoration: none;
+        }
+
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+
+        .markdown-body code {
+            background-color: #afb8c133;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 85%;
+        }
+
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .task-list-item {
+            position: relative;
+            padding-left: 1.5em;
+        }
+
+        .task-list-item-checkbox {
+            position: absolute;
+            left: 0;
+            top: 0.15em;
+        }
+
+        .closed-banner {
+            background-color: #8250df;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .comment-box {
+            background-color: #fff8c5;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #d1d9e0;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-section h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #656d76;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+        }
+
+        .assignee-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        .assignee-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .assignee-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2328;
+        }
+
+        .labels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .label {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 7px;
+            height: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .label-ghqc {
+            background-color: #FFCB05;
+            color: #000;
+        }
+
+        .label-main {
+            background-color: #00274C;
+            color: #fff;
+        }
+
+        .milestone-none {
+            color: #656d76;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .milestone-name {
+            color: #1f2328;
+            font-weight: 500;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <div class="header">
+        <div class="header-content">
+            <a href="#" class="header-title">GitHub Issue Thread</a>
+        </div>
+    </div> -->
+
+    <div class="container">
+        <div style="margin-bottom: 16px;">
+            <a href="#" class="breadcrumb">my_org</a> /
+            <a href="#" class="breadcrumb">my_analysis-</a> /
+            <span>Issues</span> /
+            <span>#1</span>
+        </div>
+
+        <div class="main-content">
+            <div class="issue-content">
+                <div class="issue-header">
+            <h1 class="issue-title">
+                scripts/file_1.qmd
+                <span class="issue-number">#1</span>
+            </h1>
+
+            <div class="issue-meta">
+                <span class="state-badge state-closed">
+                    ✓ Closed
+                </span>
+                <span>Author opened this issue</span>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <!-- Initial Issue Comment -->
+            <div class="timeline-item">
+                <div class="timeline-item-avatar">
+                    <img src="issue_thread_files/Author.png" alt="Author" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="timeline-item-content">
+                    <div class="timeline-item-header">
+                        <strong>Author</strong> commented
+                    </div>
+                    <div class="timeline-item-body">
+                        <div class="markdown-body">
+                            <h1>Metadata</h1>
+                            <ul>
+                                <li>initial qc commit: <a href="#"><code>eb37771</code></a></li>
+                                <li>git branch: <a href="#">main</a></li>
+                                <li>author: Author <a href="mailto:author@a2-ai.com">author@a2-ai.com</a></li>
+                                <li><a href="#">file contents at initial qc commit</a></li>
+                            </ul>
+
+                            <h1>Report</h1>
+                            <p>Note: edit checklist items as needed</p>
+
+                            <h3>Table of Contents</h3>
+                            <ul class="task-list">
+                                <li class="task-list-item">
+                                    <input type="checkbox" class="task-list-item-checkbox" disabled checked> Does the file run without error?
+                                </li>
+                                <li class="task-list-item">
+                                    <input type="checkbox" class="task-list-item-checkbox" disabled checked> Are the results sensible?
+                                </li>
+                                <li class="task-list-item">
+                                    <input type="checkbox" class="task-list-item-checkbox" disabled checked> Is the code well-documented?
+                                </li>
+                                <li class="task-list-item">
+                                    <input type="checkbox" class="task-list-item-checkbox" disabled checked> Does the file follow coding standards?
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comment about plot on line 371 -->
+            <div class="timeline-item">
+                <div class="timeline-item-avatar">
+                    <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="timeline-item-content">
+                    <div class="timeline-item-header">
+                        <strong>QCer</strong> commented
+                    </div>
+                    <div class="timeline-item-body">
+                        <div class="markdown-body">
+                            <p>On line 371, the commented out plot is relevant and should be included</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-item-avatar">
+                    <img src="issue_thread_files/Author.png" alt="Author" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="timeline-item-content">
+                    <div class="timeline-item-header">
+                        <strong>Author</strong> commented
+                    </div>
+                    <div class="timeline-item-body">
+                        <div class="markdown-body">
+                            <h1>QC Notification</h1>
+
+                            <p>Hi QCer! I wasn't sure, so I left a note in case we did want the plot</p>
+
+                            <h2>Metadata</h2>
+                            <ul>
+                                <li>current commit: <a href="#"><code>d148535</code></a></li>
+                                <li>previous commit: <a href="#"><code>eb37771</code></a></li>
+                                <li><a href="#">commit comparison</a></li>
+                            </ul>
+
+                            <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto"><pre class="notranslate"><span class="pl-mdr">@@ -12,7 +12,7 @@</span>
+# Data analysis
+df <- read_data()
+<span class="pl-md"><span class="pl-md">-</span># plot(df$x, df$y)</span>
+<span class="pl-mi1"><span class="pl-mi1">+</span>plot(df$x, df$y)</span>
+
+# Process results
+save_output(df)</pre><div class="zeroclipboard-container position-absolute right-0 top-0">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="@@ - previous: lines 370-378 @@
+@@ + current:  lines 370-378 @@
+  370 # Study X dose-normalized stratified by dose route (1=IV, 2 = SC)
+  371 # HELP: no dose route, so this is irrelevant, right?
+- 372 # ggplot(dat %&gt;% filter(EVID == 0 &amp; is.na(C) &amp; STUDY == 'X'),
++ 372 ggplot(dat %&gt;% filter(EVID == 0 &amp; is.na(C) &amp; STUDY == 'X'),
+- 373 # aes(DTIM, DV/DOSEA, col = factor(DOSE))) +
++ 373 aes(DTIM, DV/DOSEA, col = factor(DOSE))) +
+- 374 #   geom_smooth(se = FALSE) +
++ 374   geom_smooth(se = FALSE) +
+- 375 #   geom_point() +
++ 375   geom_point() +
+- 376 #   facet_wrap(~ROUTE, scales = &quot;free&quot;)
++ 376   facet_wrap(~ROUTE, scales = &quot;free&quot;)
+  377 ```
+  378                                                                  " tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon m-2">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none m-2">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QC Approved Comment -->
+            <div class="timeline-item">
+                <div class="timeline-item-avatar">
+                    <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="timeline-item-content">
+                    <div class="timeline-item-header">
+                        <strong>QCer</strong> commented
+                    </div>
+                    <div class="timeline-item-body">
+                        <div class="markdown-body">
+                            <h1>QC Approved</h1>
+
+                            <h2>Metadata</h2>
+                            <ul>
+                                <li>approved qc commit: <a href="#"><code>d148535</code></a></li>
+                                <li><a href="#">file contents at approved qc commit</a></li>
+                                <li><a href="#">initial qc commit vs. approved qc commit</a></li>
+                            </ul>
+
+                            <p>✅ Plot sections have been uncommented and included as requested. Code quality review complete.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Closed Event -->
+            <div class="timeline-item">
+                <div class="timeline-item-avatar">
+                    <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+                </div>
+                <div class="closed-banner">
+                    <span>✓</span>
+                    <span><strong>QCer</strong> closed this as <strong>completed</strong></span>
+                </div>
+            </div>
+            </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Assignees</h3>
+                    <div class="assignee-item">
+                        <img src="issue_thread_files/QCer.png" alt="QCer" class="assignee-avatar">
+                        <span class="assignee-name">QCer</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Labels</h3>
+                    <div class="labels-container">
+                        <span class="label label-ghqc">ghqc</span>
+                        <span class="label label-main">main</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Milestone</h3>
+                    <span class="milestone-name">Milestone 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
