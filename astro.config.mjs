@@ -32,7 +32,8 @@ export default defineConfig({
 						{ label: 'Introduction', slug: 'workflow/introduction' },
 						{ label: 'Assign Files for QC', slug: 'workflow/assign' },
 						{ label: 'Review QC Files', slug: 'workflow/review' },
-						{ label: 'Notify Files Changes', slug: 'workflow/notify' },
+						{ label: 'Notify File Changes', slug: 'workflow/notify' },
+						{ label: 'Approve QCed Files', slug: 'workflow/approve' },
 					]
 				}
 			],

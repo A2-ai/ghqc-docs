@@ -140,6 +140,21 @@
             box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
         }
 
+        .dropdown optgroup {
+            color: var(--sl-color-gray-3);
+            font-size: 12px;
+            font-weight: 600;
+            font-style: normal;
+            transition: color 0.2s;
+        }
+
+        .dropdown option {
+            color: var(--sl-color-gray-6);
+            font-size: 14px;
+            font-weight: normal;
+            transition: color 0.2s;
+        }
+
         .right-column {
             flex: 1;
             background-color: var(--sl-color-white);
@@ -344,11 +359,16 @@
                 <div class="dropdown-section">
                     <div class="dropdown-label">Select Issue</div>
                     <select id="issue-select" class="dropdown">
-                        <option value="issue1" data-milestone="milestone1">file_1.qmd #1</option>
-                        <option value="issue2" data-milestone="milestone1">file_2.qmd #2</option>
-                        <option value="issue3" data-milestone="milestone2">file_3.qmd #3</option>
-                        <option value="issue4" data-milestone="milestone2">file_1.qmd #4</option>
-                        <option value="issue5" data-milestone="milestone1">file_4.qmd #5</option>
+                        <option value="">Select an issue...</option>
+                        <optgroup label="Milestone 1:" id="milestone1-group">
+                            <option value="issue1" data-milestone="milestone1">file_1.qmd #1</option>
+                            <option value="issue2" data-milestone="milestone1">file_2.qmd #2</option>
+                            <option value="issue5" data-milestone="milestone1">file_4.qmd #5</option>
+                        </optgroup>
+                        <optgroup label="Milestone 2:" id="milestone2-group">
+                            <option value="issue4" data-milestone="milestone2">file_1.qmd #4</option>
+                            <option value="issue3" data-milestone="milestone2">file_3.qmd #3</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -388,13 +408,15 @@
                         previous: { sha: '9f8e7d6', message: 'Initial analysis setup' }
                     },
                     diff: `@@ -12,7 +12,7 @@
- # Data preprocessing
- data <- read.csv("input.csv")
--data$group <- factor(data$group)
-+data$group <- factor(...levels)
+# Data analysis
+df <- read_data()
+-# NOTE: Include plot?
+-# QC: Yes, let's include it
+-# plot(df$x, df$y)
++plot(df$x, df$y)
 
- # Analysis
- model <- lm(outcome ~ group)`
+# Process results
+save_output(df)`
                 },
                 issue2: {
                     title: 'file_2.qmd #2',
@@ -480,7 +502,21 @@
 
             function filterIssueOptions() {
                 const selectedMilestone = milestoneFilter.value;
+                const optgroups = issueSelect.querySelectorAll('optgroup');
                 const options = issueSelect.querySelectorAll('option[data-milestone]');
+
+                optgroups.forEach(optgroup => {
+                    const groupId = optgroup.id;
+                    const milestoneKey = groupId.replace('-group', '');
+
+                    if (selectedMilestone === 'all' || selectedMilestone === milestoneKey) {
+                        optgroup.style.display = '';
+                        optgroup.hidden = false;
+                    } else {
+                        optgroup.style.display = 'none';
+                        optgroup.hidden = true;
+                    }
+                });
 
                 options.forEach(option => {
                     if (selectedMilestone === 'all' || option.dataset.milestone === selectedMilestone) {

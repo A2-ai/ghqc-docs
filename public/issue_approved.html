@@ -102,28 +102,6 @@
             flex-shrink: 0;
         }
 
-        .header {
-            background-color: #24292f;
-            color: #f0f6fc;
-            padding: 16px 0;
-            margin-bottom: 24px;
-        }
-
-        .header-content {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 16px;
-            display: flex;
-            align-items: center;
-        }
-
-        .header-title {
-            color: #f0f6fc;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 20px;
-        }
-
         .breadcrumb {
             color: var(--sl-color-accent);
             text-decoration: none;
@@ -171,18 +149,6 @@
         .state-closed {
             background-color: var(--sl-color-purple);
             color: var(--sl-color-white);
-        }
-
-        .state-open {
-            background-color: var(--sl-color-green);
-            color: var(--sl-color-white);
-        }
-
-        .avatar {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #656d76;
         }
 
         .timeline {
@@ -282,6 +248,10 @@
             font-size: 85%;
         }
 
+        .markdown-body p {
+            margin-bottom: 16px;
+        }
+
         .task-list {
             list-style: none;
             padding-left: 0;
@@ -307,15 +277,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .comment-box {
-            background-color: var(--sl-color-gray-1);
-            border: 1px solid var(--sl-color-gray-2);
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 16px;
-            transition: background-color 0.2s, border-color 0.2s;
         }
 
         .sidebar-section {
@@ -386,13 +347,6 @@
             color: #fff;
         }
 
-        .milestone-none {
-            color: var(--sl-color-gray-3);
-            font-style: italic;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-
         .milestone-name {
             color: var(--sl-color-gray-6);
             font-weight: 500;
@@ -400,143 +354,43 @@
             transition: color 0.2s;
         }
 
-        .add-comment-section {
-            margin-top: 24px;
-            display: flex;
-            gap: 16px;
+        /* GitHub diff integration */
+        .highlight {
+            margin-bottom: 16px;
         }
 
-        .comment-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            flex-shrink: 0;
+        /* Dark mode overrides for code blocks */
+        [data-theme='dark'] .highlight {
+            background-color: var(--sl-color-gray-1);
         }
 
-        .comment-form-container {
-            flex: 1;
-        }
-
-        .comment-textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 8px 12px;
-            font-size: 14px;
-            line-height: 1.5;
+        [data-theme='dark'] .highlight pre {
+            background-color: var(--sl-color-gray-1);
             color: var(--sl-color-gray-6);
-            background-color: var(--sl-color-white);
-            border: 1px solid var(--sl-color-gray-2);
-            border-radius: 6px;
-            resize: vertical;
-            font-family: inherit;
-            box-sizing: border-box;
-            transition: color 0.2s, background-color 0.2s, border-color 0.2s;
         }
 
-        .comment-textarea:focus {
-            border-color: var(--sl-color-accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+        [data-theme='dark'] .highlight code {
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
         }
 
-        [data-theme='dark'] .comment-textarea:focus {
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        /* Dark mode diff colors */
+        [data-theme='dark'] .pl-md {
+            background-color: rgba(248, 81, 73, 0.15);
+            color: #ff7b72;
         }
 
-        .comment-textarea::placeholder {
-            color: var(--sl-color-gray-3);
+        [data-theme='dark'] .pl-mi1 {
+            background-color: rgba(63, 185, 80, 0.15);
+            color: #7ee787;
         }
 
-        .comment-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 8px;
-            gap: 8px;
-        }
-
-        .btn-comment {
-            padding: 5px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 20px;
-            color: #ffffff;
-            background-color: var(--sl-color-green);
-            border: 1px solid var(--sl-color-green);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .btn-comment:hover {
-            opacity: 0.9;
-        }
-
-        .btn-comment:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Assignee functionality styles */
-        .no-assignee {
-            color: var(--sl-color-gray-3);
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-
-        .assign-link {
-            color: var(--sl-color-accent);
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .assign-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Grayout effect for highlighting assignees section */
-        .grayout-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: 998;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .grayout-overlay.active {
-            opacity: 1;
-        }
-
-        .sidebar-section.highlighted {
-            position: relative;
-            z-index: 999;
-            background-color: var(--sl-color-white);
-            border: 2px solid var(--sl-color-accent);
-            border-radius: 8px;
-            padding: 16px;
-            margin: -8px;
-            box-shadow: 0 8px 24px rgba(9, 105, 218, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        [data-theme='dark'] .sidebar-section.highlighted {
-            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.2);
-        }
-
-        .hidden {
-            display: none;
+        [data-theme='dark'] .pl-mdr {
+            color: #a5a3ff;
         }
     </style>
 </head>
 <body>
-    <!-- Grayout overlay -->
-    <div class="grayout-overlay" id="grayout-overlay"></div>
-
     <div class="container">
         <div style="margin-bottom: 16px;">
             <a href="#" class="breadcrumb">my_organization</a> /
@@ -548,81 +402,179 @@
         <div class="main-content">
             <div class="issue-content">
                 <div class="issue-header">
-            <h1 class="issue-title">
-                file_1.qmd
-                <span class="issue-number">#1</span>
-            </h1>
+                    <h1 class="issue-title">
+                        file_1.qmd
+                        <span class="issue-number">#1</span>
+                    </h1>
 
-            <div class="issue-meta">
-                <span class="state-badge state-open">
-                    ● Open
-                </span>
-                <span>Author opened this issue now</span>
-            </div>
-        </div>
-
-        <div class="timeline">
-            <!-- Initial Issue Comment -->
-            <div class="timeline-item">
-                <div class="timeline-item-avatar">
-                    <img src="issue_thread_files/Author.png" alt="Author" style="width: 40px; height: 40px; border-radius: 50%;">
-                </div>
-                <div class="timeline-item-content">
-                    <div class="timeline-item-header">
-                        <strong>Author</strong> commented
+                    <div class="issue-meta">
+                        <span class="state-badge state-closed">
+                            ✓ Closed
+                        </span>
+                        <span>Author opened this issue • QC Approved</span>
                     </div>
-                    <div class="timeline-item-body">
-                        <div class="markdown-body">
-                            <h1>Metadata</h1>
-                            <ul>
-                                <li>initial qc commit: <a href="#"><code>d148e35</code></a></li>
-                                <li>git branch: <a href="#">analysis</a></li>
-                                <li>author: Author <a href="mailto:author@a2-ai.com">author@a2-ai.com</a></li>
-                                <li><a href="#">file contents at initial qc commit</a></li>
-                            </ul>
+                </div>
 
-                            <h1>Report</h1>
-                            <h3>Table of Contents</h3>
-                            <ul class="task-list">
-                                <li class="task-list-item">
-                                    <input type="checkbox" class="task-list-item-checkbox" enabled unchecked> Does the file run without error?
-                                </li>
-                                <li class="task-list-item">
-                                    <input type="checkbox" class="task-list-item-checkbox" enabled unchecked> Are the results sensible?
-                                </li>
-                            </ul>
+                <div class="timeline">
+                    <!-- Initial Issue Comment -->
+                    <div class="timeline-item">
+                        <div class="timeline-item-avatar">
+                            <img src="issue_thread_files/Author.png" alt="Author" style="width: 40px; height: 40px; border-radius: 50%;">
+                        </div>
+                        <div class="timeline-item-content">
+                            <div class="timeline-item-header">
+                                <strong>Author</strong> commented
+                            </div>
+                            <div class="timeline-item-body">
+                                <div class="markdown-body">
+                                    <h1>Metadata</h1>
+                                    <ul>
+                                        <li>initial qc commit: <a href="#"><code>d148e35</code></a></li>
+                                        <li>git branch: <a href="#">analysis</a></li>
+                                        <li>author: Author <a href="mailto:author@a2-ai.com">author@a2-ai.com</a></li>
+                                        <li><a href="#">file contents at initial qc commit</a></li>
+                                    </ul>
+
+                                    <h1>Report</h1>
+                                    <h3>Table of Contents</h3>
+                                    <ul class="task-list">
+                                        <li class="task-list-item">
+                                            <input type="checkbox" class="task-list-item-checkbox" disabled checked> Does the file run without error?
+                                        </li>
+                                        <li class="task-list-item">
+                                            <input type="checkbox" class="task-list-item-checkbox" disabled checked> Are the results sensible?
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QC Notification Comment -->
+                    <div class="timeline-item">
+                        <div class="timeline-item-avatar">
+                            <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+                        </div>
+                        <div class="timeline-item-content">
+                            <div class="timeline-item-header">
+                                <strong>QCer</strong> commented
+                            </div>
+                            <div class="timeline-item-body">
+                                <div class="markdown-body">
+                                    <h1>QC Notification</h1>
+
+                                    <p><strong><u>@Author</u></strong></p>
+                                    <p>Answering your question around plots</p>
+
+                                    <h2>Metadata</h2>
+                                    <ul>
+                                        <li>current commit: <a href="#"><code>a7f2b1c</code></a></li>
+                                        <li>previous commit: <a href="#"><code>d148e35</code></a></li>
+                                        <li><a href="#">commit comparison</a></li>
+                                    </ul>
+
+                                    <h2>File Difference</h2>
+                                    <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto">
+                                        <pre class="notranslate"><code><span class="pl-mdr">@@ -12,7 +12,7 @@</span>
+# Data analysis
+df <- read_data()
+# NOTE: Include plot?
+<span class="pl-mi1"><span class="pl-mi1">+</span># QC: Yes, let's include it</span>
+# plot(df$x, df$y)
+
+# Process results
+save_output(df)</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Author Notification Response -->
+                    <div class="timeline-item">
+                        <div class="timeline-item-avatar">
+                            <img src="issue_thread_files/Author.png" alt="Author" style="width: 40px; height: 40px; border-radius: 50%;">
+                        </div>
+                        <div class="timeline-item-content">
+                            <div class="timeline-item-header">
+                                <strong>Author</strong> commented
+                            </div>
+                            <div class="timeline-item-body">
+                                <div class="markdown-body">
+                                    <h1>QC Notification</h1>
+
+                                    <p>Hi QCer! I wasn't sure, so I thank you for letting me know</p>
+
+                                    <h2>Metadata</h2>
+                                    <ul>
+                                        <li>current commit: <a href="#"><code>a3b2c1d</code></a></li>
+                                        <li>previous commit: <a href="#"><code>a7f2b1c</code></a></li>
+                                        <li><a href="#">commit comparison</a></li>
+                                    </ul>
+
+                                    <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto">
+                                        <pre class="notranslate"><code><span class="pl-mdr">@@ -12,7 +12,7 @@</span>
+# Data analysis
+df <- read_data()
+<span class="pl-md"><span class="pl-md">-</span># NOTE: Include plot?</span>
+<span class="pl-md"><span class="pl-md">-</span># QC: Yes, let's include</span>
+<span class="pl-md"><span class="pl-md">-</span># plot(df$x, df$y)</span>
+<span class="pl-mi1"><span class="pl-mi1">+</span>plot(df$x, df$y)</span>
+
+# Process results
+save_output(df)</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QC Approved Comment -->
+                    <div class="timeline-item">
+                        <div class="timeline-item-avatar">
+                            <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+                        </div>
+                        <div class="timeline-item-content">
+                            <div class="timeline-item-header">
+                                <strong>QCer</strong> commented
+                            </div>
+                            <div class="timeline-item-body">
+                                <div class="markdown-body">
+                                    <h1>QC Approved</h1>
+
+                                    <p>✅ Plot sections have been uncommented and included as requested. Code quality review complete.</p>
+
+                                    <h2>Metadata</h2>
+                                    <ul>
+                                        <li>approved qc commit: <a href="#"><code>a3b2c1d</code></a></li>
+                                        <li><a href="#">file contents at approved qc commit</a></li>
+                                        <li><a href="#">initial qc commit vs. approved qc commit</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Closed Event -->
+                    <div class="timeline-item">
+                        <div class="timeline-item-avatar">
+                            <img src="issue_thread_files/QCer.png" alt="QCer" style="width: 40px; height: 40px; border-radius: 50%;">
+                        </div>
+                        <div class="closed-banner">
+                            <span>✓</span>
+                            <span><strong>QCer</strong> closed this as <strong>completed</strong></span>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Add Comment Section -->
-            <div class="add-comment-section">
-                <div class="comment-avatar">
-                    <img src="issue_thread_files/QCer.png" alt="Your avatar" style="width: 40px; height: 40px; border-radius: 50%;">
-                </div>
-                <div class="comment-form-container">
-                    <textarea class="comment-textarea" placeholder="Leave a comment" disabled></textarea>
-                    <div class="comment-actions">
-                        <button class="btn-comment" disabled>Comment</button>
-                    </div>
-                </div>
-            </div>
-        </div>
             </div>
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <div class="sidebar-section" id="assignees-section">
+                <div class="sidebar-section">
                     <h3>Assignees</h3>
-                    <div id="assignee-content">
-                        <div class="no-assignee">
-                            No one - <a href="#" class="assign-link" onclick="assignYourself()">Assign yourself</a>
-                        </div>
-                        <div class="assignee-item hidden" id="assigned-item">
-                            <img src="issue_thread_files/QCer.png" alt="QCer" class="assignee-avatar">
-                            <span class="assignee-name">QCer</span>
-                        </div>
+                    <div class="assignee-item">
+                        <img src="issue_thread_files/QCer.png" alt="QCer" class="assignee-avatar">
+                        <span class="assignee-name">QCer</span>
                     </div>
                 </div>
 
@@ -641,44 +593,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Highlight assignees section on page load
-            highlightAssigneesSection();
-        });
-
-        function assignYourself() {
-            const noAssigneeDiv = document.querySelector('.no-assignee');
-            const assignedItem = document.getElementById('assigned-item');
-
-            // Hide the "No one - Assign yourself" message
-            noAssigneeDiv.classList.add('hidden');
-
-            // Show the assigned QCer
-            assignedItem.classList.remove('hidden');
-
-            // Remove highlighting after assignment
-            removeHighlight();
-        }
-
-        function highlightAssigneesSection() {
-            const assigneesSection = document.getElementById('assignees-section');
-            const grayoutOverlay = document.getElementById('grayout-overlay');
-
-            // Add highlighting classes
-            assigneesSection.classList.add('highlighted');
-            grayoutOverlay.classList.add('active');
-        }
-
-        function removeHighlight() {
-            const assigneesSection = document.getElementById('assignees-section');
-            const grayoutOverlay = document.getElementById('grayout-overlay');
-
-            // Remove highlighting classes
-            assigneesSection.classList.remove('highlighted');
-            grayoutOverlay.classList.remove('active');
-        }
-    </script>
 </body>
 </html>

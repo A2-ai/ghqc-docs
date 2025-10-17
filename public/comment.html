@@ -228,7 +228,7 @@
                         <h1>QC Notification</h1>
 
                         <p><strong><u>@Author</u></strong></p>
-                        <p>Some feedback</p>
+                        <p>Answering your question around plots</p>
 
                         <h2>Metadata</h2>
                         <ul>
@@ -239,15 +239,15 @@
 
                         <h2>File Difference</h2>
                         <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto">
-                            <pre class="notranslate"><code><span class="pl-mdr">@@ -15,6 +15,8 @@</span>
-# Data analysis function
-def analyze_data(df):
-    results = []
-<span class="pl-mi1"><span class="pl-mi1">+</span>   # TODO: Add validation</span>
-<span class="pl-mi1"><span class="pl-mi1">+</span>   # Check data quality first</span>
+                            <pre class="notranslate"><code><span class="pl-mdr">@@ -12,7 +12,7 @@</span>
+# Data analysis
+df <- read_data()
+# NOTE: Include plot?
+<span class="pl-mi1"><span class="pl-mi1">+</span># QC: Yes, let's include it</span>
+# plot(df$x, df$y)
 
-    for col in df.columns:
-        mean_val = df[col].mean()</code></pre>
+# Process results
+save_output(df)</code></pre>
                         </div>
                     </div>
                 </div>

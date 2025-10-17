@@ -352,25 +352,25 @@
 
     <div class="container">
         <div style="margin-bottom: 16px;">
-            <a href="#" class="breadcrumb">ghqc-example</a> /
-            <a href="#" class="breadcrumb">ghqc-docs-repo</a> /
+            <a href="#" class="breadcrumb">my_org</a> /
+            <a href="#" class="breadcrumb">my_analysis-</a> /
             <span>Issues</span> /
-            <span>#28</span>
+            <span>#1</span>
         </div>
 
         <div class="main-content">
             <div class="issue-content">
                 <div class="issue-header">
             <h1 class="issue-title">
-                scripts/qc2.qmd
-                <span class="issue-number">#28</span>
+                scripts/file_1.qmd
+                <span class="issue-number">#1</span>
             </h1>
 
             <div class="issue-meta">
                 <span class="state-badge state-closed">
                     ✓ Closed
                 </span>
-                <span>wes opened this issue • QC Approved</span>
+                <span>Author opened this issue</span>
             </div>
         </div>
 
@@ -455,22 +455,14 @@
                                 <li><a href="#">commit comparison</a></li>
                             </ul>
 
-                            <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto"><pre class="notranslate"><span class="pl-mdr">@@ - previous: lines 370-378 @@</span>
-<span class="pl-mdr">@@ + current:  lines 370-378 @@</span>
-  370 # Study X dose-normalized stratified by dose route (1=IV, 2 = SC)
-  371 # HELP: no dose route, so this is irrelevant, right?
-<span class="pl-md"><span class="pl-md">-</span> 372 # ggplot(dat %&gt;% filter(EVID == 0 &amp; is.na(C) &amp; STUDY == 'X'),    </span>
-<span class="pl-mi1"><span class="pl-mi1">+</span> 372 ggplot(dat %&gt;% filter(EVID == 0 &amp; is.na(C) &amp; STUDY == 'X'),      </span>
-<span class="pl-md"><span class="pl-md">-</span> 373 # aes(DTIM, DV/DOSEA, col = factor(DOSE))) +                     </span>
-<span class="pl-mi1"><span class="pl-mi1">+</span> 373 aes(DTIM, DV/DOSEA, col = factor(DOSE))) +                       </span>
-<span class="pl-md"><span class="pl-md">-</span> 374 #   geom_smooth(se = FALSE) +                                    </span>
-<span class="pl-mi1"><span class="pl-mi1">+</span> 374   geom_smooth(se = FALSE) +                                      </span>
-<span class="pl-md"><span class="pl-md">-</span> 375 #   geom_point() +                                               </span>
-<span class="pl-mi1"><span class="pl-mi1">+</span> 375   geom_point() +                                                 </span>
-<span class="pl-md"><span class="pl-md">-</span> 376 #   facet_wrap(~ROUTE, scales = "free")                          </span>
-<span class="pl-mi1"><span class="pl-mi1">+</span> 376   facet_wrap(~ROUTE, scales = "free")                            </span>
-  377 ```
-  378                                                                  </pre><div class="zeroclipboard-container position-absolute right-0 top-0">
+                            <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto"><pre class="notranslate"><span class="pl-mdr">@@ -12,7 +12,7 @@</span>
+# Data analysis
+df <- read_data()
+<span class="pl-md"><span class="pl-md">-</span># plot(df$x, df$y)</span>
+<span class="pl-mi1"><span class="pl-mi1">+</span>plot(df$x, df$y)</span>
+
+# Process results
+save_output(df)</pre><div class="zeroclipboard-container position-absolute right-0 top-0">
     <clipboard-copy aria-label="Copy" class="ClipboardButton btn js-clipboard-copy m-2 p-0 tooltipped-no-delay" data-copy-feedback="Copied!" data-tooltip-direction="w" value="@@ - previous: lines 370-378 @@
 @@ + current:  lines 370-378 @@
   370 # Study X dose-normalized stratified by dose route (1=IV, 2 = SC)
