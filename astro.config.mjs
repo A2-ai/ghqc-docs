@@ -35,6 +35,14 @@ export default defineConfig({
 						{ label: 'Notify File Changes', slug: 'workflow/notify' },
 						{ label: 'Approve QCed Files', slug: 'workflow/approve' },
 					]
+				},
+				{
+					label: 'Admin Guide',
+					collapsed: true,
+					items: [
+						{ label: 'Ecosystem Architecture', slug: 'admin_guide/ecosystem_arch' },
+						{ label: 'Configuration Repository', slug: 'admin_guide/configuration' },
+					]
 				}
 			],
 		}),
