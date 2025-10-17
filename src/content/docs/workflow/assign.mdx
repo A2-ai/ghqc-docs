@@ -26,7 +26,7 @@ Additionally, the Assign app determines your local *branch*, *commit*, and the f
 
 The Assign app contains many features which are useful to orient users while using the app.
 
-Below is a screenshot of the app on open. You can see its similar to the mock UI above, where you are able to provide
+Below is a screenshot of the app on open. You can see it's similar to the mock UI above, where you are able to provide
 a milestone name, description, select files from a file tree, and assign QC files, but it also provides many additional useful features.
 
 ![](../../../assets/workflow/assign_app_open.png)
@@ -40,7 +40,7 @@ a milestone name, description, select files from a file tree, and assign QC file
 ### Existing Milestones
 
 The Assign app allows users to create new milestones as well as add new issues to existing milestones.
-Within a milestone, `ghqc` enforces that a file can only assigned to one file to ensure reviews do not conflict with each other
+Within a milestone, `ghqc` enforces that a file can only be assigned to one issue to ensure reviews do not conflict with each other
 and all feedback is co-located.
 
 To help make this clear to users assigning new files to be QCed within a milestone, the Assign app will grey out files already
@@ -96,7 +96,7 @@ verifying it is up to date with the remote.
 
 * **Remote Commits** - If there are remote commits which have not been pulled locally, the Assign app will *not* allow the user to create the issues.
 * **Local Commits** - If there are local commits which have not been pushed to the remote, the Assign app will *not* allow the user to create the issues.
-* **Local Changes** - The behavior depends on if they file is selected for QC:
+* **Local Changes** - The behavior depends on if the file is selected for QC:
     * **Selected for QC** - The Assign app will *not* allow the user to create the issues.
     * **Not selected for QC** - The Assign app will warn about the local changes, but allow the user to proceed and create the issues.
 
