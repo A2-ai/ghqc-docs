@@ -31,6 +31,8 @@ export default defineConfig({
 					items: [
 						{ label: 'Introduction', slug: 'workflow/introduction' },
 						{ label: 'Assign Files for QC', slug: 'workflow/assign' },
+						{ label: 'Review QC Files', slug: 'workflow/review' },
+						{ label: 'Notify Files Changes', slug: 'workflow/notify' },
 					]
 				}
 			],

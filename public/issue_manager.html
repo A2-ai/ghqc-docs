@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue Manager</title>
+
+    <!-- GitHub CSS Files -->
+    <link rel="stylesheet" href="issue_thread_files/primer-7218ee22ec7c.css">
+    <link rel="stylesheet" href="issue_thread_files/github-6b526e0b63fc.css">
+    <link rel="stylesheet" href="issue_thread_files/global-6988ccc16eb5.css">
+    <link rel="stylesheet" href="issue_thread_files/light-0eace2597ca3.css">
+
+    <!-- Starlight Theme Detection Script -->
+    <script>
+        // Sync with Starlight's theme system
+        const getThemePreference = () => {
+            if (typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme')) {
+                return localStorage.getItem('starlight-theme');
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const isDark = getThemePreference() === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+
+        // Listen for theme changes
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'starlight-theme') {
+                document.documentElement.dataset.theme = e.newValue;
+            }
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('starlight-theme')) {
+                document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+            }
+        });
+    </script>
+    <style>
+        /* Starlight-compatible color variables */
+        :root {
+            --sl-color-white: #ffffff;
+            --sl-color-gray-1: #f6f8fa;
+            --sl-color-gray-2: #d1d9e0;
+            --sl-color-gray-3: #656d76;
+            --sl-color-gray-6: #1f2328;
+            --sl-color-black: #000000;
+            --sl-color-accent: #0969da;
+            --sl-color-green: #1a7f37;
+            --sl-color-purple: #8250df;
+        }
+
+        [data-theme='dark'] {
+            --sl-color-white: #0d1117;
+            --sl-color-gray-1: #21262d;
+            --sl-color-gray-2: #30363d;
+            --sl-color-gray-3: #7d8590;
+            --sl-color-gray-6: #e6edf3;
+            --sl-color-black: #ffffff;
+            --sl-color-accent: #58a6ff;
+            --sl-color-green: #3fb950;
+            --sl-color-purple: #a5a3ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 12px;
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .main-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .left-column {
+            width: 30%;
+            min-width: 250px;
+            flex: 0 0 30%;
+            align-self: flex-start;
+            position: sticky;
+            top: 20px;
+        }
+
+        .dropdown-section {
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .dropdown-label {
+            font-weight: 600;
+            color: var(--sl-color-gray-6);
+            margin-bottom: 8px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 4px;
+            background-color: var(--sl-color-white);
+            color: var(--sl-color-gray-6);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+
+        .dropdown:focus {
+            outline: none;
+            border-color: var(--sl-color-accent);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+
+        [data-theme='light'] .dropdown:focus {
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+        }
+
+        .right-column {
+            flex: 1;
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 12px;
+            transition: background-color 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .right-column h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: var(--sl-color-gray-6);
+            border-bottom: 1px solid var(--sl-color-gray-2);
+            padding-bottom: 8px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .commits-section, .diff-section {
+            margin-bottom: 20px;
+        }
+
+        .commits-section h4, .diff-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--sl-color-gray-6);
+            margin: 0 0 12px 0;
+            transition: color 0.2s;
+        }
+
+        .commit-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 14px;
+        }
+
+        .commit-label {
+            font-weight: 600;
+            color: var(--sl-color-gray-3);
+            min-width: 70px;
+            transition: color 0.2s;
+        }
+
+        .commit-sha {
+            background-color: #afb8c133;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            font-size: 12px;
+            color: var(--sl-color-gray-6);
+            margin-right: 8px;
+            transition: color 0.2s;
+        }
+
+
+        /* Additional styling for GitHub diff integration */
+        .highlight {
+            margin-bottom: 16px;
+        }
+
+        /* Dark mode overrides for code blocks */
+        [data-theme='dark'] .highlight {
+            background-color: var(--sl-color-gray-1);
+        }
+
+        [data-theme='dark'] .highlight pre {
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
+        }
+
+        [data-theme='dark'] .highlight code {
+            background-color: var(--sl-color-gray-1);
+            color: var(--sl-color-gray-6);
+        }
+
+        /* Dark mode diff colors */
+        [data-theme='dark'] .pl-md {
+            background-color: rgba(248, 81, 73, 0.15);
+            color: #ff7b72;
+        }
+
+        [data-theme='dark'] .pl-mi1 {
+            background-color: rgba(63, 185, 80, 0.15);
+            color: #7ee787;
+        }
+
+        [data-theme='dark'] .pl-mdr {
+            color: #a5a3ff;
+        }
+
+        .notify-btn {
+            background-color: var(--sl-color-accent);
+            color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-accent);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.15s ease, border-color 0.2s;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+        }
+
+        .notify-btn:hover {
+            opacity: 0.9;
+        }
+
+        .notify-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-gray-2);
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+            z-index: 1000;
+            min-width: 300px;
+            text-align: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(140, 149, 159, 0.2);
+            z-index: 999;
+        }
+
+        .popup-message {
+            color: var(--sl-color-gray-6);
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: color 0.2s;
+        }
+
+        .popup-close-btn {
+            background-color: var(--sl-color-accent);
+            color: var(--sl-color-white);
+            border: 1px solid var(--sl-color-accent);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .popup-close-btn:hover {
+            opacity: 0.9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .no-diff-message {
+            color: var(--sl-color-gray-3);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            transition: color 0.2s;
+        }
+
+        .no-selection {
+            color: var(--sl-color-gray-3);
+            font-style: italic;
+            text-align: center;
+            padding: 40px;
+            transition: color 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-row">
+            <div class="left-column">
+                <div class="dropdown-section">
+                    <div class="dropdown-label">Filter Issues by Milestone</div>
+                    <select id="milestone-filter" class="dropdown">
+                        <option value="all">All Issues</option>
+                        <option value="milestone1">Milestone 1</option>
+                        <option value="milestone2">Milestone 2</option>
+                    </select>
+                </div>
+
+                <div class="dropdown-section">
+                    <div class="dropdown-label">Select Issue</div>
+                    <select id="issue-select" class="dropdown">
+                        <option value="issue1" data-milestone="milestone1">file_1.qmd #1</option>
+                        <option value="issue2" data-milestone="milestone1">file_2.qmd #2</option>
+                        <option value="issue3" data-milestone="milestone2">file_3.qmd #3</option>
+                        <option value="issue4" data-milestone="milestone2">file_1.qmd #4</option>
+                        <option value="issue5" data-milestone="milestone1">file_4.qmd #5</option>
+                    </select>
+                </div>
+
+                <button id="notify-btn" class="notify-btn" onclick="notifyFileChanges()">Notify File changes</button>
+            </div>
+
+            <div class="right-column">
+                <h3 id="issue-header">Notification Details</h3>
+                <div id="issue-content">
+                    <div class="no-selection">Select an issue to see details here</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay hidden" id="popup-overlay" onclick="closePopup()"></div>
+    <div class="popup hidden" id="popup">
+        <div class="popup-message" id="popup-message"></div>
+        <button class="popup-close-btn" onclick="closePopup()">OK</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const milestoneFilter = document.getElementById('milestone-filter');
+            const issueSelect = document.getElementById('issue-select');
+            const issueHeader = document.getElementById('issue-header');
+            const issueContent = document.getElementById('issue-content');
+
+            // Issue data with commits and diffs
+            const issueData = {
+                issue1: {
+                    title: 'file_1.qmd #1',
+                    milestone: 'milestone1',
+                    commits: {
+                        current: { sha: 'a3b2c1d', message: 'Update analysis parameters' },
+                        previous: { sha: '9f8e7d6', message: 'Initial analysis setup' }
+                    },
+                    diff: `@@ -12,7 +12,7 @@
+ # Data preprocessing
+ data <- read.csv("input.csv")
+-data$group <- factor(data$group)
++data$group <- factor(...levels)
+
+ # Analysis
+ model <- lm(outcome ~ group)`
+                },
+                issue2: {
+                    title: 'file_2.qmd #2',
+                    milestone: 'milestone1',
+                    commits: {
+                        current: { sha: 'b4c5d6e', message: 'Fix data filtering logic' },
+                        previous: { sha: 'c7d8e9f', message: 'Add initial filtering' }
+                    },
+                    diff: `@@ -24,8 +24,8 @@
+   filter(age >= 18) %>%
+   filter(!is.na(outcome))
+
+-# Remove outliers (> 3 SD)
+-threshold <- 3 * sd(...)
++# Remove outliers (> 2.5 SD)
++threshold <- 2.5 * sd(...)
+ filtered_data <- data %>%
+   filter(abs(outcome) <= threshold)`
+                },
+                issue3: {
+                    title: 'file_3.qmd #3',
+                    milestone: 'milestone2',
+                    commits: {
+                        current: { sha: '5e6f7g8', message: 'Update documentation' },
+                        previous: { sha: '2a3b4c5', message: 'Add documentation draft' }
+                    },
+                    diff: null // No file differences
+                },
+                issue4: {
+                    title: 'file_1.qmd #4',
+                    milestone: 'milestone2',
+                    commits: {
+                        current: { sha: 'f7g8h9i', message: 'Refactor plotting function' },
+                        previous: { sha: 'd2e3f4g', message: 'Initial plot implementation' }
+                    },
+                    diff: `@@ -45,12 +45,15 @@
+   p <- ggplot(data, aes(...)) +
+     geom_point() +
+     geom_smooth(method = "lm") +
+-    labs(title = title)
++    labs(title = title,
++         x = "X Variable",
++         y = "Y Variable") +
++    theme_minimal()
+
+   return(p)
+ }`
+                },
+                issue5: {
+                    title: 'file_4.qmd #5',
+                    milestone: 'milestone1',
+                    commits: {
+                        current: { sha: 'g8h9i0j', message: 'Clean up code structure' },
+                        previous: { sha: 'h1i2j3k', message: 'Initial code structure' }
+                    },
+                    diff: null // No file differences
+                }
+            };
+
+            // Handle milestone filter changes
+            milestoneFilter.addEventListener('change', function() {
+                filterIssueOptions();
+                // Clear selection if current selection is no longer available
+                const currentSelection = issueSelect.value;
+                const availableOptions = Array.from(issueSelect.options).filter(option => !option.hidden && option.value);
+                const isCurrentSelectionAvailable = availableOptions.some(option => option.value === currentSelection);
+
+                if (!isCurrentSelectionAvailable) {
+                    issueSelect.value = '';
+                    showNoSelection();
+                }
+            });
+
+            // Handle issue selection changes
+            issueSelect.addEventListener('change', function() {
+                const selectedIssue = this.value;
+                if (selectedIssue && issueData[selectedIssue]) {
+                    displayIssueDetails(issueData[selectedIssue]);
+                } else {
+                    showNoSelection();
+                }
+            });
+
+            function filterIssueOptions() {
+                const selectedMilestone = milestoneFilter.value;
+                const options = issueSelect.querySelectorAll('option[data-milestone]');
+
+                options.forEach(option => {
+                    if (selectedMilestone === 'all' || option.dataset.milestone === selectedMilestone) {
+                        option.style.display = '';
+                        option.hidden = false;
+                    } else {
+                        option.style.display = 'none';
+                        option.hidden = true;
+                    }
+                });
+            }
+
+            function displayIssueDetails(issue) {
+                issueHeader.innerHTML = `Notification Details:<br>${issue.title}`;
+
+                let content = `
+                    <div class="commits-section">
+                        <h4>Commits</h4>
+                        <div class="commit-item">
+                            <span class="commit-label">Current:</span>
+                            <span class="commit-sha">${issue.commits.current.sha}</span>
+                        </div>
+                        <div class="commit-item">
+                            <span class="commit-label">Previous:</span>
+                            <span class="commit-sha">${issue.commits.previous.sha}</span>
+                        </div>
+                    </div>
+
+                    <div class="diff-section">
+                        <h4>Diff</h4>
+                `;
+
+                if (issue.diff === null) {
+                    content += `
+                        <div class="no-diff-message">
+                            No file differences to notify
+                        </div>
+                    `;
+                } else {
+                    content += `
+                        <div class="markdown-body">
+                            <div class="highlight highlight-source-diff notranslate position-relative overflow-auto" dir="auto">
+                                <pre class="notranslate"><code>${formatGitHubDiff(issue.diff)}</code></pre>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                content += `</div>`;
+
+                issueContent.innerHTML = content;
+            }
+
+            function formatGitHubDiff(diffText) {
+                return diffText.split('\n').map(line => {
+                    let span = '';
+                    const escapedLine = escapeHtml(line);
+
+                    if (line.startsWith('@@')) {
+                        // Diff header line
+                        span = `<span class="pl-mdr">${escapedLine}</span>`;
+                    } else if (line.startsWith('-')) {
+                        // Removed line
+                        span = `<span class="pl-md"><span class="pl-md">-</span> ${escapedLine.substring(1)}</span>`;
+                    } else if (line.startsWith('+')) {
+                        // Added line
+                        span = `<span class="pl-mi1"><span class="pl-mi1">+</span> ${escapedLine.substring(1)}</span>`;
+                    } else {
+                        // Unchanged line
+                        span = escapedLine;
+                    }
+
+                    return span;
+                }).join('\n');
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function showNoSelection() {
+                issueHeader.textContent = 'Issue Details';
+                issueContent.innerHTML = '<div class="no-selection">Select an issue to see details here</div>';
+            }
+
+            // Global function for notify button
+            window.notifyFileChanges = function() {
+                const selectedIssue = issueSelect.value;
+
+                if (!selectedIssue) {
+                    showPopup('Please select an issue first.');
+                    return;
+                }
+
+                const issue = issueData[selectedIssue];
+                if (!issue) {
+                    showPopup('Issue data not found.');
+                    return;
+                }
+
+                if (issue.diff === null) {
+                    showPopup("Can't create comment - no file differences to notify");
+                } else {
+                    showPopup(`Comment successfully posted for ${issue.title}`);
+                }
+            };
+
+            // Global functions for popup
+            window.showPopup = function(message) {
+                const popup = document.getElementById('popup');
+                const popupOverlay = document.getElementById('popup-overlay');
+                const popupMessage = document.getElementById('popup-message');
+
+                popupMessage.textContent = message;
+                popup.classList.remove('hidden');
+                popupOverlay.classList.remove('hidden');
+            };
+
+            window.closePopup = function() {
+                const popup = document.getElementById('popup');
+                const popupOverlay = document.getElementById('popup-overlay');
+
+                popup.classList.add('hidden');
+                popupOverlay.classList.add('hidden');
+            };
+
+            // Auto-select issue 1 on page load
+            function autoSelectIssue1() {
+                issueSelect.value = 'issue1';
+                if (issueData['issue1']) {
+                    displayIssueDetails(issueData['issue1']);
+                }
+            }
+
+            // Initialize with all issues visible and auto-select issue 1
+            filterIssueOptions();
+            autoSelectIssue1();
+        });
+    </script>
+</body>
+</html>
