@@ -24,6 +24,7 @@ export default defineConfig({
 						{ label: '2. Review', slug: 'intro/review' },
 						{ label: '3. Approve', slug: 'intro/approve' },
 						{ label: '4. Record', slug: 'intro/record' },
+						{ label: '5. Archive', slug: 'intro/archive' }
 					],
 				},
 				{
