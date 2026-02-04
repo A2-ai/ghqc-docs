@@ -1,6 +1,6 @@
 ---
 title: Archive Files
-description: Walk through the Archiving of Files based on Milestones and the file directory
+description: Walk through the archiving of files based on milestones and file structure
 ---
 import { Tabs, TabItem, Card, CardGrid, Badge } from '@astrojs/starlight/components';
 
@@ -9,29 +9,29 @@ At any point in the QC process, you can create a comprehensive archive that incl
 ### 1. Launch the Archive App
 
 <Tabs syncKey="addins">
-    <TabItem label = "via Console">
+    <TabItem label="via Console">
         ```r
         library(ghqc)
         ghqc_archive_app()
         ```
     </TabItem>
-    <TabItem label = "via RStudio Addin">
+    <TabItem label="via RStudio Addin">
         :::note
             `miniUI` must be installed in your project to use RStudio Addins.
             <Tabs syncKey="rv">
-                <TabItem label = "R">
+                <TabItem label="R">
                     ```r
                     install.packages("miniUI") 
                     ```
                 </TabItem>
-                <TabItem label = "rv">
+                <TabItem label="rv">
                     <CardGrid>
-                        <Card title = "Shell Command">
+                        <Card title="Shell Command">
                         ```
                         rv add miniUI
                         ```
                         </Card>
-                        <Card title= "R Console">
+                        <Card title="R Console">
                         ```r
                         .rv$add("miniUI")
                         ```
@@ -41,7 +41,7 @@ At any point in the QC process, you can create a comprehensive archive that incl
             </Tabs>
         :::
 
-        Using the `Addins` dropdown in the RStudio navigation bar, search for `ghqc`, then select "Archive QC Files".
+        In RStudio, click the `Addins` dropdown in the navigation bar, search for `ghqc`, then select "Archive QC Files".
 
         ![](../../../assets/archive_addin.png)
     </TabItem>
@@ -53,7 +53,10 @@ The app will launch in your viewer panel. The left pane is for selecting milesto
 
 ### 2. Selecting Files to Archive
 
-There are two ways to archive files: using the milestone selector along with configuration options to determine which files to include, or selecting files directly from the file tree.
+There are two ways to archive files:
+
+1. **Using the milestone selector** - Select milestones along with configuration options to determine which files to include
+2. **Selecting files directly** - Choose files directly from the file tree
 
 ![](../../../assets/archive_app_selection.png)
 
@@ -72,17 +75,17 @@ Select the milestone you wish to archive. By default, selecting a milestone incl
 To include open issues in the archive, select the "Include Open Issues" checkbox. This will populate the archive with open issues from your selected milestone(s). Open issues display a message saying "Issue is Open".
 ![](../../../assets/archive_open_issues_included.png)
 
-Since we associated a relevant file with "scripts/qc1.qmd", let's archive that too. Click "Include Relevant Files" to populate relevant files associated with issues in the selected milestones. In the right pane, "Milestones" and "Commits" will default to blank with a "Required" message under commit. This allows free choice of commit and milestone for files that aren't issues in selected milestones.
+Since we have a relevant file associated with `scripts/qc1.qmd`, let's archive that too. Click "Include Relevant Files" to populate relevant files associated with issues in the selected milestones. In the right pane, "Milestones" and "Commits" will default to blank with a "Required" message under commit. This allows free choice of commit and milestone for files that aren't issues in selected milestones.
 ![](../../../assets/archive_relevant_files.png)
 
-Now that we have all issues and relevant files from the milestone, let's select the recently made QC report from the file tree so we can include it in the archive. Since this file isn't associated with an issue in a milestone, it will display a message saying "No milestone available".
+Now that we have all issues and relevant files from the milestone, let's select the QC report from the file tree to include it in the archive. Since this file isn't associated with an issue in a milestone, it will display a message saying "No milestone available".
 ![](../../../assets/archive_filetree_selection.png)
 
 We have all the files we want in the archive, but before we can archive, we need to ensure all files have commits. For our relevant file in the right pane, click on the "Select a milestone (optional)" dropdown and select a milestone (if available). 
 ![](../../../assets/archive_local_milestone.png)
 
 
-This selection will automatically select a commit in the Commits drop down that will default to the approved QC commit for that file's issue in the selected milestone, or the most recent commit if that issue is still open.
+This selection will automatically select a commit in the Commits dropdown. It will default to the approved QC commit for that file's issue in the selected milestone, or the most recent commit if that issue is still open.
 
 ![](../../../assets/archive_local_milestone_commit.png)
 
@@ -95,7 +98,7 @@ However, you don't need to select a milestone in the right pane for every file; 
 Now that we have selected all the commits for our files, we can generate the archive.
 
 By default, the archive structure mirrors the working directory's structure. Click the "Flatten Directory Structure" checkbox to remove the normal file directory structure.
-For example: "scripts/qc1.qmd" becomes "qc1.qmd" in the archive. 
+For example: `scripts/qc1.qmd` becomes `qc1.qmd` in the archive. 
 
 ![](../../../assets/archive_flatten_dir.png)
 
@@ -122,6 +125,6 @@ This is what your archive should look like now: the zip file and the unzipped ve
 
 ![](../../../assets/archive_file_dir.png)
 
-The archive will include all the files you selected to archive, plus a metadata JSON file containing the creator of the archive, the time it was created, and a list of files in the archive with their archive path, repository path, selected commit, and issue QC approval status.
+The archive will include all the files you selected to archive, plus a metadata JSON file. This metadata file contains the creator of the archive, the time it was created, and a list of files in the archive with their archive path, repository path, selected commit, and issue QC approval status.
 ![](../../../assets/archive_dir.png)
 ![](../../../assets/archive_metadata.png)
