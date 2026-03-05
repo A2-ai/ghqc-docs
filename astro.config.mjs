@@ -14,34 +14,40 @@ export default defineConfig({
 				{ icon: 'github', label: 'ghqc.app', href: 'https://github.com/a2-ai/ghqc.app' }
 			],
 			sidebar: [
-				{ label: 'Installation', slug: 'installation' },
-				{
-					label: 'First ghqc project',
-					items: [
-						{ label: 'Introduction', slug: 'intro/introduction' },
-						{ label: '0. Set-up', slug: 'intro/setup' },
-						{ label: '1. Initialize', slug: 'intro/initialize'},
-						{ label: '2. Review', slug: 'intro/review' },
-						{ label: '3. Approve', slug: 'intro/approve' },
-						{ label: '4. Record', slug: 'intro/record' },
-					],
-				},
-				{
-					label: 'Workflow',
-					items: [
-						{ label: 'Introduction', slug: 'workflow/introduction' },
-						{ label: 'Assign Files for QC', slug: 'workflow/assign' },
-						{ label: 'Review QC Files', slug: 'workflow/review' },
-						{ label: 'Notify File Changes', slug: 'workflow/notify' },
-						{ label: 'Approve QCed Files', slug: 'workflow/approve' },
-					]
-				},
-				{
-					label: 'Admin Guide',
+				{ 
+					label: 'Legacy - R packages',
 					collapsed: true,
 					items: [
-						{ label: 'Ecosystem Architecture', slug: 'admin_guide/ecosystem_arch' },
-						{ label: 'Configuration Repository', slug: 'admin_guide/configuration' },
+						{ label: 'Installation', slug: 'legacy/installation' },
+						{
+							label: 'First ghqc project',
+							items: [
+								{ label: 'Introduction', slug: 'legacy/intro/introduction' },
+								{ label: '0. Set-up', slug: 'legacy/intro/setup' },
+								{ label: '1. Initialize', slug: 'legacy/intro/initialize'},
+								{ label: '2. Review', slug: 'legacy/intro/review' },
+								{ label: '3. Approve', slug: 'legacy/intro/approve' },
+								{ label: '4. Record', slug: 'legacy/intro/record' },
+							],
+						},
+						{
+							label: 'Workflow',
+							items: [
+								{ label: 'Introduction', slug: 'legacy/workflow/introduction' },
+								{ label: 'Assign Files for QC', slug: 'legacy/workflow/assign' },
+								{ label: 'Review QC Files', slug: 'legacy/workflow/review' },
+								{ label: 'Notify File Changes', slug: 'legacy/workflow/notify' },
+								{ label: 'Approve QCed Files', slug: 'legacy/workflow/approve' },
+							]
+						},
+						{
+							label: 'Admin Guide',
+							collapsed: true,
+							items: [
+								{ label: 'Ecosystem Architecture', slug: 'legacy/admin_guide/ecosystem_arch' },
+								{ label: 'Configuration Repository', slug: 'legacy/admin_guide/configuration' },
+							]
+						}
 					]
 				}
 			],

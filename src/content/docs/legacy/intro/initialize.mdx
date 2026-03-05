@@ -46,14 +46,14 @@ After the R packages have been installed, there are two ways to launch the app:
 
         Using the `Addins` dropdown in the RStudio navigation bar, search for `ghqc`, then select "Assign QC file(s)".
 
-        ![](../../../assets/assign_addin.png)
+        ![](../../../../assets/legacy/assign_addin.png)
     </TabItem>
 </Tabs>
 
 The app will then launch, with the process running as a [background job](https://docs.posit.co/ide/user/ide/guide/tools/jobs.html) 
 and the UI in the "Viewer" panel, leaving your R session free to continue working while the app is open in your screen.
 
-![](../../../assets/assign_app_load.png)
+![](../../../../assets/legacy/assign_app_load.png)
 
 ### 2. Create a New Milestone
 
@@ -61,13 +61,13 @@ The first thing we'll do in the app is create a New Milestone.
 
 In this example, we will name the Milestone "*Milestone 1*" and input the optional description as "*My first ghqc project*".
 
-![](../../../assets/assign_app_new_milestone.png)
+![](../../../../assets/legacy/assign_app_new_milestone.png)
 
 ### 3. Select Files for QC
 
 Next, we will select files from file tree to be QC'd. These will then populate in the right panel to configure each file for QC uniquely.
 
-![](../../../assets/assign_app_pick_file.png)
+![](../../../../assets/legacy/assign_app_pick_file.png)
 
 ### 4. Configure Files for QC
 
@@ -77,14 +77,14 @@ For each file, you are able to configure 3 options:
 Allows the user to attach relevant files that the QCer may need to reference during QC, 
 such as datasets, helper functions, etc.
 
-![](../../../assets/assign_app_rel_file.png)
+![](../../../../assets/legacy/assign_app_rel_file.png)
 </Card>
 
 <Card title = "Assign QCer" icon = "pen">
 A QCer can be picked from a list of users which have the required access to the repository 
 or can be assigned to the GitHub Issue later in GitHub.
 
-![](../../../assets/assign_app_qcer.png)
+![](../../../../assets/legacy/assign_app_qcer.png)
 </Card>
 
 <Card title = "Choose a Checklist" icon = "approve-check-circle">
@@ -93,7 +93,7 @@ or can be assigned to the GitHub Issue later in GitHub.
 One customizable checklists must be selected to provide the QCer a list of requirements that should be reviewed for the
 file type. 
 
-![](../../../assets/assign_app_checklist.png)
+![](../../../../assets/legacy/assign_app_checklist.png)
 </Card>
 
 ### 5. Assign QC File(s)
@@ -101,21 +101,21 @@ file type.
 Once your desired configuration is set-up, with at least each selected file having a checklist, the "Assign QC file(s)" button will activate.
 Clicking this button will create the issues within the new milestone.
 
-![](../../../assets/assign_app_assign.png)
+![](../../../../assets/legacy/assign_app_assign.png)
 
 After assigning the files for QC, a pop-up will appear that the QC was successfully initialized with a URL to the created Milestone.
 
-![](../../../assets/assign_app_success.png)
+![](../../../../assets/legacy/assign_app_success.png)
 
 Following the link will bring us to the milestone's landing page on GitHub, allowing us to explore the newly created Issues.
 
-![](../../../assets/assign_app_gh_milestone.png)
+![](../../../../assets/legacy/assign_app_gh_milestone.png)
 
 ### 6. QC Issue Body
 
 Let's take a moment to familiarize ourselves with the Issue created by ghqc.
 
-![](../../../assets/github_issue_body.png)
+![](../../../../assets/legacy/github_issue_body.png)
 
 There are 3 components to explore:
 
