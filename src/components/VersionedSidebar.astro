@@ -1,0 +1,46 @@
+---
+import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
+import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+import type { SidebarEntry } from '@astrojs/starlight/utils/routing/types';
+import { VERSIONS } from '../data/versions';
+
+const path = Astro.url.pathname;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const { sidebar } = Astro.locals.starlightRoute;
+
+// Determine current version's basePath from URL
+let currentBasePath = VERSIONS.find(v => v.default)?.basePath ?? '';
+for (const version of VERSIONS) {
+  if (version.basePath && (path.startsWith(`${base}${version.basePath}/`) || path === `${base}${version.basePath}`)) {
+    currentBasePath = version.basePath;
+    break;
+  }
+}
+
+// All non-root basePaths (used to exclude them from the "current" version)
+const versionedPaths = VERSIONS.filter(v => v.basePath).map(v => v.basePath);
+
+function entryMatchesVersion(entry: SidebarEntry): boolean {
+  if (entry.type === 'link') {
+    if (currentBasePath === '') {
+      return !versionedPaths.some(p => entry.href.startsWith(`${base}${p}`));
+    }
+    return entry.href.startsWith(`${base}${currentBasePath}`);
+  }
+  if (entry.type === 'group') {
+    return entry.entries.some(entryMatchesVersion);
+  }
+  return false;
+}
+
+const filteredSidebar = sidebar.filter(entryMatchesVersion);
+---
+
+<SidebarPersister>
+  <SidebarSublist sublist={filteredSidebar} />
+</SidebarPersister>
+
+<div class="md:sl-hidden">
+  <MobileMenuFooter />
+</div>

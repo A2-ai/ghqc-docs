@@ -13,11 +13,17 @@ export default defineConfig({
 				{ icon: 'github', label: 'ghqc', href: 'https://github.com/a2-ai/ghqc' },
 				{ icon: 'github', label: 'ghqc.app', href: 'https://github.com/a2-ai/ghqc.app' }
 			],
+			components: {
+				SiteTitle: "./src/components/VersionSelect.astro",
+				Sidebar: "./src/components/VersionedSidebar.astro",
+			},
 			sidebar: [
-				{ 
+				{ label: 'Installation', slug: 'installation' },
+				{
 					label: 'Legacy - R packages',
 					collapsed: true,
 					items: [
+						{ label: 'Home', slug: 'legacy' },
 						{ label: 'Installation', slug: 'legacy/installation' },
 						{
 							label: 'First ghqc project',
