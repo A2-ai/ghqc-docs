@@ -19,8 +19,9 @@ export default defineConfig({
 			},
 			sidebar: [
 				{ label: 'Installation', slug: 'installation' },
+				{ label: 'Workflow', slug: 'workflow' },
 				{
-					label: 'Legacy - R packages',
+					label: 'Legacy - Shiny R packages',
 					collapsed: true,
 					items: [
 						{ label: 'Home', slug: 'legacy' },

@@ -8,27 +8,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // Find current version by matching basePath prefix
 let currentVersion = VERSIONS[0]?.tag;
-let currentPage = '/';
-
 for (const version of VERSIONS) {
-  const versionPrefix = `${base}${version.basePath}`;
-  if (version.basePath === "") {
-    // Root version — match only if no other version matches
-    continue;
-  }
-  if (path.startsWith(versionPrefix + '/') || path === versionPrefix) {
+  if (version.basePath && (path.startsWith(`${base}${version.basePath}/`) || path === `${base}${version.basePath}`)) {
     currentVersion = version.tag;
-    currentPage = path.slice(versionPrefix.length) || '/';
     break;
   }
 }
-
-// If no versioned prefix matched, we're on the root (current) version
-if (currentVersion === VERSIONS[0]?.tag && VERSIONS[0]?.basePath === "") {
-  currentPage = path.replace(base, '') || '/';
-}
-
-if (!currentPage) currentPage = '/';
 ---
 
 <div class="site-title-wrapper">
@@ -38,40 +23,17 @@ if (!currentPage) currentPage = '/';
     <select
       id="version-select"
       class="version-select"
-      data-base={base}
-      onchange="handleVersionChange(this)"
+      onchange="window.location.href = this.value"
     >
-      {VERSIONS.map((version: Version) => {
-        const versionUrl = `${base}${version.basePath}${currentPage}`;
-        return (
-          <option value={versionUrl} selected={currentVersion === version.tag}>
-            {version.label}
-          </option>
-        );
-      })}
+      {VERSIONS.map((version: Version) => (
+        <option value={`${base}${version.basePath}/`} selected={currentVersion === version.tag}>
+          {version.label}
+        </option>
+      ))}
     </select>
   </div>
 </div>
 
-<script is:inline>
-async function handleVersionChange(select) {
-  const targetUrl = select.value;
-
-  try {
-    const response = await fetch(targetUrl, { method: 'HEAD' });
-    if (response.ok) {
-      window.location.href = targetUrl;
-    } else {
-      // Page doesn't exist, fallback to version root
-      const base = select.dataset.base;
-      const url = new URL(targetUrl, window.location.href);
-      window.location.href = url.pathname.replace(/\/[^/]+$/, '/') || (base + '/');
-    }
-  } catch (e) {
-    window.location.href = targetUrl;
-  }
-}
-</script>
 
 <style>
   .site-title-wrapper {
