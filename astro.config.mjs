@@ -9,10 +9,6 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'ghqc',
-			social: [
-				{ icon: 'github', label: 'ghqc', href: 'https://github.com/a2-ai/ghqc' },
-				{ icon: 'github', label: 'ghqc.app', href: 'https://github.com/a2-ai/ghqc.app' }
-			],
 			components: {
 				SiteTitle: "./src/components/VersionSelect.astro",
 				Sidebar: "./src/components/VersionedSidebar.astro",
