@@ -1,0 +1,30 @@
+---
+title: Ecosystem architecture
+---
+
+import { Card } from '@astrojs/starlight/components';
+
+The ghqc ecosystem is split into 4 components to give the user control over the QC process
+while ensuring additional project package dependencies are minimal.
+
+<Card title="The QCed project" icon="github">
+    Your GitHub repository, containing the files to be QCed.
+</Card>
+<Card title="ghqc" icon="add-document" color = "red">
+    `ghqc` is a low dependency burden package designed to be installed alongside any project packages.
+    It aids with the installation process and launches the Shiny applications as background jobs.
+</Card>
+<Card title="ghqc.app" icon="add-document">
+    `ghqc.app` is a high dependency burden package "back-end" to the Shiny applications.
+    To ensure `ghqc.app` dependencies do not interfere with project work, ghqc.app and its dependencies are installed in an isolated directory outside the QCed project.
+</Card>
+<Card title="Custom configuration repository " icon="github">
+    Custom options for app inputs and outputs, including an organization's selectable QC checklists, are configured by an organization administrator in a custom configuration repository.
+
+    `ghqc` users clone this repository locally to an isolated directory outside the QCed project.
+    
+    Learn more [here](../configuration)
+</Card>
+
+![](../../../assets/admin_guide/ecosystem_arch.png)
+

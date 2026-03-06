@@ -21,20 +21,20 @@ jobs:
       - run: bun install 
       - name: build
         run: bun run build
-      # since the site is currently on github pages on /rv-docs we need
+      # since the site is currently on github pages on /ghqc-docs we need
       # to shift the dir structure around on netlify to also represent that subpath
       - name: setup
         run: |
           mkdir build
           mv dist build
-          mv build/dist build/rv-docs
+          mv build/dist build/ghqc-docs
           cat > build/index.html << 'EOF'
           <!DOCTYPE html>
           <html lang="en">
           <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <meta http-equiv="refresh" content="0; url=./rv-docs/">
+              <meta http-equiv="refresh" content="0; url=./ghqc-docs/">
               <title>Redirecting...</title>
           </head>
           <body>
@@ -55,6 +55,6 @@ jobs:
           overwrites-pull-request-comment: true
           fails-without-credentials: true
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.ORG_NETLIFY_DOCS_PREVIEW_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.ORG_NETLIFY_DOCS_PREVIEW_SITE_ID }}
         timeout-minutes: 1      

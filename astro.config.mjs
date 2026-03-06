@@ -34,6 +34,7 @@ export default defineConfig({
 								{ label: '2. Review', slug: 'legacy/intro/review' },
 								{ label: '3. Approve', slug: 'legacy/intro/approve' },
 								{ label: '4. Record', slug: 'legacy/intro/record' },
+								{ label: '5. Archive', slug: 'legacy/intro/archive' },
 							],
 						},
 						{

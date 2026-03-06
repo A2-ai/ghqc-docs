@@ -1,0 +1,44 @@
+---
+title: Approve QCed Files
+---
+import { LinkCard } from '@astrojs/starlight/components';
+
+After the QCer is finished reviewing and all of their feedback implemented, they must approve the QCed file. To do this, we use the **Status app**.
+
+:::note
+Documentation is on-going. On this page, we will not detail all of the features of the Status app.
+
+In the meantime, we encourage you to explore the app and how it can be used in your workflow!
+:::
+
+Instruction for how to launch the Status app and approve issues can be found below:
+
+<LinkCard 
+    title = "How to Use the Status App for Approval"
+    href = "../../intro/approve/"
+    description = ""
+/>
+
+## Approved Issue Thread
+
+Approval of a QC Issue is fairly straightforward, it leaves metadata within the issue for when the file was approved so that future users can reference the version
+of the script that was approved. Therefore, on this page we'll spend some time reviewing the final issue thread with all of the comments.
+
+In the below example, we can notice a few key aspects:
+
+* The QCer was assigned as the **Assignee**, whether in the [Assign app](../assign) or [self-assigned](../review/#set-assignee)
+* The QCer chose to [push their comments](../review/#push-qc-comments) in-line and use the [Notify app](../notify)
+* The Author made the edits requested by the QCer and notified the changes using the [Notify app](../notify)
+* Once the QCer was satisfied with the changes, they approved the issue.
+
+<iframe
+    src = "/ghqc-docs/issue_approved.html"
+    style = "width: 100%; height: 80vh; border: none;"
+>
+</iframe>
+
+## Close Milestones
+
+When all Issues within a Milestone are closed, you may [close the Milestone](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/creating-and-editing-milestones-for-issues-and-pull-requests).
+
+This communicates to the other `ghqc` apps that the Milestone is completed.
