@@ -1,0 +1,23 @@
+---
+title: Approve the QC
+description: Initial walkthrough to approve a file
+---
+
+import approvePopUp from '../../../../assets/intro/getting-started/approve/popup.png';
+
+Once the reviewer and author agree the file has been fully QCed and there are no more findings, the reviewer an approve the issue.
+
+Issue approval is more than just simply closing the issue, it includes the commit at which the file is designated as "approved" such that
+if someone was to re-start an analysis or include it in a FDA submission, there is traceability to exactly the version of the file which 
+was QCed and approved.
+
+File which are in the _Ready for Review_ swimlane AND do not have any uncommitted local changes will automatically open the "Approve" tab
+of the pop-up.
+
+In the review tab, you can select the commit which you'd like to say the file is approved at, an optional comment, and preview the comment.
+
+<div style="display: flex; justify-content: center;">
+    <img src={approvePopUp.src} style="width: 75%;" />
+</div>
+
+Clicking "Post" will post the comment, close the issue, and update the issue's status to "Approved".

@@ -1,0 +1,51 @@
+---
+title: Review the QC Files
+description: "Initial walkthrough of the review functionality"
+---
+
+import reviewDirtyFile from '../../../../assets/intro/getting-started/review/dirty-file.png';
+import reviewPopUp from '../../../../assets/intro/getting-started/review/pop-up.png';
+import reviewPreview from '../../../../assets/intro/getting-started/review/preview.png';
+
+As the reviewer, we recommend you to use the review functionality built into `ghqc` to leave your comments. This has many benefits for the organization and traceability of the QC,
+but also provides the user to leave in-line comments. To do so, simply open the file and type where you want. `ghqc` will read the local file content and compare it to the latest committed version and provide a comparison difference
+directly into the issue comment body.
+
+Let's resume our `scripts/helper.R` example. The file simply adds two numbers and returns their sum. But the reviewers wants to comment saying they don't need to `return()` 
+the result since that is R's default behavior. They can simply leave a comment directly in the file and save the content.
+
+```r ins={3}
+//helper.R 
+add2 <- function(a, b) {
+    # QC: No need for return, R will return value by default
+    return(a + b)
+}
+```
+
+After editing the file (and up to 30 sec for the git status to update), the issue will be marked with a star indicating there are local, uncommitted changes to the file.
+
+<div style="display: flex; justify-content: center;">
+    <img src={reviewDirtyFile.src} style="width: 75%;" />
+</div>
+
+Clicking on the card will open a pop-up to the "Review" Tab. On this tab, you can select the commit you want your review to be on, include an optional comment,
+and preview the comment that will be posted.
+
+<div style="display: flex; justify-content: center;">
+    <img src={reviewPopUp.src} style="width: 60%;" />
+</div>
+
+<div style="display: flex; justify-content: center;">
+    <img src={reviewPreview.src} style="width: 60%;" />
+</div>
+
+Clicking "Post" will post the comment and update the issue's status to "Findings to Address". 
+
+:::note
+After posting a review, the file will remain in a dirty state. To revert back to the committed state, run one of the following terminal commands:
+```bash
+git checkout -- <reviewed file>
+# OR
+git restore <reviewed file>
+```
+:::

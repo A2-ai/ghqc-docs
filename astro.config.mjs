@@ -14,8 +14,25 @@ export default defineConfig({
 				Sidebar: "./src/components/VersionedSidebar.astro",
 			},
 			sidebar: [
-				{ label: 'Installation', slug: 'installation' },
-				{ label: 'Workflow', slug: 'workflow' },
+				{ 
+					label: 'Introduction',
+					items: [
+						{ label: 'Installation', slug: 'intro/installation' },
+						{ label: 'Workflow', slug: 'intro/workflow' },
+						{ 
+							label: 'First ghqc project', 
+							collapsed: true,
+							items: [
+								{ label: 'Introduction', slug: 'intro/getting-started' },
+								{ label: 'Create', slug: 'intro/getting-started/create' },
+								{ label: 'Status', slug: 'intro/getting-started/status' },
+								{ label: 'Review', slug: 'intro/getting-started/review' },
+								{ label: 'Findings', slug: 'intro/getting-started/findings' },
+								{ label: 'Approve', slug: 'intro/getting-started/approve' },
+							] 
+						},
+					]
+				},
 				{
 					label: 'Legacy - Shiny R packages',
 					collapsed: true,
