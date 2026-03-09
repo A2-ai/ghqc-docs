@@ -1,18 +1,17 @@
 ---
 title: Address and Notify Findings
-description: Initial walkthrough to address and notify findings
+description: Walkthrough of addressing findings and notifying the reviewer
 ---
 
 import findingsSwimLane from '../../../../assets/intro/getting-started/findings/swimlanes.png';
 import findingsPopUp from '../../../../assets/intro/getting-started/findings/popup.png';
 import findingsPreview from '../../../../assets/intro/getting-started/findings/preview.png';
 
-Since the reviewer left a review on the latest commit, its now on the author to address their comments. 
-To address the review our QCer left us, we must fix our code, commit it, and notify the reviewer that an update has been made.
+Once the reviewer has left comments on the latest commit, the author can address them. In this step, we update the file, commit the changes, and notify the reviewer that the issue is ready to be checked again.
 
 ## Address Findings
 
-Continuing with the `scripts/helper.R` example, we remove the `return()` call and simply have `a + b`.
+Continuing with the `scripts/helper.R` example, we remove the `return()` call and leave only `a + b`.
 
 ```r ins={3} del={4}
 //helper.R 
@@ -22,30 +21,28 @@ add2 <- function(a, b) {
 }
 ```
 
-After making the updates, we commit the changes to git.
+After making the updates, we commit the changes.
 
-## Notify changes
+## Notify Changes
 
-Returning to the `ghqc` ui, `scripts/helpers.R` has moved from _Findings to Address_ to _Changes to Notify_. 
+Returning to the `ghqc` UI, `scripts/helper.R` has moved from _Findings to Address_ to _Changes to Notify_.
 
 <div style="display: flex; justify-content: center;">
     <img src={findingsSwimLane.src} style="width: 75%;" />
 </div>
 
-We can see in the card that the last posted commit does not match the latest file-changing, remote commit. In this state,
-the author should notify the reviewer of how they changed their file using the notify functionality. To open this functionality,
-simply click on the issue card.
+In the card, the last commit referenced in the review no longer matches the latest commit that changed the file. In this state, the author should use the notify workflow
+to explain what changed and let the reviewer know there is an update. To open this workflow, click the issue card.
 
 <div style="display: flex; justify-content: center;">
     <img src={findingsPopUp.src} style="width: 75%;" />
 </div>
 
-In the notify tab, you can select between two commits, include a comment, and preview the comment that will be posted.
+In the _Notify_ tab, you can select the commit range to reference, include a comment, and preview the comment that will be posted.
 
 <div style="display: flex; justify-content: center;">
     <img src={findingsPreview.src} style="width: 75%;" />
 </div>
 
-Clicking "Post" will post the comment and update the issue's status to "Ready for Review".
-
+Clicking _Post_ posts the comment and updates the issue status to _Ready for Review_.
 

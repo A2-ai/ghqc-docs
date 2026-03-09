@@ -7,12 +7,12 @@ import reviewDirtyFile from '../../../../assets/intro/getting-started/review/dir
 import reviewPopUp from '../../../../assets/intro/getting-started/review/pop-up.png';
 import reviewPreview from '../../../../assets/intro/getting-started/review/preview.png';
 
-As the reviewer, we recommend you to use the review functionality built into `ghqc` to leave your comments. This has many benefits for the organization and traceability of the QC,
-but also provides the user to leave in-line comments. To do so, simply open the file and type where you want. `ghqc` will read the local file content and compare it to the latest committed version and provide a comparison difference
-directly into the issue comment body.
+As the reviewer, we recommend using the review workflow built into `ghqc` to leave comments. It keeps the QC discussion organized, preserves traceability, and lets you leave
+inline comments directly in the file. To do this, open the file locally and add comments where you want them. `ghqc` reads the local file content, compares it to the latest
+committed version, and includes the diff directly in the issue comment body.
 
-Let's resume our `scripts/helper.R` example. The file simply adds two numbers and returns their sum. But the reviewers wants to comment saying they don't need to `return()` 
-the result since that is R's default behavior. They can simply leave a comment directly in the file and save the content.
+Continuing the `scripts/helper.R` example, the file simply adds two numbers and returns their sum. The reviewer wants to point out that the explicit `return()` is not needed,
+since R returns the last expression by default. They can leave that comment directly in the file and save it locally.
 
 ```r ins={3}
 //helper.R 
@@ -22,14 +22,13 @@ add2 <- function(a, b) {
 }
 ```
 
-After editing the file (and up to 30 sec for the git status to update), the issue will be marked with a star indicating there are local, uncommitted changes to the file.
+After editing the file, the issue will be marked with a star once the Git status refreshes, indicating that there are local, uncommitted changes to the file.
 
 <div style="display: flex; justify-content: center;">
     <img src={reviewDirtyFile.src} style="width: 75%;" />
 </div>
 
-Clicking on the card will open a pop-up to the "Review" Tab. On this tab, you can select the commit you want your review to be on, include an optional comment,
-and preview the comment that will be posted.
+Clicking the card opens a pop-up on the _Review_ tab. There, you can select the commit the review applies to, include an optional comment, and preview the comment that will be posted.
 
 <div style="display: flex; justify-content: center;">
     <img src={reviewPopUp.src} style="width: 60%;" />
@@ -39,10 +38,10 @@ and preview the comment that will be posted.
     <img src={reviewPreview.src} style="width: 60%;" />
 </div>
 
-Clicking "Post" will post the comment and update the issue's status to "Findings to Address". 
+Clicking _Post_ posts the comment and updates the issue status to _Findings to Address_.
 
 :::note
-After posting a review, the file will remain in a dirty state. To revert back to the committed state, run one of the following terminal commands:
+After posting a review, the file will remain in a dirty state because your local comment is still present. To return the file to its last committed state, run one of the following commands:
 ```bash
 git checkout -- <reviewed file>
 # OR

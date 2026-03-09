@@ -1,6 +1,6 @@
 ---
 title: Assign Files for QC
-description: Walk through creating first QC issues
+description: Walkthrough of creating your first QC issues
 ---
 
 import { Steps } from '@astrojs/starlight/components';
@@ -14,47 +14,41 @@ import createReviewSelect from '../../../../assets/intro/getting-started/create/
 import createQueued from '../../../../assets/intro/getting-started/create/queued.png';
 import createCreated from '../../../../assets/intro/getting-started/create/created.png';
 
-Now that we can determine our repository is up-to-date and the configuration is set-up, we can create our first QC issues. Selecting the _Create_ tab 
-will open a page that allows you to either _Select_ a Milestone and add more files to it, or create a _New_ milestone. Since this project does not have any
-existing milestones, we will select the _New_.
+Now that the repository is up to date and the configuration is set up, we can create our first QC issues. Open the _Create_ tab to either select an existing
+milestone and add more files to it, or create a new milestone. Since this example project does not have any existing milestones, we will choose _New_.
 
 <div style="display: flex; justify-content: center;">
   <img src={createMilestone.src} style="width: 75%;" />
 </div>
 
-When creating a new milestone, you must provide a milestone name and have the option to include a description of this milestone. Additionally, on this page is
-the opportunity to add files to be QCed. Clicking on the _Create New QC_ button will open a modal pop-up with 4 tabs:
+When creating a new milestone, you must provide a name and can optionally include a description. This page also lets you add files for QC.
+Clicking _Create New QC_ opens a modal with four tabs:
 
 <Steps>
     1. **Select a File**
 
-        The first tab contains a file tree to select the file to be QCed. Since issues and files are one-to-one, you _must_ select one and only one file.
+        The first tab contains a file tree for selecting the file to review. Each QC issue is tied to exactly one file, so you must select one file here.
         <div style="display: flex; justify-content: center;">
             <img src={createFileSelect.src} style="width: 75%;" />
         </div>
 
     2. **Select a Checklist**
 
-        The second tab requires you to select a checklist for which the file must be reviewed against. These are templates that can be edited directly in the
-        tab before creating the QC.
+        The second tab asks you to choose the checklist that will be used for the review. These checklist templates can be edited directly in the tab before
+        creating the QC issue.
         <div style="display: flex; justify-content: center;">
             <img src={createChecklistSelect.src} style="width: 75%;" />
         </div>
 
     3. **Select Relevant Files**
 
-        In `ghqc`, we recognize a file hardly ever stands alone in an analysis. A file sources outputs from another, uses helper functions, or expands on a previously
-        QCed file. Because of this, we can add files which are relevant to the current QC, while adding some rules how a QC must be approved. 
-        
-        Relevant files have 4 classifications:
-            * Previous QC - A QC which has previously been done for this file (or a very similar one). Must be approved before the main issue can be.
-            * Gating QC - A QC of a file which the main file depends on. The gating QC must be approved before the main issue can be.
-            * Relevant QC - A QC of a file which is relevant to the current QC, but does not directly change the current QC. Has no baring on the main QC's approval.
-            * Relevant File - A file which is relevant to the current QC, but does not require QC. Has no baring on the main QC's approval.
-        For more details, reference the [Relevant Files section](../create/#relevant-files).
+        In many projects, a file does not stand alone. It may depend on other files, build on earlier work, or relate to a previous QC. This tab lets you attach
+        those related files so the reviewer has the right context.
 
-        To add a relevant file, select the _Add Relevant File_ button. This will open a pop-up with a file tree. Any files that have issues created for them will have 
-        their issue number next to the file as well. 
+        `ghqc` supports several types of relevant files, including previous QC issues, gating QC issues, related QC issues, and related files without a QC issue.
+        For more detail on how each type affects approval, see the [Relevant Files section](../create/#relevant-files).
+
+        To add a relevant file, select _Add Relevant File_. This opens a pop-up with a file tree. Files that already have QC issues will also show their issue number.
 
         <div style="display: flex; justify-content: center;">
             <img src={createRelFileSelect.src} style="width: 75%;" />
@@ -65,19 +59,18 @@ the opportunity to add files to be QCed. Clicking on the _Create New QC_ button 
 
     4. **Assign Reviewer**
 
-        Optionally, you can add reviewer(s) to the QC in the tab. If you do not know who will be reviewing your QC at the time of initialization, the reviewer can add 
-        themselves to the GitHub Issue and `ghqc` will treat it the exact same.
+        Optionally, you can assign one or more reviewers in this tab. If you do not know who will review the QC issue yet, that is fine. A reviewer can add themselves
+        to the GitHub issue later and `ghqc` will treat it the same way.
 
         <div style="display: flex; justify-content: center;">
             <img src={createReviewSelect.src} style="width: 75%;" />
         </div>
 </Steps>
 
-After the file and checklist is selected, you can queue the QC for creation. This allows you to assign multiple files for QC and edit them as needed before creation.
+After the file and checklist are selected, you can queue the QC issue for creation. This lets you prepare multiple QC issues together and adjust them before creating them.
 
 <div style="display: flex; justify-content: center;">
     <img src={createQueued.src} style="width: 75%;" />
 </div>
 
-After all files files you wish to create together are queued, select the "Create QC Issues" button. This will create the milestone and issues and return a pop-up with links
-to the create issues.
+After all files you want to create together are queued, select _Create QC Issues_. This creates the milestone and QC issues, then returns a pop-up with links to the new issues.
