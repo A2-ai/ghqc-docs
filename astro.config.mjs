@@ -54,6 +54,7 @@ export default defineConfig({
 						{ label: 'Introduction', slug: 'concepts' },
 						{ label: 'Configuration', slug: 'concepts/configuration' },
 						{ label: 'Relevant Files and Issues', slug: 'concepts/relevant-files' },
+						{ label: 'QC Record', slug: 'concepts/record' },
 					]
 				},
 				{
