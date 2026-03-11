@@ -42,6 +42,7 @@ export default defineConfig({
 						{ label: 'QC Status', slug: 'features/qc_status'},
 						{ label: 'Comments', slug: 'features/comments' },
 						{ label: 'Create', slug: 'features/create' },
+						{ label: 'Record', slug: 'features/record' },
 					]
 				},
 				{
