@@ -30,7 +30,18 @@ export default defineConfig({
 								{ label: 'Findings', slug: 'intro/getting-started/findings' },
 								{ label: 'Approve', slug: 'intro/getting-started/approve' },
 							] 
-						},
+						}
+					]
+				},
+				{
+					label: 'Features',
+					collapsed: true,
+					items: [
+						{ label: 'Introduction', slug: 'features'},
+						{ label: 'Git Status', slug: 'features/git_status'},
+						{ label: 'QC Status', slug: 'features/qc_status'},
+						{ label: 'Comments', slug: 'features/comments' },
+						{ label: 'Create', slug: 'features/create' },
 					]
 				},
 				{
