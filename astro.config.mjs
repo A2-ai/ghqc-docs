@@ -48,6 +48,15 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'Concepts',
+					collapsed: true,
+					items: [
+						{ label: 'Introduction', slug: 'concepts' },
+						{ label: 'Configuration', slug: 'concepts/configuration' },
+						{ label: 'Relevant Files and Issues', slug: 'concepts/relevant-files' },
+					]
+				},
+				{
 					label: 'Legacy - Shiny R packages',
 					collapsed: true,
 					items: [
