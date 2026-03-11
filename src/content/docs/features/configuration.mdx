@@ -1,0 +1,167 @@
+---
+title: Configuration
+description: Understanding the Configuration tab for setting up and inspecting the ghqc configuration repository
+---
+
+import configTabWarning from '../../../assets/features/config/tab_warning.png';
+import configSetUp from '../../../assets/intro/getting-started/config-setting-up.png';
+import configEnvVar from '../../../assets/features/config/env_var.png';
+import configGitSetup from '../../../assets/features/config/git_setup.png';
+import configChecklists from '../../../assets/features/config/checklists.png';
+import configOptions from '../../../assets/features/config/options.png';
+
+The Configuration tab is the main place in the UI for checking whether `ghqc` has access to a configuration repository.
+It gives a lightweight overview of the pieces of configuration that affect the rest of the app, especially checklists and a few core paths and labels, 
+and an easy way to set-up the configuration.
+
+## What Configuration Controls
+
+At a high level, the configuration repository provides the shared review setup used across `ghqc` by you or your group.
+In the UI, the Configuration tab surfaces the most immediately useful parts of that setup:
+
+- whether the configuration repository is connected
+- which checklists are available
+- how checklists are named in the UI
+- where key assets such as the logo and record output paths are expected
+- which local configuration directory `ghqc` resolved for the current session
+
+The tab is primarily for setup and inspection. It does not expose every configuration capability directly in the UI.
+
+## Tab Warning State
+
+If the configuration repository has not been set up, the **Configuration** tab itself shows a warning badge and tooltip:
+
+`Configuration repository is not set up`
+
+This makes it visible from anywhere in the app that the shared checklist/configuration layer still needs attention.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configTabWarning.src} style="width: 75%;" />
+</div>
+
+## Layout
+
+The Configuration tab has three collapsible sections:
+
+- **Git Repository**
+- **Checklists**
+- **Options**
+
+Each section can be expanded or collapsed independently.
+
+## Git Repository
+
+The **Git Repository** section has two modes depending on whether configuration has already been set up.
+
+### Not Yet Configured
+
+When no configuration repository is connected, the section shows a setup form with:
+
+- a **Git URL** input
+- a **Set Up** button
+
+The button remains disabled until a URL is available.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configSetUp.src} style="width: 75%;" />
+</div>
+
+If `GHQC_CONFIG_REPO` is set, the URL field is pre-filled and disabled, and the UI shows:
+
+`Set by GHQC_CONFIG_REPO`
+
+In that case, the **Set Up** button can be used immediately without typing.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configEnvVar.src} style="width: 60%;" />
+</div>
+
+If setup fails, the error message is shown directly below the form and the tab remains in setup mode.
+
+:::note[Non-Git Directory]
+When pointing to an existing, non-git directory, the Git Repository section will indicate **Not a git repository** and list the directory.
+
+This is especially import when using `GHQC_CONFIG_DIR`.
+:::
+
+### Configured State
+
+Once configuration is available, the setup form is replaced by a repository summary showing:
+
+- repository owner and name
+- git sync state: `clean`, `ahead`, `behind`, or `diverged`
+- the local configuration directory path
+- any dirty files in the configuration repository
+
+This section is mainly a health check. It lets you confirm that the app is pointed at the expected repository and whether that repository itself is in a clean git state.
+The displayed directory is the fully resolved config location, so it reflects custom resolution sources such as `GHQC_CONFIG_DIR` when that env var is being used.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configGitSetup.src} style="width: 60%;" />
+</div>
+
+## Checklists
+
+The **Checklists** section displays the checklists loaded from the configuration repository.
+
+The layout has two parts:
+
+- a list of checklist names on the left
+- the selected checklist's content on the right in a read-only text area
+
+The UI filters out the special `Custom` checklist from this list. Only repository-backed checklists are shown here.
+
+If no checklists are found, the section shows:
+
+`No checklists found`
+
+This section is useful for quickly confirming:
+
+- which checklist templates are available
+- whether the expected checklist content was loaded
+- how those templates will appear elsewhere in the app
+
+<div style="display: flex; justify-content: center;">
+  <img src={configChecklists.src} style="width: 75%;" />
+</div>
+
+## Options
+
+The **Options** section displays a small set of high-impact configuration values that affect the UI and downstream outputs.
+
+The section shows:
+
+- **Display name** — the configured human-readable checklist name
+- **Checklist directory** — where checklist files are expected inside the config repo
+- **Logo path** — the configured logo location, plus whether the file was found
+- **Record path** — the configured records directory
+- **Checklist note** — shown only when a prepended checklist note is configured
+
+Most of these values are read-only status information. They are intended to help you verify what the application resolved from configuration, not to edit the config in place.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configOptions.src} style="width: 75%;" />
+</div>
+
+### Display Name Behavior
+
+The configured checklist display name affects terminology elsewhere in the UI.
+
+For example, if the configuration uses a different display name than "Checklist", that label is reused in places like:
+
+- Create
+- Record
+- other checklist-related labels throughout the app
+
+The Configuration tab is where you can confirm which naming convention the UI is currently using.
+
+## When To Use This Tab
+
+The Configuration tab is most useful when you need to:
+
+- set up the configuration repository for the first time
+- confirm that the expected config repo is connected
+- confirm that a custom directory override such as `GHQC_CONFIG_DIR` resolved to the expected path
+- inspect whether checklist files were loaded correctly
+- verify the resolved display names and core paths
+- diagnose why configuration-driven features in other tabs are not behaving as expected

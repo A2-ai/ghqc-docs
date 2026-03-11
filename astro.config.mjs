@@ -38,12 +38,13 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{ label: 'Introduction', slug: 'features'},
-						{ label: 'Git Status', slug: 'features/git_status'},
+						{ label: 'Create', slug: 'features/create' },
 						{ label: 'QC Status', slug: 'features/qc_status'},
 						{ label: 'Comments', slug: 'features/comments' },
-						{ label: 'Create', slug: 'features/create' },
 						{ label: 'Record', slug: 'features/record' },
 						{ label: 'Archive', slug: 'features/archive' },
+						{ label: 'Configuration', slug: 'features/configuration' },
+						{ label: 'Git Status', slug: 'features/git_status'},
 					]
 				},
 				{
