@@ -17,6 +17,7 @@ for (const version of VERSIONS) {
 ---
 
 <div class="site-title-wrapper">
+  <img class="site-favicon" src={`${base}/favicon.svg`} alt="" aria-hidden="true" />
   <Default {...Astro.props} />
   <div class="version-select-wrapper">
     <label class="sr-only" for="version-select">Select version</label>
@@ -40,6 +41,12 @@ for (const version of VERSIONS) {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .site-favicon {
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
   }
 
   .version-select-wrapper {
