@@ -87,6 +87,19 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'R Package',
+					collapsed: true,
+					items: [
+						{ label: 'Introduction', slug: 'rpkg'},
+						{ label: 'ghqc', slug: 'rpkg/ghqc' },
+						{ label: 'Install', slug: 'rpkg/install' },
+						{ label: 'Server Management', slug: 'rpkg/management' },
+						{ label: 'Logging', slug: 'rpkg/log' },
+						{ label: 'Situation Report', slug: 'rpkg/sitrep' },
+						{ label: 'Version', slug: 'rpkg/version' },
+					]
+				},
+				{
 					label: 'Concepts',
 					collapsed: true,
 					items: [

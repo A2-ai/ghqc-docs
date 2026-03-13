@@ -1,0 +1,21 @@
+---
+title: ghqc R Package
+description: R helpers for installing, launching, and managing ghqc from an R session
+---
+
+The `ghqc` R package is a lightweight wrapper around the `ghqc` CLI.
+It installs the binary, launches the web UI as a background process, and provides a few R-native helpers for status, reconnection, logs, and diagnostics.
+
+Refer to the [installation instructions](../intro/installation/#r-package) to install the R package.
+
+## Functions
+
+- [`ghqc::ghqc()`](./ghqc) starts the ghqc web UI from R and opens it in your browser
+- [`ghqc::ghqc_install()`](./install) installs or upgrades the `ghqc` binary
+- [`ghqc::ghqc_status()`](./management/#ghqcghqc_status) reports whether the background server is still running
+- [`ghqc::ghqc_reconnect()`](./management/#ghqcghqc_reconnect) reopens the browser without restarting the server
+- [`ghqc::ghqc_stop()`](./management/#ghqcghqc_stop) stops the background server
+- [`ghqc::ghqc_log()`](./log) streams server logs into the R console
+- [`ghqc::ghqc_sitrep()`](./sitrep) prints a diagnostic report for the binary, server, and repository
+- [`ghqc::ghqc_version()`](./version/#ghqcghqc_version) reports the installed ghqc version
+- [`ghqc::ghqc_remote_version()`](./version/#ghqcghqc_remote_version) reports the latest released ghqc versions

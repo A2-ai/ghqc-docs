@@ -1,0 +1,91 @@
+---
+title: ghqc::ghqc()
+description: Launch the ghqc web UI from R as a supervised background process
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc::ghqc()` starts the ghqc web UI from R by launching the `ghqc` binary in the background, waiting for it to become available, and then opening the app in your browser.
+
+It is the main entry point for the R package and the R-side equivalent of running `ghqc ui` from the terminal.
+
+```r
+ghqc::ghqc()
+```
+
+## What It Does
+
+When you call `ghqc::ghqc()`:
+
+- any previously started ghqc background server from the current R session is stopped first
+- the target project directory is resolved from `here::here()`
+- a port is chosen automatically unless you supply one
+- the package launches `ghqc ui --no-open` as a supervised background process
+- once the server responds, R opens `http://localhost:<port>` in your browser
+
+The function is called for its side effects and returns `NULL` invisibly.
+
+## Arguments
+
+<table>
+  <colgroup>
+    <col style={{ width: '26%' }} />
+    <col style={{ width: '74%' }} />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>directory</code></td>
+      <td>Project directory to serve. Defaults to <code>here::here()</code>.</td>
+    </tr>
+    <tr>
+      <td><code>port</code></td>
+      <td>Port to bind the server to. If <code>NULL</code>, ghqc selects a random available port.</td>
+    </tr>
+    <tr>
+      <td><code>config_dir</code></td>
+      <td>Optional ghqc configuration directory. If omitted, ghqc uses its normal configuration discovery logic.</td>
+    </tr>
+    <tr>
+      <td><code>log_level</code></td>
+      <td>Logging level value, defaulting to <code>Sys.getenv("GHQC_LOG_LEVEL", "TRACE")</code>. This exists for the R logging workflow; the function still launches the server in verbose mode so logs can be filtered later with <code>ghqc::ghqc_log()</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Examples
+
+```r
+# Start using the current project root
+ghqc::ghqc()
+```
+
+```r
+# Start on a fixed port
+ghqc::ghqc(port = 8080)
+```
+
+```r
+# Start for a subdirectory with a custom config location
+ghqc::ghqc(directory = "analysis", config_dir = "~/.config/ghqc")
+```
+
+## Requirements
+
+- the `ghqc` CLI binary must already be installed and available on `PATH`
+- because the R package launches `ghqc ui`, the installed binary must include the `ui` feature
+- on unix-like systems, `ghqc::ghqc_install()` is the intended way to install or upgrade that binary
+
+If the binary is missing, `ghqc::ghqc()` fails immediately and tells you to run `ghqc::ghqc_install()`.
+
+## Startup Behavior
+
+- if `port = NULL`, the package samples a random available TCP port rather than defaulting to `3103`
+- startup waits until the local server is reachable, then opens the browser
+- if the server fails to come up within the timeout, the function stops with the captured server error when one is available
+

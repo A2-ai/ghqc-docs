@@ -1,0 +1,78 @@
+---
+title: ghqc::ghqc_install()
+description: Install or upgrade the ghqc binary from the R package
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc::ghqc_install()` installs the `ghqc` CLI binary that the R package wraps.
+On supported systems, it downloads the latest release using the package's bundled install script and makes the binary available to the current R session.
+
+```r
+ghqc::ghqc_install()
+```
+
+## What It Does
+
+When you call `ghqc::ghqc_install()`:
+
+- the function checks the latest GitHub release for `a2-ai/ghqctoolkit`
+- if `ghqc` is already installed, it compares the local version with the latest release
+- in interactive R sessions, it asks before upgrading when the installed version is out of date
+- it runs the bundled installer script, which downloads the appropriate release asset for your platform
+- after a successful install, it adds `~/.local/bin` to `PATH` for the current R session if needed
+
+The function is called for its side effects and returns `NULL` invisibly.
+
+## Platform Support
+
+`ghqc::ghqc_install()` is intended for unix-like systems:
+
+- macOS
+- Linux
+
+On Windows, the function prints a warning and returns without installing anything.
+
+## Installation Location
+
+The installer places the `ghqc` binary in:
+
+```text
+~/.local/bin
+```
+
+If that directory is not already present in the current R session's `PATH`, the function prepends it for the rest of the session.
+
+## Upgrade Behavior
+
+If `ghqc` is already installed:
+
+- when the latest release version can be determined and matches the installed version, the function reports that `ghqc` is up to date and exits
+- when the latest release is newer, interactive sessions prompt for confirmation before upgrading
+- when the latest version cannot be determined, the function still allows installation and reports that the remote version is unknown
+
+Non-interactive sessions do not prompt; they proceed directly to installation.
+
+## How the Installer Picks a Binary
+
+The bundled shell installer detects:
+
+- operating system
+- CPU architecture
+- on Linux, whether to prefer `gnu` or `musl` release assets based on detected `glibc` compatibility
+
+It then downloads the matching release artifact from the latest `ghqctoolkit` GitHub release.
+
+## Example
+
+```r
+ghqc::ghqc_install()
+```
+
+## Failure Modes
+
+- if GitHub version lookup fails, installation can still proceed, but version-aware messaging is reduced
+- if the bundled installer exits with a non-zero status, `ghqc::ghqc_install()` reports the failure and does not mark the install as successful
+- if no matching release artifact exists for the current platform, the installer fails and prints target guidance from the shell script
+
+<LinkCard title="ghqc::ghqc()" href="./ghqc" description="Launch the ghqc web UI from R after the binary is installed"/>
