@@ -1,0 +1,182 @@
+---
+title: QC Status
+description: How ghqc derives QC states from issue history, file-changing commits, and approvals
+---
+
+`ghqc` uses a small set of computed QC states to decide what attention a file needs next.
+Those states drive:
+
+- the swimlanes in the UI Status tab
+- the default action shown in the issue detail panel
+- the output of `ghqc issue status`
+- parts of milestone summaries and dependency checks
+
+This page explains the status model itself rather than the layout of any one screen.
+If you want the UI walkthrough, see [QC Status feature](../features/qc_status).
+
+## 1. Mental Model
+
+At a high level, `ghqc` compares three things:
+
+1. whether the issue is open or closed
+2. whether there is a recorded approval
+3. whether the latest file-changing commit is already covered by a QC status comment
+
+The important idea is that QC status is not just "open versus closed".
+It is a derived state based on the relationship between Git history and the issue thread.
+
+### 1.1. The Core Question
+
+For an open issue, the central question is:
+
+> Has the most recent relevant file change already been captured by the issue thread?
+
+If yes, the issue is waiting on reviewer action.
+If no, the issue is waiting on the author to notify the reviewer about that newer change.
+
+That is why `ghqc` distinguishes:
+
+- a file that has been commented on recently
+- a file that has changed since the last QC comment
+
+## 3. Issue States
+
+### 3.1. `In progress`
+
+This means the issue exists, but there is not yet enough status-bearing history to treat it as notified, reviewed, or approved.
+
+In practice, this is the earliest workflow state.
+The issue has started, but no meaningful QC exchange has covered a file-changing commit yet.
+
+This state is hardly ever encountered as all issues _should_ have a file-changing commit or QC initialization.
+
+### 3.2. `Changes to comment`
+
+This means the newest file-changing commit is newer than the newest QC status comment that covers the file.
+
+Operationally, this is the "author needs to notify" state.
+The file has changed, but the issue thread does not yet document that newest change.
+
+### 3.3. `Awaiting review`
+
+This means the latest relevant file change is already covered by the issue thread and the latest status-bearing action is not a review requesting changes.
+
+Operationally, the reviewer is up next.
+The author has already posted enough context for the current version.
+
+### 3.4. `Changes requested`
+
+This means the latest covered state is a review state rather than a notification-style state.
+
+Operationally, the reviewer has already responded to the current file version and the author is expected to make changes or reply with a newer notification.
+
+### 3.5. `Approval required`
+
+This means the issue is closed but there is no recorded approval.
+
+This is a special case because a closed issue is not automatically treated as approved.
+`ghqc` distinguishes formal approval from any other way an issue might have ended up closed.
+
+### 3.6. `Approved`
+
+This means the issue has a recorded approval and there are no later file-changing commits after that approved commit.
+
+This is the stable "done" state for a file.
+
+### 3.7. `Approved; subsequent file changes`
+
+This means the issue does have a recorded approval, but the file changed after the approved commit.
+
+Operationally, the previous approval no longer describes the current file contents.
+That is why the UI keeps these issues in the approved lane but highlights them as changed-after-approval cases.
+
+## 4. Coverage
+
+The subtle part of the model is the idea of a file change being "covered" by a QC status comment.
+
+`ghqc` looks at the commit history for the tracked file and identifies:
+
+- the newest commit that changed the file
+- the newest commit in the issue thread that carries QC status information
+
+If the status-bearing commit is at the same point in history or newer than the newest file-changing commit, the current file state is considered covered.
+If the newest file-changing commit is newer, the status is `Changes to comment`.
+
+This is what lets `ghqc` detect that the issue thread has gone stale relative to the file.
+
+## 5. Approval
+
+Approval is handled differently from the other states because it pins the QC to a specific commit.
+
+After approval, `ghqc` checks whether any later commit also changed the file.
+
+- if no later file-changing commit exists, the state stays `Approved`
+- if a later file-changing commit exists, the state becomes `Approved; subsequent file changes`
+
+That means approval is not just "the issue was closed".
+It is "the file was approved at a specific commit, and that approval is still current".
+
+## 6. Open vs. Closed
+
+Issue openness still matters, but only as one part of the model.
+
+- open issues can be `In progress`, `Changes to comment`, `Awaiting review`, or `Changes requested`
+- closed issues can be `Approval required` or one of the approved states
+
+This is why `ghqc` can show a closed issue that still needs attention: closed does not necessarily mean approved.
+
+## 7. How QC Status is Used
+
+### 7.1. UI
+
+The UI maps the computed states into four swimlanes:
+
+- `Ready for Review`
+  Includes `Awaiting review` and `Approval required`
+- `Findings to Address`
+  Includes `Changes requested`
+- `Changes to Notify`
+  Includes `In progress` and `Changes to comment`
+- `Approved`
+  Includes `Approved` and `Approved; subsequent file changes`
+
+Those lanes are therefore a grouping layer on top of the underlying QC states, not the states themselves.
+
+### 7.2. CLI
+
+The CLI `ghqc issue status` command exposes the same underlying status model in text form.
+
+It combines the computed QC state with:
+
+- file-aware Git status
+- checklist completion summaries
+- blocking QC status
+
+That command is useful when you want to inspect the logic for one issue without opening the UI.
+
+## 8. Related Signals
+
+Some related signals appear alongside QC status, but they are not the QC status state machine itself.
+
+### 8.1. Checklist Progress
+
+Checklist progress influences how people interpret an issue, but it does not directly determine the QC status state.
+
+For example:
+
+- an issue can be `Awaiting review` with an incomplete checklist
+- an issue can be `Changes requested` even if many checklist items are checked
+- an issue can be `Approved` because approval is based on the issue thread and commit state, not on checklist percentage alone
+
+So checklist completion is supporting information, not the state machine itself.
+
+### 8.2. Blocking QCs
+
+Blocking QCs affect whether approval can proceed cleanly, but they do not directly redefine the issue's computed QC state.
+
+That means an issue can be:
+
+- `Awaiting review` while also having unresolved blocking QCs
+- `Approved` only after approval has actually been recorded
+
+The dependency model and the status model interact, but they are not the same concept.

@@ -116,6 +116,7 @@ export default defineConfig({
 						{ label: 'Relevant Files and Issues', slug: 'concepts/relevant-files' },
 						{ label: 'QC Record', slug: 'concepts/record' },
 						{ label: 'Authentication', slug: 'concepts/authentication' },
+						{ label: 'QC Status', slug: 'concepts/qc-status' },
 					]
 				},
 				{
