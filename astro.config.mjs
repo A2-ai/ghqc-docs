@@ -117,6 +117,7 @@ export default defineConfig({
 						{ label: 'QC Record', slug: 'concepts/record' },
 						{ label: 'Authentication', slug: 'concepts/authentication' },
 						{ label: 'QC Status', slug: 'concepts/qc-status' },
+						{ label: 'Unapproval Impact', slug: 'concepts/unapproval-impact' },
 					]
 				},
 				{
