@@ -1,0 +1,63 @@
+---
+title: UI
+description: Start the embedded ghqc web UI and API server together
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc ui` starts the ghqc API and serves the embedded React frontend from the same port.
+It is the quickest way to run the full local app without a separate frontend dev server.
+
+```bash
+ghqc ui
+```
+
+## Non-interactive
+
+`ghqc ui` does not have an interactive prompt mode.
+It starts the server, optionally opens your browser, and keeps running until you stop it.
+
+```bash
+ghqc ui
+```
+
+```bash
+ghqc ui --port 8080 --no-open
+```
+
+## What Opens
+
+By default, `ghqc ui` opens `http://localhost:<port>` in your browser after the server starts.
+
+Use `--no-open` when you want to:
+
+- keep startup fully terminal-only
+- launch the browser yourself
+- run the UI in remote shells, CI, or headless environments
+
+<LinkCard
+    title="User Interface Features"
+    href="../../features"
+    description="Visit the Features section for more information about the user interface"
+/>
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `-p, --port` | Port to listen on. Defaults to `3103`. |
+| `--no-open` | Start the server without opening a browser tab. |
+| `-d, --directory` | Set the git project directory the UI should operate on. |
+| `--config-dir` | Override the configuration directory used by the UI. |
+
+## Build Features
+
+`ghqc ui` is available when the binary is built with the `ui` feature.
+That feature also pulls in the API server automatically.
+
+```bash
+cargo build --features cli,ui --release
+./target/release/ghqc ui
+```
+
+<LinkCard title="Serve Command" href="./serve" description="Run the REST API without the embedded frontend when you only need backend access"/>

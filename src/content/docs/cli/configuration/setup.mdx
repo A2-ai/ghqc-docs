@@ -1,0 +1,78 @@
+---
+title: Configuration Setup
+description: Clone and register a configuration repository for ghqc
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc configuration setup` clones the configuration repository that `ghqc` uses for shared checklists, options, and record assets.
+Unlike the issue and milestone commands, setup is always non-interactive: it reads a Git URL, resolves the target config directory, and clones the repository there.
+
+```bash
+ghqc configuration setup [git]
+```
+
+## URL Sources
+
+`ghqc configuration setup` accepts the repository URL from one of two places:
+
+- the optional positional `git` argument
+- the `GHQC_CONFIG_REPO` environment variable
+
+If both are absent, setup fails immediately.
+
+```bash
+ghqc configuration setup https://github.com/org/ghqc-config.git
+```
+
+```bash
+export GHQC_CONFIG_REPO=https://github.com/org/ghqc-config.git
+ghqc configuration setup
+```
+
+## Directory Resolution
+
+Setup uses the same configuration-directory resolution order as the rest of the CLI:
+
+1. `--config-dir`
+2. `GHQC_CONFIG_REPO`
+3. `GHQC_CONFIG_DIR`
+4. default XDG path
+
+That means:
+
+- `--config-dir` always wins if you provide it
+- if `GHQC_CONFIG_REPO` is set, it determines the local directory name even when you also pass a positional `git` URL
+- `GHQC_CONFIG_DIR` is only used when `--config-dir` is absent and `GHQC_CONFIG_REPO` is not set
+- otherwise, the fallback path is `$XDG_DATA_HOME/ghqc/config`
+
+When `GHQC_CONFIG_REPO` drives directory resolution, `ghqc` clones into:
+
+```text
+$XDG_DATA_HOME/ghqc/<repo-name>
+```
+
+## Options
+
+| Argument / Flag | Description |
+|---|---|
+| `[git]` | Git repository URL for the configuration repo. |
+| `--config-dir` | Override the target configuration directory directly. |
+
+## Validation and Defaults
+
+- The selected Git URL must parse as a valid Git remote URL
+- If the target directory does not exist, `ghqc` creates parent directories as needed and clones the repo
+- If the target directory already exists as a Git repository with the same remote URL, setup succeeds as a no-op
+- If the target directory already exists with a different remote, setup fails instead of overwriting it
+- If the target directory already exists but is not a Git repository, setup also fails
+
+## Output
+
+On success, setup prints the resolved configuration directory.
+
+```text
+✅ Configuration successfully setup at /Users/you/.local/share/ghqc/ghqc-config.git
+```
+
+<LinkCard title="Configuration Concepts" href="../../../concepts/configuration" description="See how ghqc resolves configuration directories and loads config contents"/>

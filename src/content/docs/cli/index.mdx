@@ -27,6 +27,23 @@ Commands for summarizing, exporting, and archiving groups of QC issues.
 * [`ghqc milestone record`](./milestone/record) - Generate a PDF QC record for selected milestones.
 * [`ghqc milestone archive`](./milestone/archive) - Bundle milestone artifacts into an archive for storage or delivery.
 
+### Configuration Management
+Commands for cloning, inspecting, and verifying the shared configuration used by `ghqc`.
+
+* [`ghqc configuration setup`](./configuration/setup) - Clone the configuration repository into the resolved local config directory.
+* [`ghqc configuration status`](./configuration/status) - Print the resolved config directory, git state, and loaded checklist summary.
+
+### Diagnostics
+Commands for capturing the current CLI, repository, and configuration environment.
+
+* [`ghqc sitrep`](./sitrep) - Print a combined situation report for the binary, project repository, and configuration.
+
+### Server and Web UI
+Commands for running `ghqc` as a local API service or embedded browser app.
+
+* [`ghqc serve`](./serve) - Start the REST API server without the embedded UI.
+* [`ghqc ui`](./ui) - Start the embedded web UI and API server on the same port.
+
 ## Global Options
 
 These options can be used with most `ghqc` commands.

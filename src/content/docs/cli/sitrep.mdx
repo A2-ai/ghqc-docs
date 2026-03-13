@@ -1,0 +1,82 @@
+---
+title: Sitrep
+description: Print a situation report covering the ghqc binary, repository, and configuration
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc sitrep` prints a compact environment report for the current `ghqc` session.
+It combines binary information, repository status, and configuration details in one command, which makes it useful for troubleshooting or sharing setup context in a bug report.
+
+```bash
+ghqc sitrep
+```
+
+## Non-interactive
+
+`ghqc sitrep` does not have an interactive mode.
+Run it directly against the current working directory, or combine it with `-d` and `--config-dir` to inspect a different project or configuration path.
+
+```bash
+ghqc sitrep
+```
+
+```bash
+ghqc sitrep -d /path/to/project --config-dir /path/to/config
+```
+
+## What It Reports
+
+The text report is divided into three sections:
+
+- `Binary`, with the installed `ghqc` version and resolved executable path
+- `Repository`, with the resolved project directory, GitHub remote, current branch, and milestone counts
+- `Configuration`, with the resolved config directory, config repo details when available, loaded checklists, and active option values
+
+If repository inspection fails, `sitrep` still prints the binary and configuration sections and replaces the repository block with an error message.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Print the same report as pretty-printed JSON instead of text. |
+| `-d, --directory` | Set the project directory to inspect. |
+| `--config-dir` | Override the configuration directory to inspect. |
+
+## Validation and Defaults
+
+- `sitrep` uses the same repository directory default as the rest of the CLI: `.` unless `-d` is supplied
+- configuration directory resolution follows the normal precedence: `--config-dir`, `GHQC_CONFIG_REPO`, `GHQC_CONFIG_DIR`, then the default XDG path
+- if the configuration directory does not exist, `sitrep` still prints the resolved path and marks it as not found
+- if the configuration directory is not a Git repository, `sitrep` still loads local configuration and reports `Repository: Not determined to be git repository`
+- the built-in `Custom` checklist still appears when no repository-backed checklists can be loaded
+- milestones are sorted by open issue count descending, then alphabetically by name
+
+## Example
+
+```text
+=== Binary =========================
+Version: 0.2.0
+Path: /usr/local/bin/ghqc
+
+=== Repository =====================
+Directory: /projects/myrepo
+Repository: owner/repo (https://github.com/owner/repo)
+Branch: main
+Milestones: 2
+  - v1.0 [open]: 4 open | 8 closed
+  - v2.0 [open]: 2 open | 3 closed
+
+=== Configuration ==================
+Directory: /config/path    ❌ Directory not found
+Repository: owner/repo (https://github.com/owner/repo)
+Checklists: 1
+  - Custom: 1 items
+Options:
+  - Checklist Display Name:  checklists
+  - Logo Path: logo.png
+  - Checklist Directory: checklists
+  - Record Template Path: record.typ
+```
+
+<LinkCard title="Configuration Status" href="../configuration/status" description="Use the narrower configuration-only report when you do not need repository or binary details"/>

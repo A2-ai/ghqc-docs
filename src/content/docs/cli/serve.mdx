@@ -1,0 +1,87 @@
+---
+title: Serve
+description: Start the ghqc REST API server without the embedded web UI
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+:::caution
+This is a non-standard command: it is not available in binaries built with the `ui` feature, including the published release binaries.
+:::
+
+`ghqc serve` starts the local HTTP API that powers the ghqc web interface, but does not serve the frontend itself.
+Use it when you want API-only access for local tooling, tests, or frontend development against a separate dev server.
+
+```bash
+ghqc serve
+```
+
+## Non-interactive
+
+`ghqc serve` does not have an interactive mode.
+It binds an HTTP server immediately and keeps running until you stop the process.
+
+```bash
+ghqc serve
+```
+
+```bash
+ghqc serve --port 3104 -d /path/to/project --config-dir /path/to/config
+```
+
+## What It Exposes
+
+The API router includes endpoints for:
+
+- repository health and repo status
+- milestone listing and milestone issue retrieval
+- issue creation, status lookup, and blocked-issue inspection
+- comment, review, approve, and unapprove actions
+- repository file browsing and content preview
+- record preview, PDF generation, and archive generation
+- configuration inspection and configuration repo setup
+
+All routes are mounted under `/api/...`.
+
+<LinkCard
+    title="OpenAPI Specification"
+    href="https://github.com/A2-ai/ghqctoolkit/blob/main/openapi/openapi.yml"
+/>
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `-p, --port` | Port to listen on. Defaults to `3103`. |
+| `-d, --directory` | Set the git project directory the API should operate on. |
+| `--config-dir` | Override the configuration directory used by the API. |
+
+## Build Features
+
+`ghqc serve` is only available when the binary is built with the `api` feature and without the `ui` feature.
+
+```bash
+cargo build --features cli,api --release
+./target/release/ghqc serve
+```
+
+If you build with `cli,api,ui`, the separate `serve` subcommand is omitted entirely and `ghqc ui` becomes the entry point for the combined API and frontend server.
+
+That means the release binaries do not expose `ghqc serve`.
+To use it, you need a custom build without the `ui` feature.
+
+## Frontend Development
+
+One common workflow is to run the API separately and point the UI dev server at it.
+
+```bash
+cargo run --features cli,api -- serve --port 3104
+```
+
+Then, in the `ui/` directory of `ghqctoolkit`:
+
+```bash
+bun run dev
+```
+
+<LinkCard title="UI Command" href="./ui" description="Run the combined embedded UI and API server instead of the API alone"/>

@@ -73,6 +73,17 @@ export default defineConfig({
 								{ label: 'Archive', slug: 'cli/milestone/archive' },
 							]
 						},
+						{
+							label: 'Configuration',
+							collapsed: true,
+							items: [
+								{ label: 'Setup', slug: 'cli/configuration/setup' },
+								{ label: 'Status', slug: 'cli/configuration/status' },
+							]
+						},
+						{ label: 'Situation Report', slug: 'cli/sitrep' },
+						{ label: 'UI', slug: 'cli/ui' },
+						{ label: 'Serve', slug: 'cli/serve' },
 					]
 				},
 				{
