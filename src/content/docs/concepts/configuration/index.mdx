@@ -1,15 +1,15 @@
 ---
 title: Configuration Concepts
-description: How ghqc resolves, loads, and uses configuration across the CLI and web UI
+description: How ghqc resolves, finds, and operationalizes configuration across the CLI and web UI
 ---
 
-import { FileTree } from '@astrojs/starlight/components';
+import { Card, CardGrid, FileTree } from '@astrojs/starlight/components';
 
 `ghqc` uses a separate configuration directory to hold shared review setup for a project or team.
 That directory is where `ghqc` looks for checklist files, optional UI naming overrides, a logo, and a custom record template.
 
-This page explains the underlying configuration model.
-If you want the walkthrough of the web UI tab specifically, see [Configuration feature](../features/configuration).
+This page explains the configuration model at a high level.
+If you want the walkthrough of the web UI tab specifically, see [Configuration feature](../../features/configuration).
 
 ## 1. Overview
 
@@ -36,14 +36,12 @@ The expected layout is:
 
 - `checklists/` is where repository-backed checklist files are loaded from by default
 - `options.yaml` is optional and overrides defaults
-- `logo.png` is the logo used in generated QC record output; it is optional unless you explicitly configure a different logo path
-- `record.typ` is the Typst template used when generating QC records; it is optional unless you explicitly configure a custom record template
+- `logo.png` is the logo used in generated QC record output
+- `record.typ` is the Typst template used when generating QC records
 
 Even with no repository-backed checklists present, `ghqc` still provides a built-in `Custom` checklist as a fallback.
 
-## 2. Resolution Model
-
-### 2.1. Directory Resolution
+## 2. Directory Resolution
 
 The configuration directory is resolved in a fixed order:
 
@@ -59,12 +57,12 @@ That means:
 - `GHQC_CONFIG_DIR` is only used when `--config-dir` is absent and `GHQC_CONFIG_REPO` is not set
 - otherwise, `ghqc` falls back to a default local directory
 
-### 2.2. `--config-dir`
+### 2.1. `--config-dir`
 
 When you pass `--config-dir`, `ghqc` uses that exact directory directly.
 This is the most explicit option and the best choice for one-off runs, testing, or scripting.
 
-### 2.3. `GHQC_CONFIG_REPO`
+### 2.2. `GHQC_CONFIG_REPO`
 
 When `GHQC_CONFIG_REPO` is set, `ghqc` derives a local directory from the repository URL instead of using the URL itself as configuration.
 It resolves to:
@@ -84,13 +82,14 @@ typically resolves to:
 ```text
 ~/.local/share/ghqc/ghqc.example_config_repo
 ```
+
 This is useful because:
 
 - the config location is stable across machines
 - the repo name keeps multiple config repos distinct
 - the UI can pre-fill the setup form from the environment variable
 
-### 2.4. `GHQC_CONFIG_DIR`
+### 2.3. `GHQC_CONFIG_DIR`
 
 When `GHQC_CONFIG_DIR` is set, `ghqc` uses that directory path directly.
 This is useful when:
@@ -103,7 +102,7 @@ This is useful when:
 One important detail: `GHQC_CONFIG_DIR` has lower precedence than `GHQC_CONFIG_REPO`.
 If both are set, `GHQC_CONFIG_REPO` wins.
 
-### 2.5. Default Location
+### 2.4. Default Location
 
 If no override is provided, `ghqc` falls back to:
 
@@ -117,66 +116,9 @@ On a typical Linux or macOS setup using XDG defaults, that is often:
 ~/.local/share/ghqc/config
 ```
 
-## 3. Configuration Contents
+## 3. Operation
 
-### 3.1. Defaults
-
-If `options.yaml` is missing or cannot be read, `ghqc` falls back to built-in defaults.
-
-The current defaults are:
-
-| Setting | Default |
-|---|---|
-| `prepended_checklist_note` | none |
-| `checklist_display_name` | `checklists` |
-| `logo_path` | `logo.png` |
-| `checklist_directory` | `checklists` |
-| `record_path` | `record.typ` |
-
-These defaults matter because they determine what `ghqc` looks for even in a minimal configuration directory.
-
-### 3.2. `options.yaml`
-
-`options.yaml` lets you override a small set of high-impact settings.
-
-| Option | Purpose |
-|---|---|
-| `prepended_checklist_note` | Prepends a note to loaded checklist content |
-| `checklist_display_name` | Changes how checklist-like content is named in the UI |
-| `logo_path` | Changes the relative path to the logo file |
-| `checklist_directory` | Changes the relative path where checklists are loaded from |
-| `record_path` | Changes the relative path to a custom Typst record template |
-
-All of these paths are relative to the resolved configuration directory.
-
-### 3.3. Checklists
-
-By default, `ghqc` loads checklist files from `checklists/`.
-Supported repository-backed checklist formats are:
-
-- `.txt`
-- `.yaml`
-- `.yml`
-
-Other file types in that directory are ignored.
-
-For `.txt` files, the checklist name comes from the filename.
-For `.yaml` and `.yml` files, the checklist name comes from the top-level YAML key.
-
-The built-in `Custom` checklist is always present, even if the configuration directory is empty or the checklist directory is missing.
-
-### 3.4. Logo And Record Template
-
-`logo.png` and `record.typ` both affect QC record generation, but they are handled differently when absent.
-
-- `logo.png` is optional visual branding for generated records
-- `record.typ` is the Typst template that controls how records are rendered
-
-If `logo.png` is not provided and you have not configured a custom `logo_path`, record generation still works, just without an embedded logo.
-
-If `record.typ` is not provided and you have not configured a custom `record_path`, `ghqc` falls back to its built-in record template.
-
-### 3.5. Git And Non-Git Directories
+### 3.1. Git And Non-Git Directories
 
 `ghqc` can read configuration from either:
 
@@ -189,9 +131,7 @@ If it is just a local folder, configuration can still load, but setup and status
 
 If setup targets an existing directory that is not already a Git repository, `ghqc` treats that as a conflict instead of silently overwriting it.
 
-## 4. Operational Guidance
-
-### 4.1. Recommended Setup
+### 3.2. Recommended Setup
 
 For most teams, the best setup is:
 
@@ -210,11 +150,11 @@ This gives you:
 Use `GHQC_CONFIG_DIR` mainly for local development, experimentation, or situations where the configuration is intentionally not backed by a Git remote.
 
 :::note[HPC]
-For groups using a shared HPC, it is recommended to set `GHQC_CONFIG_DIR` to a shared, readable location. 
-The group's admin can then set-up one configuration directory for use by all users, ensuring every user has the most up to date configuration.
+For groups using a shared HPC, it is recommended to set `GHQC_CONFIG_DIR` to a shared, readable location.
+The group's admin can then set up one configuration directory for use by all users, ensuring every user has the most up to date configuration.
 :::
 
-### 4.2. Environment Variables
+### 3.3. Environment Variables
 
 The main environment variables are:
 
@@ -227,7 +167,7 @@ The main environment variables are:
 `GHQC_CONFIG_REPO` and `GHQC_CONFIG_DIR` affect where configuration is found.
 `XDG_DATA_HOME` affects where the default or repo-derived local directory lives.
 
-### 4.3. How The UI Fits In
+### 3.4. How The UI Fits In
 
 The Configuration tab is an inspector and setup surface for this model.
 It does not define configuration behavior itself.
@@ -240,3 +180,16 @@ The tab mainly shows:
 - which option values were resolved
 
 So the concept is: configuration is resolved first, then the UI reports what `ghqc` found.
+
+## 4. Next Topics
+
+<Card title="Content and Defaults" icon="setting">
+  What files `ghqc` expects inside the configuration directory, which defaults apply, and which fallback behaviors are built in.
+
+  [Explore Content and Defaults →](./content-defaults)
+</Card>
+<Card title="Configuration Authoring" icon="seti:git">
+  How to author `options.yaml`, checklist files, and a maintainable configuration repository layout for your team.
+
+  [Explore Configuration Authoring →](./authoring)
+</Card>

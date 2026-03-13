@@ -1,12 +1,16 @@
 ---
-title: Issue Notify
-description: Notify a reviewer about file changes from the terminal
+title: Issue Comment
+description: Comment about file changes from the terminal to notify the reviewer
 ---
 
 import { LinkCard } from '@astrojs/starlight/components';
 
+:::note
+The CLI uses `comment` instead of [notify](../../../features/comments/#notify) to document a change into the QC Issue. 
+:::
+
 The notify step is handled by `ghqc issue comment`.
-It is the CLI counterpart to the UI's [Comments](../../../features/comments) flow when the author needs to post an update showing what changed between commits.
+It is the CLI counterpart to the UI's [Comments](../../../features/comments/#notify) flow when the author needs to post an update showing what changed between commits.
 
 ```bash
 ghqc issue comment

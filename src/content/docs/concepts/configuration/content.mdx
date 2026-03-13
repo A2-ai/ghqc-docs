@@ -1,0 +1,93 @@
+---
+title: Content and Defaults
+description: What lives in a ghqc configuration directory and which built-in defaults and fallbacks apply
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+This page focuses on the contents of a `ghqc` configuration directory.
+If you need the higher-level resolution model first, start with [Configuration Concepts](./).
+
+## 1. Expected Contents
+
+The default configuration layout is:
+
+<FileTree>
+- \<config-dir\>/
+    - checklists/
+        - checklist1.txt
+        - checklist2.yaml
+    - logo.png
+    - options.yaml
+    - record.typ
+</FileTree>
+
+These files are not all equally required.
+Some are optional, some have built-in fallbacks, and some only matter when you override their default path.
+
+## 2. Options
+
+`options.yaml` lets you override a small set of high-impact settings.
+
+| Option | Purpose |
+|---|---|
+| `prepended_checklist_note` | Prepends a note to loaded checklist content |
+| `checklist_display_name` | Changes how checklist-like content is named in the UI |
+| `logo_path` | Changes the relative path to the logo file |
+| `checklist_directory` | Changes the relative path where checklists are loaded from |
+| `record_path` | Changes the relative path to a custom Typst record template |
+
+All of these paths are relative to the resolved configuration directory.
+
+If `options.yaml` exists but cannot be parsed, `ghqc` does not abort configuration loading entirely.
+Instead, it falls back to the same built-in defaults shown above.
+
+### 2.1. Built-In Defaults
+
+If `options.yaml` is missing or cannot be read, `ghqc` falls back to built-in defaults.
+
+The current defaults are:
+
+| Setting | Default |
+|---|---|
+| `prepended_checklist_note` | none |
+| `checklist_display_name` | `checklists` |
+| `logo_path` | `logo.png` |
+| `checklist_directory` | `checklists` |
+| `record_path` | `record.typ` |
+
+These defaults determine what `ghqc` looks for even in a minimal configuration directory.
+
+## 3. Checklists
+
+By default, `ghqc` loads checklist files from `checklists/`.
+Supported repository-backed checklist formats are:
+
+- `.txt`
+- `.yaml`
+- `.yml`
+
+Other file types in that directory are ignored.
+
+For `.txt` files, the checklist name comes from the filename.
+For `.yaml` and `.yml` files, the checklist name comes from the top-level YAML key.
+
+The built-in `Custom` checklist is always present, even if:
+
+- the configuration directory is empty
+- the checklist directory is missing
+- all repository-backed checklist files fail to load
+
+That means `ghqc` always has at least one fallback checklist available.
+
+## 4. Logo And Record Template
+
+`logo.png` and `record.typ` both affect QC record generation, but they are handled differently when absent.
+
+- `logo.png` is optional visual branding for generated records
+- `record.typ` is the Typst template that controls how records are rendered
+
+If `logo.png` is not provided and you have not configured a custom `logo_path`, record generation still works, just without an embedded logo.
+
+If `record.typ` is not provided and you have not configured a custom `record_path`, `ghqc` falls back to its built-in record template.
+

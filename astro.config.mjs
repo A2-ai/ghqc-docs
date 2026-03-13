@@ -57,7 +57,7 @@ export default defineConfig({
 							collapsed: true,
 							items: [
 								{ label: 'Create', slug: 'cli/issue/create' },
-								{ label: 'Notify', slug: 'cli/issue/notify' },
+								{ label: 'Comment', slug: 'cli/issue/comment' },
 								{ label: 'Review', slug: 'cli/issue/review' },
 								{ label: 'Approve', slug: 'cli/issue/approve' },
 								{ label: 'Unapprove', slug: 'cli/issue/unapprove' },
@@ -104,9 +104,18 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{ label: 'Introduction', slug: 'concepts' },
-						{ label: 'Configuration', slug: 'concepts/configuration' },
+						{ 
+							label: 'Configuration', 
+							collapsed: true,
+							items: [
+								{ label: 'Introduction', slug: 'concepts/configuration' },
+								{ label: 'Content and Defaults', slug: 'concepts/configuration/content' },
+								{ label: 'Authoring', slug: 'concepts/configuration/authoring' },
+							]
+						},
 						{ label: 'Relevant Files and Issues', slug: 'concepts/relevant-files' },
 						{ label: 'QC Record', slug: 'concepts/record' },
+						{ label: 'Authentication', slug: 'concepts/authentication' },
 					]
 				},
 				{
