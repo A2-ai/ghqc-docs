@@ -1,0 +1,136 @@
+---
+title: Issue Status
+description: Check the detailed status of a single QC issue from the terminal
+---
+
+`ghqc issue status` prints the current QC status, git status, checklist progress, and blocking QC dependency status for one issue.
+It is the CLI equivalent of opening a single issue from the UI status board and inspecting its current state in detail.
+
+```bash
+ghqc issue status
+```
+
+## Interactive
+Run `ghqc issue status` with no issue-specific arguments to enter the full prompt flow.
+
+```bash
+ghqc issue status
+```
+
+### Steps
+
+#### 1. Select a Milestone
+
+The interactive flow starts by selecting an existing open milestone.
+
+- Only open milestones are shown
+- If there are no open milestones, the command stops and asks you to create one first
+
+```text
+📊 Welcome to GHQC Status Mode!
+? Select a milestone:
+> 🎯 PK Review
+  🎯 Round 2
+```
+
+#### 2. Select an Issue
+
+After choosing the milestone, `ghqc` loads the issues in that milestone and prompts by issue title.
+
+- The prompt uses autocomplete, so typing part of the file path is usually enough
+- If the milestone has no issues, the command stops rather than continuing with an empty prompt
+
+```text
+? 🎫 Enter issue title (use Tab for autocomplete):
+> scripts/helper.R
+  scripts/model-fit.R
+```
+
+#### 3. Read the Printed Status
+
+Once the issue is selected, `ghqc` computes and prints a detailed status report.
+
+The output includes:
+
+- file path
+- tracked branch
+- issue open/closed state
+- current QC status
+- git status for that file in the current repository state
+- checklist totals and section-level checklist summaries
+- blocking QC dependency status
+
+## Non-interactive
+
+To skip interactive mode, you must provide both:
+
+- `--milestone`
+- `--file`
+
+Any partial combination fails fast instead of dropping into a mixed prompt mode.
+
+```bash
+ghqc issue status \
+  --milestone "PK Review" \
+  --file scripts/helper.R
+```
+
+### Options
+| Flag | Description |
+|---|---|
+| `-m, --milestone` | Milestone name for the QC issue. |
+| `-f, --file` | Repository-relative file path of the issue to inspect. |
+
+### Validation and Defaults
+
+- The provided milestone and file must resolve to an existing GHQC issue
+- The command builds the issue thread from the issue body and comments, so malformed or incomplete issue metadata can prevent status calculation
+- The git-status text is file-aware, not just repository-wide, so it distinguishes between repo divergence and whether the selected file is actually affected
+- Blocking QC status is calculated from any gating or previous QC references parsed from the issue body
+
+## QC Status Values
+
+These are the high-level QC states the command can report.
+
+| Status | Meaning |
+|---|---|
+| `Approved` | The issue has an approval and there are no later file changes. |
+| `Approved. File has changed since approval` | The issue was approved, but later commits changed the file. |
+| `Awaiting review. Latest commit notified` | The latest relevant file change has already been notified and is waiting for reviewer action. |
+| `Changes requested. Latest commit reviewed` | The latest relevant file change has been reviewed and changes were requested. |
+| `Awaiting approval` | The issue has tracked activity but no current file-changing commit requiring notification. |
+| `Issue closed without approval` | The issue is closed but there is no approval comment recorded. |
+| `File change in '<sha>' not commented` | A newer file-changing commit exists that has not yet been captured in a notification comment. |
+
+
+### Example
+```text
+- File:        scripts/helper.R
+- Branch:      analysis
+- Issue State: open
+- QC Status:   File change in 'bb23a12' not commented
+- Git Status:  File has local, committed changes
+- Checklist Summary: 3/5 (60.0%)
+  - Code Quality: 1/2 (50.0%)
+  - Scientific Review: 2/3 (66.7%)
+- Blocking QCs:
+  ✅ #18 - data/raw/adsl.csv (Approved)
+  ❌ #21 - scripts/prepare-adsl.R (Awaiting review)
+```
+
+## Git Status Interpretation
+
+The git-status line is specific to the selected file, not just the repository as a whole.
+
+- A clean repository can still report local uncommitted changes for the selected file
+- An ahead/behind/diverged repository only changes the file-level message if the selected file is part of those commits
+- Dirty working-tree changes are surfaced separately from committed but unpushed file changes
+
+## Blocking QC Status
+
+If the issue references blocking QCs, `ghqc` prints their current status after the checklist summary.
+
+- Approved blocking QCs are shown with `✅`
+- Unapproved blocking QCs are shown with `❌` and their current QC status
+- Dependency lookup failures are shown with `⚠️`
+- If there are no blocking QCs, the output states `No blocking QCs`

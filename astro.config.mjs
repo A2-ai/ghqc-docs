@@ -48,6 +48,34 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'CLI',
+					collapsed: true,
+					items: [
+						{ label: 'Introduction', slug: 'cli' },
+						{
+							label: 'Issue',
+							collapsed: true,
+							items: [
+								{ label: 'Create', slug: 'cli/issue/create' },
+								{ label: 'Notify', slug: 'cli/issue/notify' },
+								{ label: 'Review', slug: 'cli/issue/review' },
+								{ label: 'Approve', slug: 'cli/issue/approve' },
+								{ label: 'Unapprove', slug: 'cli/issue/unapprove' },
+								{ label: 'Status', slug: 'cli/issue/status' },
+							]
+						},
+						{
+							label: 'Milestone',
+							collapsed: true,
+							items: [
+								{ label: 'Status', slug: 'cli/milestone/status' },
+								{ label: 'Record', slug: 'cli/milestone/record' },
+								{ label: 'Archive', slug: 'cli/milestone/archive' },
+							]
+						},
+					]
+				},
+				{
 					label: 'Concepts',
 					collapsed: true,
 					items: [

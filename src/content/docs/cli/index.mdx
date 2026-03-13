@@ -1,0 +1,37 @@
+---
+title: ghqc CLI
+description: Command-line workflows for ghqc, organized in the same order as the core product features
+---
+
+The `ghqc` CLI exposes the same QC lifecycle as the web UI, but in a prompt-driven or scriptable terminal workflow.
+
+Most commands have both interactive and non-interactive modes.
+
+
+## Commands
+
+### Issue Management
+Commands for issue management from creation, to iteration, to approval.
+
+* [`ghqc issue create`](./issue/create) - Create a new QC issue for a file by creating or selecting a milestone.
+* [`ghqc issue notify`](./issue/notify) - Notify the reviewer about changes made between commits by posting a QC notification comment.
+* [`ghqc issue review`](./issue/review) - Review the current working directory against a tracked commit and post reviewer feedback.
+* [`ghqc issue approve`](./issue/approve) - Approve a QC issue at a selected commit and close it.
+* [`ghqc issue unapprove`](./issue/unapprove) - Reopen an approved QC issue when additional changes are needed.
+* [`ghqc issue status`](./issue/status) - Print detailed QC, git, checklist, and dependency status for a single issue.
+
+### Milestone Management
+Commands for summarizing, exporting, and archiving groups of QC issues.
+
+* [`ghqc milestone status`](./milestone/status) - Print a table of issue status across one or more milestones.
+* [`ghqc milestone record`](./milestone/record) - Generate a PDF QC record for selected milestones.
+* [`ghqc milestone archive`](./milestone/archive) - Bundle milestone artifacts into an archive for storage or delivery.
+
+## Global Options
+
+These options can be used with most `ghqc` commands.
+
+| Flag | Description |
+|---|---|
+| `-d, --directory` | Set the git project directory that `ghqc` should operate on. Defaults to the current working directory, `.`. |
+| `--config-dir` | Override the resolved configuration directory. By default, `ghqc` resolves this automatically from the configured repository location. |

@@ -1,0 +1,150 @@
+---
+title: Issue Approve
+description: Approve a QC issue and close it from the terminal
+---
+
+`ghqc issue approve` finalizes a QC issue at a selected commit, posts an approval comment, and closes the issue.
+It is typically used by the reviewer after the review and notify cycle is complete.
+
+```bash
+ghqc issue approve
+```
+
+## Interactive
+Run `ghqc issue approve` with no issue-specific arguments to enter the full prompt flow.
+
+```bash
+ghqc issue approve
+```
+
+### Steps
+
+#### 1. Select a Milestone
+
+The interactive flow starts by selecting an existing open milestone.
+
+- Only open milestones are shown
+- If there are no open milestones, the command stops and asks you to create one first
+
+```text
+✅ Welcome to GHQC Approve Mode!
+? Select a milestone:
+> 🎯 PK Review
+  🎯 Round 2
+```
+
+#### 2. Select an Issue
+
+After choosing the milestone, `ghqc` loads the issues in that milestone and narrows the list to open issues only.
+
+- Closed issues are excluded because they are already approved
+- The prompt uses autocomplete, so typing part of the file path is usually enough
+- If the milestone has no open issues, the command stops rather than continuing with an empty prompt
+
+```text
+? 🎫 Enter issue title (use Tab for autocomplete):
+> scripts/helper.R
+  scripts/model-fit.R
+```
+
+#### 3. Select a Commit
+
+The approve flow records one commit as the approved QC commit.
+
+- If the file has only one known commit, `ghqc` selects it automatically
+- Otherwise, the picker defaults to the issue thread's latest meaningful commit
+- The commit list includes QC status markers so you can see which commits were previously notified, reviewed, or approved
+
+The commit picker includes status markers:
+
+```text
+📋 Commit Status Legend:
+   🌱 Initial commit  💬 Has comments  ✅ Approved  📍 Latest  📝 File changed
+```
+
+```text
+📝 Select commit to approve (press Enter for latest):
+? Pick commit:
+>   💬📝 00eadb9b - update helper output
+    💬📝 bf8e8730 - address review findings
+    🌱📝 32cf8fd6 - initial version
+```
+
+#### 4. Add Context
+
+After selecting the commit, `ghqc` prompts for an optional approval note.
+
+```text
+? 📝 Enter optional note for this comment (Enter to skip):
+```
+
+### Summary
+
+Before posting, interactive mode prints a short summary of the approval configuration.
+
+- milestone
+- issue number and title
+- file path
+- approved commit
+- optional note
+
+## Non-interactive
+
+To skip interactive mode, you must provide both:
+
+- `--milestone`
+- `--file`
+
+Any partial combination fails fast instead of dropping into a mixed prompt mode.
+
+```bash
+ghqc issue approve \
+  --milestone "PK Review" \
+  --file scripts/helper.R \
+  --approved-commit 00eadb9b \
+  --note "Reviewed and approved for record generation."
+```
+
+### Options
+| Flag | Description |
+|---|---|
+| `-m, --milestone` | Milestone name for the QC issue. |
+| `-f, --file` | Repository-relative file path of the issue to approve. |
+| `-a, --approved-commit` | Commit to record as the approved QC commit. Defaults to the most recent file commit. |
+| `-n, --note` | Optional note to include in the approval comment. |
+| `--force` | Approve even when blocking QC dependencies are not approved or their status cannot be checked. |
+
+### Validation and Defaults
+
+- The provided milestone and file must resolve to an existing GHQC issue
+- The issue must be open; closed issues cannot be approved again through this command
+- The issue must have known tracked commits for the file, or approval cannot be built
+- If `--approved-commit` is supplied, it must match one of the file's known commits
+- If no `--approved-commit` is supplied, `ghqc` uses the most recent known file commit
+
+Before posting the approval, `ghqc` checks any blocking QC relationships parsed from the issue body.
+
+- If all blocking QCs are approved, approval proceeds normally
+- If blocking QCs are unapproved or their status cannot be determined, approval is rejected by default
+- `--force` bypasses that dependency check, but the result message records that the check was skipped
+
+## What Gets Captured
+
+The posted comment is a QC approval comment, not a generic GitHub comment.
+
+- The comment starts with `# QC Approved`
+- Your optional note is inserted above the metadata block
+- The metadata block records the approved QC commit
+- The metadata block links to the file contents at the approved commit
+- After posting the comment, `ghqc` closes the GitHub issue
+
+### Example
+```md
+# QC Approved
+
+Reviewed and approved for record generation.
+
+## Metadata
+* approved qc commit: b038c3c41bdebddaceb25b6d9c4469abea990491
+* [file contents at approved qc commit](https://github.com/org/repo/blob/b038c3c/scripts/helper.R)
+```
