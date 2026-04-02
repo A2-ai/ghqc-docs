@@ -53,6 +53,17 @@ export default defineConfig({
 					items: [
 						{ label: 'Introduction', slug: 'cli' },
 						{
+							label: 'Auth',
+							collapsed: true,
+							items: [
+								{ label: 'Introduction', slug: 'cli/auth' },
+								{ label: 'Login', slug: 'cli/auth/login' },
+								{ label: 'Logout', slug: 'cli/auth/logout' },
+								{ label: 'Status', slug: 'cli/auth/status' },
+								{ label: 'Token', slug: 'cli/auth/token' },
+							]
+						},
+						{
 							label: 'Issue',
 							collapsed: true,
 							items: [

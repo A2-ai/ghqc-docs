@@ -10,6 +10,14 @@ Most commands have both interactive and non-interactive modes.
 
 ## Commands
 
+### Authentication
+Commands for logging in, inspecting auth source resolution, and retrieving the token `ghqc` will actually use.
+
+* [`ghqc auth login`](./auth/login) - Log in for the current repository host or a specific GitHub host.
+* [`ghqc auth logout`](./auth/logout) - Remove a token stored in the local `ghqc` auth store.
+* [`ghqc auth status`](./auth/status) - Show the local auth store and the auth sources available for the selected host.
+* [`ghqc auth token`](./auth/token) - Print the resolved token using the normal auth priority order.
+
 ### Issue Management
 Commands for issue management from creation, to iteration, to approval.
 

@@ -1,0 +1,55 @@
+---
+title: Auth Login
+description: Log in for the current repository host or a specific GitHub host
+---
+
+`ghqc auth login` logs in to a GitHub host and can store the resulting token in the local `ghqc` auth store.
+
+```bash
+ghqc auth login [TOKEN]
+```
+
+## Behavior
+
+Behavior depends on how authentication is provided:
+
+- If `TOKEN` is passed directly, `ghqc` validates it and stores it immediately.
+- If `gh` is available, `ghqc` runs `gh auth login` and then imports the resulting token into the local auth store.
+- If `gh` is not available, or if you pass `--skip-gh`, `ghqc` opens the personal access token page for the selected host and prompts for a token interactively.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--host` | GitHub host to use, such as `github.com` or `ghe.example.com`. |
+| `--skip-gh` | Skip using the `gh` CLI even when it is installed, and go directly to the manual token flow. |
+| `--no-store` | Do not import the token into the local `ghqc` auth store after a successful `gh auth login`. |
+
+## Examples
+
+```bash
+ghqc auth login
+```
+
+```bash
+ghqc auth login --host ghe.example.com
+```
+
+```bash
+ghqc auth login ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+```bash
+ghqc auth login --no-store
+```
+
+```bash
+ghqc auth login --skip-gh
+```
+
+## Notes
+
+- Host resolution uses `--host` first, then the current repository remote.
+- `--skip-gh` is useful when you want to avoid shelling out to GitHub CLI and enter or paste the token yourself.
+- `--no-store` only affects the `gh auth login` flow.
+- If you want to inspect the result afterward, run [`ghqc auth status`](./status).

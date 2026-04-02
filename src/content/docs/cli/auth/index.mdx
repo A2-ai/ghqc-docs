@@ -1,0 +1,42 @@
+---
+title: Authentication Commands
+description: Manage ghqc authentication and inspect how credentials are resolved
+---
+
+`ghqc` includes a small auth command group for host-aware credential management and troubleshooting.
+
+These commands are useful when you want to:
+
+- log in for the current repository host or a specific GitHub host
+- inspect the local `ghqc` auth store
+- see which auth source wins for the selected host
+- print the token `ghqc` would actually use
+
+## Commands
+
+* [`ghqc auth login`](./login) - Log in for a host and optionally store the token in `ghqc`.
+* [`ghqc auth logout`](./logout) - Remove the stored `ghqc` token for a host.
+* [`ghqc auth status`](./status) - Show the local auth store and available auth sources.
+* [`ghqc auth token`](./token) - Print the resolved token for the selected host.
+
+## Host Resolution
+
+All auth commands resolve the host in the same order:
+
+1. `--host`
+2. current repository remote
+
+If `ghqc` cannot determine a host from the current directory, re-run the command with `--host`.
+
+## Source Priority
+
+When multiple credentials are available, `ghqc` prefers them in this order:
+
+1. local `ghqc` auth store
+2. `GITHUB_TOKEN`
+3. active `gh auth token`
+4. stored GitHub CLI credentials
+5. Git credential manager
+6. `.netrc`
+
+The [Authentication concept page](../../concepts/authentication) explains the model in more detail.

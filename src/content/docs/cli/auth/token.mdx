@@ -1,0 +1,39 @@
+---
+title: Auth Token
+description: Print the token ghqc would use for the selected host
+---
+
+`ghqc auth token` prints the resolved token for the selected host using the same auth priority order that `ghqc` uses for API requests.
+
+```bash
+ghqc auth token
+```
+
+## Why Use It
+
+This command is mainly useful when you want to:
+
+- confirm which source is currently winning
+- debug host-specific auth issues
+- hand the resolved token to another local tool
+
+## Examples
+
+```bash
+ghqc auth token
+```
+
+```bash
+ghqc auth token --host github.com
+```
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--host` | GitHub host to resolve, such as `github.com` or `ghe.example.com`. |
+
+## Notes
+
+- Host resolution uses `--host` first, then the current repository remote.
+- The command follows the same auth priority order documented in [`ghqc auth status`](./status).

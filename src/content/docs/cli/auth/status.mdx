@@ -1,0 +1,61 @@
+---
+title: Auth Status
+description: Inspect the local ghqc auth store and available auth sources
+---
+
+`ghqc auth status` shows the local `ghqc` auth store and the authentication sources available for the selected host.
+
+```bash
+ghqc auth status
+```
+
+## What It Shows
+
+The output is split into two sections:
+
+- `Auth Store`, showing the local store directory and any hosts with stored tokens
+- `Auth Sources`, showing the selected repository host and every auth source checked for that host
+
+The active source is highlighted according to the normal priority order.
+
+## Source Priority
+
+When more than one source is available, `ghqc` prefers them in this order:
+
+1. `ghqc` auth store
+2. `GITHUB_TOKEN`
+3. `gh auth token`
+4. stored GitHub CLI credentials
+5. Git credential manager
+6. `.netrc`
+
+## Example
+
+```text
+=== Auth Store =====================
+store directory: /home/user/.local/share/ghqc/auth
+stored tokens:
+▶ github.com (ghp_abcd...wxyz)
+
+=== Auth Sources ===================
+repository host: github.com
+
+available auth sources
+▶ ✓ ghqc auth store            (ghp_abcd...wxyz)
+  ✓ GITHUB_TOKEN               (ghp_1234...7890)
+  ✗ gh auth token
+  ✗ gh stored auth
+  ✗ git credential manager
+  ✗ .netrc
+```
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--host` | GitHub host to inspect, such as `github.com` or `ghe.example.com`. |
+
+## Notes
+
+- Host resolution uses `--host` first, then the current repository remote.
+- This is the best first command to run when GitHub-backed features are failing unexpectedly.
