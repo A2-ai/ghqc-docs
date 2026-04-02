@@ -11,6 +11,7 @@ import createChecklistSelect from '../../../../assets/intro/getting-started/crea
 import createRelFileSelect from '../../../../assets/intro/getting-started/create/rel-file-select.png';
 import createRelFilePopUp from '../../../../assets/intro/getting-started/create/rel-file-popup.png';
 import createReviewSelect from '../../../../assets/intro/getting-started/create/reviewer-select.png';
+import createCollaboratorSelect from '../../../../assets/intro/getting-started/create/collaborator-select.png';
 import createQueued from '../../../../assets/intro/getting-started/create/queued.png';
 import createCreated from '../../../../assets/intro/getting-started/create/created.png';
 
@@ -22,7 +23,7 @@ milestone and add more files to it, or create a new milestone. Since this exampl
 </div>
 
 When creating a new milestone, you must provide a name and can optionally include a description. This page also lets you add files for QC.
-Clicking _Create New QC_ opens a modal with four tabs:
+Clicking _Create New QC_ opens a modal with the core create workflow tabs:
 
 <Steps>
     1. **Select a File**
@@ -64,6 +65,15 @@ Clicking _Create New QC_ opens a modal with four tabs:
 
         <div style="display: flex; justify-content: center;">
             <img src={createReviewSelect.src} style="width: 75%;" />
+        </div>
+
+    5. **Review Collaborators**
+
+        When collaborator support is enabled, the modal also includes a collaborator tab. `ghqc` detects collaborators from the selected file's git history, shows the
+        file author separately, and lets you adjust the collaborator list before queueing the issue.
+
+        <div style="display: flex; justify-content: center;">
+            <img src={createCollaboratorSelect.src} style="width: 75%;" />
         </div>
 </Steps>
 

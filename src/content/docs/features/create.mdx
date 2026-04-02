@@ -15,13 +15,14 @@ import createRelFileIssue from '../../../assets/features/create/rel-file-issue.p
 import createRelFileType from '../../../assets/features/create/rel-file-type.png';
 import createRelFileDesc from '../../../assets/features/create/rel-file-desc.png';
 import createReviewSelect from '../../../assets/intro/getting-started/create/reviewer-select.png';
+import createCollaboratorSelect from '../../../assets/intro/getting-started/create/collaborator-select.png';
 import createQueued from '../../../assets/intro/getting-started/create/queued.png';
 import createBatchRelFile from '../../../assets/features/create/rel-file-batch.png';
 import createGitStatus from '../../../assets/features/git_status/create.png';
 import createCreated from '../../../assets/intro/getting-started/create/created.png';
 
 The Create tab prepares and assigns files to be QCed by selecting, or creating, milestones and adding review checklists, 
-relevant files, and reviewers to selected files. 
+relevant files, reviewers, and collaborators to selected files. 
 
 ## Layout
 
@@ -52,7 +53,7 @@ The Create tab has two main areas:
 
 ## Create QC Issue Modal
 
-Clicking **Create New QC** opens a modal with four tabs and a live preview card on the right. The preview updates as you fill in the issue details.
+Clicking **Create New QC** opens a modal with a live preview card on the right and a set of workflow tabs on the left. The preview updates as you fill in the issue details.
 
 ### Select a File
 
@@ -113,7 +114,7 @@ modal with a file tree, an issue dropdown, relevant file type dropdown, and a de
   <TabItem label="Type Selection">
     After selecting an issue, the following options are available to classify the relevant issue:
     - **Gating QC** — a blocking QC that must be approved first
-    - **Previous QC** — a prior QC of the same or similar work; treated as blocking
+    - **Previous QC** — a prior QC of the same or similar work; treated as blocking and defaults to posting an automatic diff comment to the new issue
     - **Relevant QC** — informational only
 
     If **No Issue** is selected, **File** is auto-selected:
@@ -135,13 +136,29 @@ modal with a file tree, an issue dropdown, relevant file type dropdown, and a de
   </TabItem>
 </Tabs>
 
-
 ### Select Reviewer(s)
 
 This tab optionally assigns one or more GitHub users to the issue at creation time. If no reviewers are selected, the issue can still be created normally.
 
 <div style="display: flex; justify-content: center;">
   <img src={createReviewSelect.src} style="width: 75%;" />
+</div>
+
+### Select Collaborators
+
+When collaborator support is enabled, the modal also includes a collaborator tab.
+
+This tab:
+
+- shows the detected `author` for the selected file separately
+- loads collaborator defaults from the file's git author history
+- lets you remove detected collaborator entries
+- lets you add additional `Name <email>` entries before queueing
+
+Collaborators appear in the preview card and are carried into the queued issue.
+
+<div style="display: flex; justify-content: center;">
+  <img src={createCollaboratorSelect.src} style="width: 75%;" />
 </div>
 
 ### Modal Actions
@@ -163,6 +180,7 @@ Each card shows:
 - current user as the issue creator
 - selected checklist
 - assigned reviewers
+- collaborators, when present
 - relevant files
 
 Queued cards also surface warnings:
