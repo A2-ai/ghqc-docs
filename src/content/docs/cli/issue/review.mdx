@@ -73,16 +73,18 @@ The commit picker includes status markers:
 
 #### 4. Add Context
 
-After selecting the commit, `ghqc` prompts for two optional inputs:
+After selecting the commit, `ghqc` prompts for three optional inputs:
 
 - a free-text note to add above the metadata
 - whether to include the diff between the selected commit and the working directory
+- whether to stash the reviewed file after a successful review post
 
-The diff prompt defaults to **Yes**.
+Both the diff prompt and the stash prompt default to **Yes**.
 
 ```text
 ? 📝 Enter optional note for this comment (Enter to skip):
 ? Include diff between commit and working directory? (Y/n)
+? Stash local changes for this file after posting review? (Y/n)
 ```
 
 ### Summary
@@ -95,6 +97,7 @@ Before posting, interactive mode prints a short summary of the review configurat
 - comparison commit
 - optional note
 - whether diff generation was disabled
+- whether auto-stash was disabled
 
 ## Non-interactive
 
@@ -121,6 +124,7 @@ ghqc issue review \
 | `-c, --commit` | Commit to compare against the current working directory. |
 | `-n, --note` | Optional note to include in the review comment. |
 | `--no-diff` | Skip embedding the file diff in the posted review comment. |
+| `--no-stash-after-review` | Do not stash the reviewed file after a successful review post. |
 
 ### Validation and Defaults
 
@@ -129,6 +133,7 @@ ghqc issue review \
 - If `--commit` matches one of the file's known commits, that commit is used
 - If `--commit` does not match a known file commit but parses as a full git object ID, `ghqc` still accepts it
 - If no `--commit` is supplied, non-interactive mode falls back to repository `HEAD`, then to the issue thread's latest commit if needed
+- review posting stashes the reviewed file by default after a successful post unless you opt out
 
 One difference from interactive mode is that non-interactive mode is more tolerant about commit resolution. Interactive review insists that `HEAD` be present in the file's known history before using it as the default selection.
 

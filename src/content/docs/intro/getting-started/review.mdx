@@ -3,6 +3,7 @@ title: Review the QC Files
 description: "Initial walkthrough of the review functionality"
 ---
 
+import { LinkCard } from '@astrojs/starlight/components';
 import reviewDirtyFile from '../../../../assets/intro/getting-started/review/dirty-file.png';
 import reviewPopUp from '../../../../assets/intro/getting-started/review/pop-up.png';
 import reviewPreview from '../../../../assets/intro/getting-started/review/preview.png';
@@ -28,7 +29,7 @@ After editing the file, the issue will be marked with a star once the Git status
     <img src={reviewDirtyFile.src} style="width: 75%;" />
 </div>
 
-Clicking the card opens a pop-up on the _Review_ tab. There, you can select the commit the review applies to, include an optional comment, and preview the comment that will be posted.
+Clicking the card opens a pop-up on the _Review_ tab. There, you can select the commit the review applies to, include an optional comment, choose whether to stash the local review edits after posting, and preview the comment that will be posted.
 
 <div style="display: flex; justify-content: center;">
     <img src={reviewPopUp.src} style="width: 60%;" />
@@ -41,10 +42,10 @@ Clicking the card opens a pop-up on the _Review_ tab. There, you can select the 
 Clicking _Post_ posts the comment and updates the issue status to _Findings to Address_.
 
 :::note
-After posting a review, the file will remain in a dirty state because your local comment is still present. To return the file to its last committed state, run one of the following commands:
-```bash
-git checkout -- <reviewed file>
-# OR
-git restore <reviewed file>
-```
+By default, `ghqc` can stash the local review edits after the review is posted, which lets the file return to a cleaner state without losing the review notes.
+
+If you want to restore those review edits later, see the review stash guide.
+
+<LinkCard title="Review Stashes" href="../../concepts/review-stashes" description="Learn what the review stash does and how to recover your local review edits later"/>
 :::
+

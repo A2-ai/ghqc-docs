@@ -3,7 +3,7 @@ title: Comments
 description: How to post notifications, reviews, approvals, and unapprovals from the QC issue detail panel
 ---
 
-import { Badge, Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge, Tabs, TabItem, LinkCard } from '@astrojs/starlight/components';
 import commentPopUp from '../../../assets/features/comments/popup.png';
 import commentNotify from '../../../assets/features/comments/notify.png';
 import commentReview from '../../../assets/features/comments/review.png';
@@ -89,16 +89,22 @@ The Review tab posts a review comment on a specific commit. Use this when you ha
 - **Commit** — select the commit being reviewed using a slider along the commit history
 - **Show all commits** — include all commits in the selector, not just relevant ones
 - **Include diff** — attach the local working directory diff to the comment; disabled if there are no local changes for the file
+- **Stash file changes from review** — when the file is dirty, controls whether `ghqc` stores the local review edits in a Git stash after the review comment is posted
 - **Comment** — optional free-text note
 
 #### Actions
 
 - **Preview** — opens a modal showing the rendered comment before posting
-- **Post** — posts the review comment to GitHub and refreshes the issue status
+- **Post** — posts the review comment to GitHub, refreshes the issue status, and shows the stash result message in the confirmation modal
+
+By default, the stash checkbox is enabled when the file has local review edits.
+That lets `ghqc` clear the working copy of the reviewed file while still preserving those edits for later recovery.
 
 <div style="display: flex; justify-content: center;">
     <img src={commentReview.src} style="width: 75%;" />
 </div>
+
+<LinkCard title="Review Stashes" href="../../concepts/review-stashes" description="Learn what the review stash does and how to restore your local review edits later"/>
 
 ---
 
@@ -172,4 +178,3 @@ is available for your GitHub instance.
     <TabItem label="Without Impact Analysis">
     </TabItem>
 </Tabs>
-
