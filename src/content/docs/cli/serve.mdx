@@ -29,6 +29,10 @@ ghqc serve
 ghqc serve --port 3104 -d /path/to/project --config-dir /path/to/config
 ```
 
+```bash
+ghqc serve --ipv4-only
+```
+
 ## What It Exposes
 
 The API router includes endpoints for:
@@ -53,6 +57,7 @@ All routes are mounted under `/api/...`.
 | Flag | Description |
 |---|---|
 | `-p, --port` | Port to listen on. Defaults to `3103`. |
+| `--ipv4-only` | Force an IPv4-only listener. |
 | `-d, --directory` | Set the git project directory the API should operate on. |
 | `--config-dir` | Override the configuration directory used by the API. |
 

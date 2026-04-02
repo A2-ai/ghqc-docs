@@ -25,15 +25,42 @@ ghqc ui
 ghqc ui --port 8080 --no-open
 ```
 
+```bash
+ghqc ui url
+```
+
 ## What Opens
 
-By default, `ghqc ui` opens `http://localhost:<port>` in your browser after the server starts.
+If `--port` is omitted, `ghqc ui` binds a random available port.
+
+After startup, it opens the exact loopback URL selected on the current machine:
+
+- `http://127.0.0.1:<port>` when using IPv4
+- `http://[::1]:<port>` when using IPv6
+
+This avoids mismatches between the listener address and the browser URL.
 
 Use `--no-open` when you want to:
 
 - keep startup fully terminal-only
 - launch the browser yourself
 - run the UI in remote shells, CI, or headless environments
+
+## URL Mode
+
+`ghqc ui url` prints the exact URL the embedded UI would use and exits without starting the app.
+
+```bash
+ghqc ui url
+```
+
+```bash
+ghqc ui url --port 8080
+```
+
+This is useful when another tool needs to know the UI address ahead of time.
+
+Like `ghqc ui`, omitting `--port` lets the OS choose an available port.
 
 <LinkCard
     title="User Interface Features"
@@ -45,8 +72,10 @@ Use `--no-open` when you want to:
 
 | Flag | Description |
 |---|---|
-| `-p, --port` | Port to listen on. Defaults to `3103`. |
+| `[url]` | Print the exact UI URL and exit instead of starting the server. |
+| `-p, --port` | Port to listen on. Omit it to bind a random available port. |
 | `--no-open` | Start the server without opening a browser tab. |
+| `--ipv4-only` | Force an IPv4-only listener and `127.0.0.1` loopback URL. |
 | `-d, --directory` | Set the git project directory the UI should operate on. |
 | `--config-dir` | Override the configuration directory used by the UI. |
 
