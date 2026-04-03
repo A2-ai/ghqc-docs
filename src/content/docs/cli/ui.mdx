@@ -62,6 +62,21 @@ This is useful when another tool needs to know the UI address ahead of time.
 
 Like `ghqc ui`, omitting `--port` lets the OS choose an available port.
 
+## Routes
+
+The embedded UI uses route-based navigation.
+Each main screen has its own URL path, so you can reload or open the app directly to a specific screen.
+
+| Route | Screen |
+|---|---|
+| `/status` | QC status board |
+| `/create` | Create workflow |
+| `/record` | Record generation |
+| `/archive` | Archive generation |
+| `/configuration` | Configuration tab |
+
+Opening `/` redirects to `/status`.
+
 <LinkCard
     title="User Interface Features"
     href="../../features"
