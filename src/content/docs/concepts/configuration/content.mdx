@@ -27,15 +27,17 @@ Some are optional, some have built-in fallbacks, and some only matter when you o
 
 ## 2. Options
 
-`options.yaml` lets you override a small set of high-impact settings.
+`options.yaml` lets you override the small set of repository options that `ghqc` reads from configuration.
 
 | Option | Purpose |
 |---|---|
 | `prepended_checklist_note` | Prepends a note to loaded checklist content |
 | `checklist_display_name` | Changes how checklist-like content is named in the UI |
+| `include_collaborators` | Enables or disables collaborator detection in create flows |
 | `logo_path` | Changes the relative path to the logo file |
 | `checklist_directory` | Changes the relative path where checklists are loaded from |
 | `record_path` | Changes the relative path to a custom Typst record template |
+| `ui_repo_refresh_rate_seconds` | Sets the repository refresh interval used by the web UI |
 
 All of these paths are relative to the resolved configuration directory.
 
@@ -52,11 +54,21 @@ The current defaults are:
 |---|---|
 | `prepended_checklist_note` | none |
 | `checklist_display_name` | `checklists` |
+| `include_collaborators` | `true` |
 | `logo_path` | `logo.png` |
 | `checklist_directory` | `checklists` |
 | `record_path` | `record.typ` |
+| `ui_repo_refresh_rate_seconds` | `15` |
 
 These defaults determine what `ghqc` looks for even in a minimal configuration directory.
+
+`ui_repo_refresh_rate_seconds` resolves in this order:
+
+1. `options.yaml` `ui_repo_refresh_rate_seconds`
+2. `GHQC_UI_REFRESH_RATE`
+3. built-in default `15`
+
+Missing, invalid, zero, and negative values fall back to the next source.
 
 ## 3. Checklists
 
@@ -90,4 +102,3 @@ That means `ghqc` always has at least one fallback checklist available.
 If `logo.png` is not provided and you have not configured a custom `logo_path`, record generation still works, just without an embedded logo.
 
 If `record.typ` is not provided and you have not configured a custom `record_path`, `ghqc` falls back to its built-in record template.
-

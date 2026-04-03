@@ -11,7 +11,7 @@ import configChecklists from '../../../assets/features/config/checklists.png';
 import configOptions from '../../../assets/features/config/options.png';
 
 The Configuration tab is the main place in the UI for checking whether `ghqc` has access to a configuration repository.
-It gives a lightweight overview of the pieces of configuration that affect the rest of the app, especially checklists and a few core paths and labels, 
+It gives a lightweight overview of the pieces of configuration that affect the rest of the app, especially checklists and the active repository options,
 and an easy way to set-up the configuration.
 
 ## What Configuration Controls
@@ -22,7 +22,9 @@ In the UI, the Configuration tab surfaces the most immediately useful parts of t
 - whether the configuration repository is connected
 - which checklists are available
 - how checklists are named in the UI
+- whether collaborator detection is enabled for issue creation
 - where key assets such as the logo and record output paths are expected
+- what repository refresh interval the UI is using
 - which local configuration directory `ghqc` resolved for the current session
 
 The tab is primarily for setup and inspection. It does not expose every configuration capability directly in the UI.
@@ -127,17 +129,20 @@ This section is useful for quickly confirming:
 
 ## Options
 
-The **Options** section displays a small set of high-impact configuration values that affect the UI and downstream outputs.
+The **Options** section displays the active repository options that `ghqc` resolved for the current session.
+These are the values currently being applied, not an editor for changing them in place.
 
 The section shows:
 
 - **Display name** — the configured human-readable checklist name
+- **Include collaborators** — whether create flows derive and expose collaborator metadata from Git history
 - **Checklist directory** — where checklist files are expected inside the config repo
 - **Logo path** — the configured logo location, plus whether the file was found
 - **Record path** — the configured records directory
+- **UI refresh rate** — the repository refresh interval used by the web UI
 - **Checklist note** — shown only when a prepended checklist note is configured
 
-Most of these values are read-only status information. They are intended to help you verify what the application resolved from configuration, not to edit the config in place.
+These values are read-only status information. They are intended to help you verify what the application resolved from configuration, not to edit the config in place.
 
 <div style="display: flex; justify-content: center;">
   <img src={configOptions.src} style="width: 75%;" />
@@ -155,6 +160,12 @@ For example, if the configuration uses a different display name than "Checklist"
 
 The Configuration tab is where you can confirm which naming convention the UI is currently using.
 
+### Include Collaborators Behavior
+
+When **Include collaborators** is enabled, the Create flow derives collaborator metadata from the selected file's Git author history and lets you review that list before issue creation.
+
+When it is disabled, collaborator detection is skipped and the collaborator editor is hidden from the Create flow.
+
 ## When To Use This Tab
 
 The Configuration tab is most useful when you need to:
@@ -163,5 +174,5 @@ The Configuration tab is most useful when you need to:
 - confirm that the expected config repo is connected
 - confirm that a custom directory override such as `GHQC_CONFIG_DIR` resolved to the expected path
 - inspect whether checklist files were loaded correctly
-- verify the resolved display names and core paths
+- verify the resolved option values, paths, and refresh settings
 - diagnose why configuration-driven features in other tabs are not behaving as expected

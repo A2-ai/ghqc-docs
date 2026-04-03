@@ -34,15 +34,31 @@ Example:
 ```yaml
 prepended_checklist_note: "Note: edit checklist items as needed."
 checklist_display_name: "review checklist"
+include_collaborators: true
 logo_path: "branding/ghqc-logo.png"
 checklist_directory: "review-checklists"
 record_path: "templates/record.typ"
+ui_repo_refresh_rate_seconds: 20
 ```
 
 All path-like values are interpreted relative to the configuration directory, not relative to the current project using `ghqc`.
 
 Use `options.yaml` sparingly.
 The more you move away from the default layout, the more important it becomes to document that structure for your team.
+
+### 2.1. Current Option Keys
+
+The supported `options.yaml` keys are:
+
+| Option | Purpose |
+|---|---|
+| `prepended_checklist_note` | Prepends a shared note to every loaded checklist |
+| `checklist_display_name` | Renames checklist-like content across the UI |
+| `include_collaborators` | Enables or disables collaborator detection in create flows |
+| `logo_path` | Changes the relative logo path |
+| `checklist_directory` | Changes the relative checklist directory |
+| `record_path` | Changes the relative Typst record template path |
+| `ui_repo_refresh_rate_seconds` | Sets the repository refresh interval used by the web UI |
 
 ## 3. Authoring Checklist Files
 

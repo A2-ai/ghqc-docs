@@ -8,23 +8,56 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## CLI Installation
 
-These commands should be run in terminal/powershell to install `ghqc`.
+These commands should be run in your terminal or PowerShell session to install `ghqc`.
 
 ### Unix-Like Systems (Linux, macOS)
+
+Install the latest GitHub release to `~/.local/bin`:
+
 ```bash
-curl -sSL https://raw.githubusercontent.com/A2-ai/ghqctoolkit/refs/heads/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/a2-ai/ghqctoolkit/main/scripts/install.sh | bash
+ghqc --version
+```
+
+Install a specific released version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/a2-ai/ghqctoolkit/main/scripts/install.sh | bash -s -- v0.4.0
 ghqc --version
 ```
 
 ### Windows
 
-For now, you can download the `x86_64-pc-windows-msvc` zip archive from the [GitHub releases page](https://github.com/A2-ai/ghqctoolkit/releases/)
-and extract it to a directory of your choive. Then add the `ghqc` binary to your PATH.
+The PowerShell installer downloads the matching Windows release, installs it to `%LOCALAPPDATA%\Programs\ghqc`, and adds that directory to your user `PATH`.
 
-```bash
-$env:PATH += ";C:\path\to\ghqc"
-.\ghqc.exe --version
+If you already have the repository checked out locally:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
+ghqc --version
 ```
+
+Install a specific released version:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Version v0.4.0
+ghqc --version
+```
+
+If you do not have the repository checked out locally, you can run the installer directly:
+
+```powershell
+irm https://raw.githubusercontent.com/a2-ai/ghqctoolkit/main/scripts/install.ps1 | iex
+```
+
+If PowerShell installation is not an option, you can still install manually from the [GitHub releases page](https://github.com/a2-ai/ghqctoolkit/releases/):
+
+1. Download the Windows zip asset for your architecture.
+2. Extract it to `%LOCALAPPDATA%\Programs\ghqc`.
+3. Open a new PowerShell window.
+4. Run `ghqc --version`.
+
+`ghqc` expects Git to be available on `PATH`, so install Git for Windows if it is not already present.
 
 ## R package
 

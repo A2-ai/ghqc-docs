@@ -1,6 +1,6 @@
 ---
 title: Configuration Status
-description: Inspect the resolved configuration directory, git state, and loaded checklists
+description: Inspect the resolved configuration directory, git state, loaded checklists, and active repository options
 ---
 
 import { LinkCard } from '@astrojs/starlight/components';
@@ -20,8 +20,8 @@ Status loads configuration from the resolved directory and reports:
 - Git repository owner/repo when the directory is a Git clone
 - git status details, including dirty files when present
 - the configured checklist directory and the number of loaded checklists
+- the active repository options currently applied from `options.yaml` and defaults
 - whether the configured logo file exists
-- the optional prepended checklist note
 - a checklist-by-checklist item count summary
 
 ## Non-interactive
@@ -50,6 +50,7 @@ ghqc configuration status --config-dir /path/to/config
 - The built-in `Custom` checklist is always present, even if the configured checklist directory is missing
 - If the directory is not a Git repository, status still prints configuration details but omits Git repo metadata
 - If a custom `logo_path` is configured but the file is missing, status prints a warning
+- The options section includes the resolved values for display name, collaborator policy, checklist directory, record path, refresh rate, and optional checklist note
 
 ## Example
 
@@ -58,6 +59,12 @@ ghqc configuration status --config-dir /path/to/config
 📁 directory: /Users/you/.local/share/ghqc/ghqc-config.git
 📦 git repository: org/ghqc-config
 Repository is up to date!
+⚙️ active options:
+  - display name: checklists
+  - include collaborators: yes
+  - checklist directory: checklists
+  - record path: record.typ
+  - ui refresh rate: 15s
 📋 Checklists available in 'checklists': 4
 ✅ Logo found at logo.png
 
