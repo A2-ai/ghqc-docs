@@ -5,7 +5,7 @@ description: Print a diagnostic report for ghqc, the current repository, and opt
 
 import { LinkCard } from '@astrojs/starlight/components';
 
-`ghqc::ghqc_sitrep()` prints a situation report for the installed `ghqc` binary, the ghqc process tracked by the current R session, and the target repository.
+`ghqc::ghqc_sitrep()` prints a situation report for the installed `ghqc` binary, the ghqc process tracked by the current R session, the target repository, and repository-host authentication state when available.
 It is a higher-level R wrapper around `ghqc sitrep --json`.
 
 ```r
@@ -20,6 +20,7 @@ The printed report includes:
 - latest remote release version when it can be determined
 - the ghqc process state tracked by the current R session
 - repository directory, GitHub remote, branch, and milestone counts
+- auth store location, stored token previews, repository host, and available auth sources when present in the CLI response
 - optional configuration details when `with_configuration = TRUE`
 
 The function invisibly returns the parsed sitrep data structure from the CLI.
@@ -102,11 +103,23 @@ Open Milestones: 6
 
 Closed Milestones: 1
 • Round 1: 0 open | 10 closed 
+
+── Auth ──────────────────────────────────────────────────────────────────────────────────────
+Store Directory: /Users/user/.local/share/ghqc/auth
+Repository Host: github.com
+
+── Available Auth Sources ──
+→ ✔ ghqc auth store (ghp_...1234)
+  ✖ GITHUB_TOKEN
+  ✔ gh auth token (gho_...5678)
+  ✖ gh stored auth
+  ✔ git credential manager (gho_...4321)
+  ✖ .netrc
 ```
 
 ## R-Specific Additions
 
-Compared with calling the CLI directly, the R wrapper also prints the status of the background process tracked in the current R session:
+Compared with calling the CLI directly, the R wrapper also adds the status of the background process tracked in the current R session:
 
 - `Not running` if no ghqc process has been started
 - `Running at http://localhost:<port>` if the tracked process is alive
@@ -117,6 +130,7 @@ Compared with calling the CLI directly, the R wrapper also prints the status of 
 - if `ghqc sitrep --json` fails, `ghqc::ghqc_sitrep()` aborts and includes stderr when available
 - if the remote release version cannot be determined, the report still prints and only that remote-version line degrades to a warning
 - if repository inspection fails, the report still prints the available error information from the CLI response
+- if auth details are unavailable, the report still prints the rest of the sitrep output
 
 ---
 

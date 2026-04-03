@@ -23,7 +23,7 @@ ghqc::ghqc_status()
 Behavior:
 
 - if no ghqc server has been started in the current R session, it prints a message and returns `NULL` invisibly
-- if the tracked process is still alive, it prints `http://localhost:<port>`
+- if the tracked process is still alive, it prints the stored ghqc server URL
 - if the tracked process has stopped, it reports that stopped state and still returns the last known URL invisibly
 
 ## `ghqc::ghqc_reconnect()`
@@ -38,7 +38,7 @@ Behavior:
 
 - if no server has been started in the current session, it prints a message and returns `NULL` invisibly
 - if the tracked process is no longer alive, it tells you to start a new one with `ghqc::ghqc()`
-- if the server is still running, it opens the browser to `http://localhost:<port>` and returns that URL invisibly
+- if the server is still running, it reopens the stored URL in the RStudio viewer or system browser and returns that URL invisibly
 
 This is useful when you closed the browser tab but want to keep using the same running backend process.
 

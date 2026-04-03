@@ -18,10 +18,10 @@ ghqc::ghqc()
 When you call `ghqc::ghqc()`:
 
 - any previously started ghqc background server from the current R session is stopped first
-- the target project directory is resolved from `here::here()`
+- the target project directory is resolved from `here::here()` and normalized to an absolute path
 - a port is chosen automatically unless you supply one
 - the package launches `ghqc ui --no-open` as a supervised background process
-- once the server responds, R opens `http://localhost:<port>` in your browser
+- once the server responds, R opens the resolved ghqc URL in your browser or IDE viewer
 
 The function is called for its side effects and returns `NULL` invisibly.
 
@@ -55,6 +55,10 @@ The function is called for its side effects and returns `NULL` invisibly.
       <td><code>log_level</code></td>
       <td>Logging level value, defaulting to <code>Sys.getenv("GHQC_LOG_LEVEL", "TRACE")</code>. This exists for the R logging workflow; the function still launches the server in verbose mode so logs can be filtered later with <code>ghqc::ghqc_log()</code>.</td>
     </tr>
+    <tr>
+      <td><code>ipv4_only</code></td>
+      <td>Logical flag that forces IPv4-only bind and loopback URL handling. Defaults to <code>FALSE</code>.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -75,6 +79,11 @@ ghqc::ghqc(port = 8080)
 ghqc::ghqc(directory = "analysis", config_dir = "~/.config/ghqc")
 ```
 
+```r
+# Force IPv4-only bind behavior
+ghqc::ghqc(ipv4_only = TRUE)
+```
+
 ## Requirements
 
 - the `ghqc` CLI binary must already be installed and available on `PATH`
@@ -86,6 +95,6 @@ If the binary is missing, `ghqc::ghqc()` fails immediately and tells you to run 
 ## Startup Behavior
 
 - if `port = NULL`, the package samples a random available TCP port rather than defaulting to `3103`
-- startup waits until the local server is reachable, then opens the browser
+- on ghqc versions that support `ghqc ui url`, the package asks the CLI for the final UI URL before opening it
+- startup waits until the local server is reachable, then opens the browser or IDE viewer
 - if the server fails to come up within the timeout, the function stops with the captured server error when one is available
-

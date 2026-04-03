@@ -61,7 +61,7 @@ If PowerShell installation is not an option, you can still install manually from
 
 ## R package
 
-`ghqc` also has a lightweight wrapper R package that installs and runs the `ghqc` CLI. 
+`ghqc` also has a lightweight wrapper R package that installs, launches, and manages the `ghqc` CLI from an R session.
 
 **To install the R package:**
 
@@ -99,6 +99,6 @@ If PowerShell installation is not an option, you can still install manually from
     </TabItem>
 </Tabs>
 
-The `ghqc` R package will also install the CLI for unix-like systems using `ghqc::ghqc_install()`. 
+After installing the R package, use `ghqc::ghqc_install()` to install or upgrade the CLI on macOS, Linux, or Windows, then launch the UI with `ghqc::ghqc()`. You can also request a specific release with `ghqc::ghqc_install(version = "v0.4.1")`.
 
 For more information regarding the `ghqc` R package, continue to the [R package reference](../../rpkg).

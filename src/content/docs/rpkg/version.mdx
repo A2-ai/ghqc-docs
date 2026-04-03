@@ -24,7 +24,7 @@ Behavior:
 
 - it runs `ghqc --version`
 - it strips either `ghqctoolkit ` or `ghqc ` from the command output
-- it returns a plain version string such as `"0.4.2"`
+- it returns a plain version string such as `"0.4.2"` without a leading `v`
 
 If the `ghqc` binary is not installed, the function errors and tells you to run `ghqc::ghqc_install()`.
 
@@ -40,7 +40,7 @@ Behavior:
 
 - it queries the GitHub Releases API with `curl`
 - it extracts the latest release `tag_name`
-- it returns a tag such as `"v0.4.2"`
+- it returns a tag such as `"v0.4.2"` with the leading `v` preserved
 
 If the request fails, the function prints a warning and returns `NULL` invisibly instead of erroring.
 
