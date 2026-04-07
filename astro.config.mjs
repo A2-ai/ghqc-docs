@@ -111,24 +111,26 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'References',
+					collapsed: true,
+					items: [
+						{ label: 'Introduction', slug: 'references' },
+						{ label: 'Configuration Authoring', slug: 'references/configuration-authoring' },
+						{ label: 'Authentication', slug: 'references/authentication' },
+						{ label: 'Environment Variables', slug: 'references/environment-variables' }
+					]
+				},
+				{
 					label: 'Concepts',
 					collapsed: true,
 					items: [
 						{ label: 'Introduction', slug: 'concepts' },
-						{ 
-							label: 'Configuration', 
-							collapsed: true,
-							items: [
-								{ label: 'Introduction', slug: 'concepts/configuration' },
-								{ label: 'Content and Defaults', slug: 'concepts/configuration/content' },
-								{ label: 'Authoring', slug: 'concepts/configuration/authoring' },
-							]
-						},
+						{ label: 'Configuration', slug: 'concepts/configuration' },
 						{ label: 'Relevant Files and Issues', slug: 'concepts/relevant-files' },
 						{ label: 'QC Record', slug: 'concepts/record' },
-						{ label: 'Authentication', slug: 'concepts/authentication' },
 						{ label: 'QC Status', slug: 'concepts/qc-status' },
 						{ label: 'Review Stashes', slug: 'concepts/review-stashes' },
+						{ label: 'Caching', slug: 'concepts/cache' },
 						{ label: 'Unapproval Impact', slug: 'concepts/unapproval-impact' },
 					]
 				},

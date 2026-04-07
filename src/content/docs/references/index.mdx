@@ -1,0 +1,27 @@
+---
+title: References
+description: Lookup tables, specifications, and technical details for ghqc configuration, authentication, and environment
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Reference pages are lookup material — specifications, option tables, resolution rules, and enumerated values.
+They assume you already understand the underlying model and just need the details.
+
+<CardGrid>
+  <Card title="Authentication" icon="seti:lock">
+    How `ghqc` discovers GitHub credentials, the resolution order across all credential sources, and what changes when no auth is available.
+
+    [Explore Authentication →](./authentication)
+  </Card>
+  <Card title="Configuration Authoring" icon="seti:config">
+    How to author `options.yaml`, checklist files, and a maintainable configuration repository layout for your team.
+
+    [Explore Configuration Authoring →](./configuration-authoring)
+  </Card>
+  <Card title="Environment Variables" icon="laptop">
+    All environment variables recognized by `ghqc`, their purpose, accepted values, and which take precedence over others.
+
+    [Explore Environment Variables →](./environment-variables)
+  </Card>
+</CardGrid>

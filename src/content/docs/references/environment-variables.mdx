@@ -1,0 +1,136 @@
+---
+title: Environment Variables
+description: All environment variables recognized by ghqc, their purpose, accepted values, and resolution precedence
+---
+
+This page lists every environment variable that `ghqc` reads to configure its behavior.
+Variables are grouped by functional area.
+Where a variable participates in a resolution chain, the full order is shown.
+
+## Configuration Directory
+
+These variables control where `ghqc` looks for its configuration directory.
+They are evaluated in this order — the first one present wins:
+
+1. `--config-dir` CLI flag
+2. `GHQC_CONFIG_REPO`
+3. `GHQC_CONFIG_DIR`
+4. Default XDG path (`$XDG_DATA_HOME/ghqc/config`)
+
+| Variable | Type | Default |
+|---|---|---|
+| `GHQC_CONFIG_REPO` | Git HTTPS URL | — |
+| `GHQC_CONFIG_DIR` | Filesystem path | — |
+| `XDG_DATA_HOME` | Filesystem path | `~/.local/share` |
+
+### `GHQC_CONFIG_REPO`
+
+A Git repository URL for the configuration repo.
+When set, `ghqc` derives a local path from the repo name rather than using the URL directly:
+
+```text
+$XDG_DATA_HOME/ghqc/<repo-name>
+```
+
+The web UI uses this variable to pre-fill the configuration setup form.
+
+### `GHQC_CONFIG_DIR`
+
+An explicit local directory path to use as the configuration directory.
+Useful when the configuration lives in a shared location (such as an HPC) or outside the XDG data directory.
+
+`GHQC_CONFIG_DIR` has lower precedence than `GHQC_CONFIG_REPO`. If both are set, `GHQC_CONFIG_REPO` wins.
+
+### `XDG_DATA_HOME`
+
+The base directory used when `ghqc` builds its default or repo-derived configuration path.
+If not set, `ghqc` falls back to the platform default (`~/.local/share` on Linux and macOS).
+
+## Cache
+
+| Variable | Type | Default |
+|---|---|---|
+| `GHQC_CACHE_TIMEOUT` | Positive integer (seconds) | `3600` |
+| `XDG_CACHE_HOME` | Filesystem path | `~/.cache` |
+
+### `GHQC_CACHE_TIMEOUT`
+
+The time-to-live for entries in `ghqc`'s persistent disk cache, in seconds.
+Cached GitHub data older than this threshold is re-fetched on the next access.
+
+Invalid, zero, or negative values fall back to the default of `3600` (1 hour).
+
+### `XDG_CACHE_HOME`
+
+The base directory where `ghqc` stores its on-disk cache.
+If not set, `ghqc` falls back to the platform default (`~/.cache` on Linux and macOS).
+
+## Web UI
+
+| Variable | Type | Default |
+|---|---|---|
+| `GHQC_UI_REFRESH_RATE` | Positive integer (seconds) | `15` |
+
+### `GHQC_UI_REFRESH_RATE`
+
+How often the web UI refreshes repository state, in seconds.
+
+This variable is the middle step in a three-level resolution chain:
+
+1. `options.yaml` `ui_repo_refresh_rate_seconds`
+2. `GHQC_UI_REFRESH_RATE`
+3. Built-in default `15`
+
+Invalid, zero, and negative values fall back to the next source.
+
+## Record Generation
+
+| Variable | Type | Default |
+|---|---|---|
+| `GHQC_RECORD_DATE` | Date string | Current local date |
+
+### `GHQC_RECORD_DATE`
+
+Overrides the date embedded in generated QC records.
+When not set, `ghqc` uses the current local date formatted as `Month Day, Year`.
+
+Useful for generating backdated records or for reproducible output in scripts and tests.
+
+## Authentication
+
+These variables are part of the credential resolution chain.
+`ghqc` evaluates sources in this order, using the first valid token found:
+
+1. ghqc auth store
+2. `GITHUB_TOKEN`
+3. Active `gh` CLI session
+4. GitHub CLI stored credentials (`$GH_CONFIG_DIR/hosts.yml`)
+5. Git credential helper (`git credential fill`)
+6. `.netrc` file
+
+| Variable | Type | Default |
+|---|---|---|
+| `GITHUB_TOKEN` | GitHub token | — |
+| `GH_CONFIG_DIR` | Filesystem path | `~/.config/gh` |
+
+### `GITHUB_TOKEN`
+
+A GitHub personal access token used for API authentication.
+`ghqc` validates that the value is a recognized GitHub token format before accepting it.
+
+### `GH_CONFIG_DIR`
+
+The directory where the GitHub CLI stores its configuration, including saved auth tokens.
+When set, `ghqc` reads `hosts.yml` from this directory as a credential source.
+If not set, `ghqc` falls back to the default GitHub CLI config location (`~/.config/gh` on Linux and macOS).
+
+## R Package
+
+| Variable | Type | Default |
+|---|---|---|
+| `GHQC_LOG_LEVEL` | Log level | `TRACE` |
+
+### `GHQC_LOG_LEVEL`
+
+Minimum log level for the `ghqc` R package.
+Accepted values: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`.
