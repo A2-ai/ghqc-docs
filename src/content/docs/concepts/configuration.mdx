@@ -1,0 +1,189 @@
+---
+title: Configuration
+description: How ghqc resolves its configuration directory, what belongs in it, and which defaults apply
+---
+
+import { FileTree, LinkCard } from '@astrojs/starlight/components';
+
+`ghqc` uses a separate configuration directory to hold shared review setup for a project or team.
+That directory is where `ghqc` looks for checklist files, optional UI naming overrides, a logo, and a custom record template.
+
+If you want the walkthrough of the web UI tab specifically, see [Configuration feature](../features/configuration).
+
+## 1. What Configuration Is
+
+At runtime, configuration is just a local directory that `ghqc` knows how to read.
+That directory may also be a Git repository, which is the recommended setup because it makes checklist and option changes versioned, reviewable, and shareable.
+
+In practice, most teams use a small dedicated config repo and point `ghqc` at the local clone of that repo.
+
+## 2. Directory Contents
+
+The expected layout is:
+
+<FileTree>
+- \<config-dir\>/
+    - checklists/
+        - checklist1.txt
+        - checklist2.yaml
+    - logo.png
+    - options.yaml
+    - record.typ
+</FileTree>
+
+These files are not all equally required.
+Some are optional, some have built-in fallbacks, and some only matter when you override their default path.
+
+### 2.1. Options
+
+`options.yaml` lets you override the small set of repository options that `ghqc` reads from configuration.
+
+| Option | Purpose |
+|---|---|
+| `prepended_checklist_note` | Prepends a note to loaded checklist content |
+| `checklist_display_name` | Changes how checklist-like content is named in the UI |
+| `include_collaborators` | Enables or disables collaborator detection in create flows |
+| `logo_path` | Changes the relative path to the logo file |
+| `checklist_directory` | Changes the relative path where checklists are loaded from |
+| `record_path` | Changes the relative path to a custom Typst record template |
+| `ui_repo_refresh_rate_seconds` | Sets the repository refresh interval used by the web UI |
+
+All paths are relative to the resolved configuration directory.
+
+If `options.yaml` exists but cannot be parsed, `ghqc` does not abort configuration loading.
+Instead, it falls back to built-in defaults.
+
+#### Built-In Defaults
+
+| Setting | Default |
+|---|---|
+| `prepended_checklist_note` | none |
+| `checklist_display_name` | `checklists` |
+| `include_collaborators` | `true` |
+| `logo_path` | `logo.png` |
+| `checklist_directory` | `checklists` |
+| `record_path` | `record.typ` |
+| `ui_repo_refresh_rate_seconds` | `15` |
+
+`ui_repo_refresh_rate_seconds` resolves in this order:
+
+1. `options.yaml` `ui_repo_refresh_rate_seconds`
+2. `GHQC_UI_REFRESH_RATE`
+3. built-in default `15`
+
+Missing, invalid, zero, and negative values fall back to the next source.
+
+### 2.2. Checklists
+
+By default, `ghqc` loads checklist files from `checklists/`.
+Supported formats are:
+
+- `.txt`
+- `.yaml`
+- `.yml`
+
+Other file types in that directory are ignored.
+
+For `.txt` files, the checklist name comes from the filename.
+For `.yaml` and `.yml` files, the checklist name comes from the top-level YAML key.
+
+The built-in `Custom` checklist is always present, even if the checklist directory is missing or all repository-backed checklist files fail to load.
+
+### 2.3. Logo And Record Template
+
+- `logo.png` is optional visual branding for generated records. If absent, record generation still works without an embedded logo.
+- `record.typ` is the Typst template that controls how records are rendered. If absent, `ghqc` falls back to its built-in record template.
+
+## 3. Directory Resolution
+
+The configuration directory is resolved in a fixed order:
+
+1. `--config-dir`
+2. `GHQC_CONFIG_REPO`
+3. `GHQC_CONFIG_DIR`
+4. default XDG data path
+
+### 3.1. `--config-dir`
+
+When you pass `--config-dir`, `ghqc` uses that exact directory directly.
+This is the most explicit option and the best choice for one-off runs, testing, or scripting.
+
+### 3.2. `GHQC_CONFIG_REPO`
+
+When `GHQC_CONFIG_REPO` is set, `ghqc` derives a local directory from the repository URL.
+It resolves to:
+
+```text
+$XDG_DATA_HOME/ghqc/<repo-name>
+```
+
+For example:
+
+```bash
+export GHQC_CONFIG_REPO=https://github.com/a2-ai/ghqc.example_config_repo
+```
+
+typically resolves to:
+
+```text
+~/.local/share/ghqc/ghqc.example_config_repo
+```
+
+This is useful because the config location is stable across machines, the repo name keeps multiple config repos distinct, and the UI can pre-fill the setup form from the environment variable.
+
+### 3.3. `GHQC_CONFIG_DIR`
+
+When `GHQC_CONFIG_DIR` is set, `ghqc` uses that directory path directly.
+This is useful when:
+
+- using an HPC where all users in a group can read the same directory
+- the configuration already exists locally outside the XDG data directory
+- you do not want `ghqc` to infer a path from a Git URL
+
+`GHQC_CONFIG_DIR` has lower precedence than `GHQC_CONFIG_REPO`. If both are set, `GHQC_CONFIG_REPO` wins.
+
+### 3.4. Default Location
+
+If no override is provided, `ghqc` falls back to:
+
+```text
+$XDG_DATA_HOME/ghqc/config
+```
+
+On a typical Linux or macOS setup using XDG defaults, that is often:
+
+```text
+~/.local/share/ghqc/config
+```
+
+## 4. Git And Non-Git Directories
+
+`ghqc` can read configuration from either a Git-backed directory or a plain local directory.
+
+If the directory is a Git repo, `ghqc` can show repo details and sync status in the UI and CLI.
+If it is just a local folder, configuration still loads, but setup and status information are more limited.
+
+If setup targets an existing directory that is not already a Git repository, `ghqc` treats that as a conflict instead of silently overwriting it.
+
+## 5. Recommended Setup
+
+For most teams:
+
+1. Create a dedicated Git repo for configuration.
+2. Set `GHQC_CONFIG_REPO` to that repo URL.
+3. Run configuration setup once so the repo is cloned locally.
+4. Keep checklists and options version-controlled there.
+
+Use `GHQC_CONFIG_DIR` mainly for local development, experimentation, or situations where configuration is intentionally not backed by a Git remote.
+
+:::note[HPC]
+For groups using a shared HPC, it is recommended to set `GHQC_CONFIG_DIR` to a shared, readable location.
+The group's admin can set up one configuration directory for all users, ensuring everyone has the most up-to-date configuration.
+:::
+
+---
+
+<LinkCard 
+    title="Authoring the Configuration Repository"
+    href="../references/configuration-authoring"
+/>

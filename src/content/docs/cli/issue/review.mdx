@@ -1,0 +1,170 @@
+---
+title: Issue Review
+description: Review a file against a tracked commit from the terminal
+---
+
+`ghqc issue review` is the reviewer-side companion to [Issue Comment](../comment).
+Instead of comparing two past commits, it compares the current working directory to a selected commit and posts a QC review comment.
+
+```bash
+ghqc issue review
+```
+
+## Interactive
+Run `ghqc issue review` with no issue-specific arguments to enter the full prompt flow.
+
+```bash
+ghqc issue review
+```
+
+### Steps
+
+#### 1. Select a Milestone
+
+The interactive flow starts by selecting an existing open milestone.
+
+- Only open milestones are shown
+- If there are no open milestones, the command stops and asks you to create one first
+
+```text
+📝 Welcome to GHQC Review Mode!
+? Select a milestone:
+> 🎯 PK Review
+  🎯 Round 2
+```
+
+#### 2. Select an Issue
+
+After choosing the milestone, `ghqc` loads the issues in that milestone and prompts by issue title.
+
+- The prompt uses autocomplete, so typing part of the file path is usually enough
+- The selected issue title becomes the file path used for the commit-to-working-directory comparison
+- If the milestone has no issues, the command stops rather than continuing with an empty prompt
+
+```text
+? 🎫 Enter issue title (use Tab for autocomplete):
+> scripts/helper.R
+  scripts/model-fit.R
+```
+
+#### 3. Select a Commit
+
+The review flow compares the current working tree version of the file against one tracked commit.
+
+- If the file has only one known commit, `ghqc` selects it automatically
+- Otherwise, the picker is pre-positioned to the current `HEAD` commit, if `HEAD` appears in the file's known history
+- If `HEAD` is not part of the file's known history, interactive review stops with an explicit error instead of guessing
+- The commit list includes QC status markers so reviewers can anchor their review to prior notifications or approvals
+
+The commit picker includes status markers:
+
+```text
+📋 Commit Status Legend:
+   🌱 Initial commit  💬 Has comments  ✅ Approved  📍 Latest  📝 File changed
+```
+
+```text
+📝 Select commit to compare against working directory:
+? Pick commit:
+>   📍📝 00eadb9b - update helper output
+    💬📝 bf8e8730 - address review findings
+    🌱📝 32cf8fd6 - initial version
+```
+
+#### 4. Add Context
+
+After selecting the commit, `ghqc` prompts for three optional inputs:
+
+- a free-text note to add above the metadata
+- whether to include the diff between the selected commit and the working directory
+- whether to stash the reviewed file after a successful review post
+
+Both the diff prompt and the stash prompt default to **Yes**.
+
+```text
+? 📝 Enter optional note for this comment (Enter to skip):
+? Include diff between commit and working directory? (Y/n)
+? Stash local changes for this file after posting review? (Y/n)
+```
+
+### Summary
+
+Before posting, interactive mode prints a short summary of the review configuration.
+
+- file path
+- issue number and title
+- milestone
+- comparison commit
+- optional note
+- whether diff generation was disabled
+- whether auto-stash was disabled
+
+## Non-interactive
+
+To skip interactive mode, you must provide both:
+
+- `--milestone`
+- `--file`
+
+Any partial combination fails fast instead of dropping into a mixed prompt mode.
+
+```bash
+ghqc issue review \
+  --milestone "PK Review" \
+  --file scripts/helper.R \
+  --commit 00eadb9b \
+  --note "The current branch still needs a small cleanup in the output labels."
+```
+
+### Options
+| Flag | Description |
+|---|---|
+| `-m, --milestone` | Milestone name for the QC issue. |
+| `-f, --file` | Repository-relative file path of the issue to review. |
+| `-c, --commit` | Commit to compare against the current working directory. |
+| `-n, --note` | Optional note to include in the review comment. |
+| `--no-diff` | Skip embedding the file diff in the posted review comment. |
+| `--no-stash-after-review` | Do not stash the reviewed file after a successful review post. |
+
+### Validation and Defaults
+
+- The provided milestone and file must resolve to an existing GHQC issue
+- The issue must have known tracked commits for the file, or the review cannot be built
+- If `--commit` matches one of the file's known commits, that commit is used
+- If `--commit` does not match a known file commit but parses as a full git object ID, `ghqc` still accepts it
+- If no `--commit` is supplied, non-interactive mode falls back to repository `HEAD`, then to the issue thread's latest commit if needed
+- review posting stashes the reviewed file by default after a successful post unless you opt out
+
+One difference from interactive mode is that non-interactive mode is more tolerant about commit resolution. Interactive review insists that `HEAD` be present in the file's known history before using it as the default selection.
+
+## What Gets Captured
+
+The posted comment is a QC review comment, not a generic GitHub comment.
+
+- The comment starts with `# QC Review`
+- The issue author is tagged automatically
+- Your optional note is inserted above the metadata block
+- The metadata block records the comparison commit and links to the file at that commit in GitHub
+- If diff generation succeeds and diff output is enabled, the comment includes a `## File Difference` section comparing the selected commit to the current working tree file
+
+### Example
+```md
+# QC Review
+
+@author
+
+Small R convention comment
+
+## Metadata
+* comparing commit: a2b0f6336fba9c822335c290163e806f2aaf3ce5
+* [file at commit](https://github.com/org/repo/blob/a2b0f63/scripts/helper.R)
+
+## File Difference
+```diff
+@@ previous script: lines 1-3 @@
+@@  current script: lines 1-4 @@
+  1 add2 <- function(a, b) {
++ 2     # QC: No need for return, R will return value by default
+  3     return(a + b)
+  4 }
+```

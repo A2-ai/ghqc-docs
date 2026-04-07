@@ -1,0 +1,73 @@
+---
+title: ghqc::ghqc_log()
+description: Stream logs from the running ghqc background server into the R console
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc::ghqc_log()` streams log output from the ghqc background process started by `ghqc::ghqc()`.
+It is meant for live debugging when you want to watch server output directly in the R console.
+
+```r
+ghqc::ghqc_log()
+```
+
+## What It Does
+
+When you call `ghqc::ghqc_log()`:
+
+- the function checks whether the current R session is tracking a running ghqc process
+- it polls the process error stream continuously
+- it filters log lines according to the requested log level
+- it prints matching output as it arrives
+
+The call blocks the R session until you interrupt it or the ghqc process exits.
+
+## Arguments
+
+<table>
+  <colgroup>
+    <col style={{ width: '22%' }} />
+    <col style={{ width: '78%' }} />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>log_level</code></td>
+      <td>Minimum log level to display. Defaults to <code>Sys.getenv("GHQC_LOG_LEVEL", "DEBUG")</code>. Valid values are <code>TRACE</code>, <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, and <code>ERROR</code>.</td>
+    </tr>
+    <tr>
+      <td><code>interval</code></td>
+      <td>Polling interval in seconds. Defaults to <code>0.2</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Log Filtering
+
+`ghqc::ghqc_log()` filters log output in R after the process starts.
+That means:
+
+- lower-severity messages can be hidden from the console
+- invalid `log_level` values fail immediately
+- the server must already be running before you can stream logs from it
+
+## Example
+
+```r
+ghqc::ghqc()
+ghqc::ghqc_log(log_level = "INFO")
+```
+
+To stop streaming, interrupt the R session with `Ctrl+C` or `Escape` in RStudio / Positron.
+
+## Behavior When No Server Is Running
+
+- if no ghqc process has been started in the current R session, the function prints a message and returns `NULL` invisibly
+- if the tracked process exists but is no longer alive, it reports that the server is not running and returns `NULL` invisibly
+- if the process exits while logs are being streamed, the function prints any remaining filtered output, reports that the server has stopped, and exits

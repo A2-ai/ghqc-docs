@@ -1,0 +1,20 @@
+---
+title: Approve the QC
+description: Initial walkthrough to approve a file
+---
+
+import approvePopUp from '../../../../assets/intro/getting-started/approve/popup.png';
+
+Once the reviewer and author agree that the file has been fully reviewed and there are no remaining findings, the reviewer can approve the issue.
+
+Approval is more than closing the issue. It records the commit at which the file is considered approved, so there is a clear link to the exact version that was reviewed.
+
+Files in the _Ready for Review_ swimlane that do not have any uncommitted local changes will automatically open the _Approve_ tab in the pop-up.
+
+In the _Approve_ tab, you can select the commit to approve, add an optional comment, and preview the comment.
+
+<div style="display: flex; justify-content: center;">
+    <img src={approvePopUp.src} style="width: 75%;" />
+</div>
+
+Clicking _Post_ posts the comment, closes the issue, and updates the issue status to _Approved_.

@@ -1,0 +1,104 @@
+---
+title: ghqc Installation
+description: How to install ghqc
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+
+## CLI Installation
+
+These commands should be run in your terminal or PowerShell session to install `ghqc`.
+
+### Unix-Like Systems (Linux, macOS)
+
+Install the latest GitHub release to `~/.local/bin`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/a2-ai/ghqctoolkit/main/scripts/install.sh | bash
+ghqc --version
+```
+
+Install a specific released version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/a2-ai/ghqctoolkit/main/scripts/install.sh | bash -s -- v0.4.0
+ghqc --version
+```
+
+### Windows
+
+The PowerShell installer downloads the matching Windows release, installs it to `%LOCALAPPDATA%\Programs\ghqc`, and adds that directory to your user `PATH`.
+
+If you already have the repository checked out locally:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
+ghqc --version
+```
+
+Install a specific released version:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Version v0.4.0
+ghqc --version
+```
+
+If you do not have the repository checked out locally, you can run the installer directly:
+
+```powershell
+irm https://raw.githubusercontent.com/a2-ai/ghqctoolkit/main/scripts/install.ps1 | iex
+```
+
+If PowerShell installation is not an option, you can still install manually from the [GitHub releases page](https://github.com/a2-ai/ghqctoolkit/releases/):
+
+1. Download the Windows zip asset for your architecture.
+2. Extract it to `%LOCALAPPDATA%\Programs\ghqc`.
+3. Open a new PowerShell window.
+4. Run `ghqc --version`.
+
+`ghqc` expects Git to be available on `PATH`, so install Git for Windows if it is not already present.
+
+## R package
+
+`ghqc` also has a lightweight wrapper R package that installs, launches, and manages the `ghqc` CLI from an R session.
+
+**To install the R package:**
+
+<Tabs syncKey="rv">
+    <TabItem label = "R">
+        <Tabs syncKey="PRISM">
+            <TabItem label = "PRISM">
+                ```r
+                options("repos" = c("PRISM" = "https://prism.dev.a2-ai.cloud/rpkgs/ghqc/latest", getOption("repos")))
+                install.packages("ghqc")
+                ```
+            </TabItem>
+            <TabItem label = "GitHub">
+                ```r
+                #install.packages("pak")
+                pak::pak("a2-ai/ghqc")
+                ```
+            </TabItem>
+        </Tabs>
+    </TabItem>
+    <TabItem label = "rv">
+        <Tabs syncKey = "PRISM">
+            <TabItem label = "PRISM">
+                ```bash
+                rv configure repository add PRISM --url https://prism.dev.a2-ai.cloud/rpkgs/ghqc/latest --first
+                rv add ghqc
+                ```
+            </TabItem>
+            <TabItem label = "GitHub">
+                ```bash
+                rv add ghqc --git https://github.com/a2-ai/ghqc --branch main
+                ```
+            </TabItem>
+        </Tabs>
+    </TabItem>
+</Tabs>
+
+After installing the R package, use `ghqc::ghqc_install()` to install or upgrade the CLI on macOS, Linux, or Windows, then launch the UI with `ghqc::ghqc()`. You can also request a specific release with `ghqc::ghqc_install(version = "v0.4.1")`.
+
+For more information regarding the `ghqc` R package, continue to the [R package reference](../../rpkg).

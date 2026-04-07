@@ -1,0 +1,140 @@
+---
+title: Issue Unapprove
+description: Reopen an approved QC issue from the terminal
+---
+
+`ghqc issue unapprove` reverses an approval by posting an unapproval comment and reopening the issue.
+It is typically used when further changes are needed after a file was previously approved.
+
+```bash
+ghqc issue unapprove
+```
+
+## Interactive
+Run `ghqc issue unapprove` with no issue-specific arguments to enter the full prompt flow.
+
+```bash
+ghqc issue unapprove
+```
+
+### Steps
+
+#### 1. Select a Milestone
+
+The interactive flow starts by selecting an existing open milestone.
+
+- Only open milestones are shown
+- If there are no open milestones, the command stops and asks you to create one first
+
+```text
+🚫 Welcome to GHQC Unapprove Mode!
+? Select a milestone:
+> 🎯 PK Review
+  🎯 Round 2
+```
+
+#### 2. Select an Issue
+
+After choosing the milestone, `ghqc` loads the issues in that milestone and narrows the list to closed issues only.
+
+- Open issues are excluded because they are already active
+- The prompt uses autocomplete, so typing part of the file path is usually enough
+- If the milestone has no closed issues, the command stops rather than continuing with an empty prompt
+
+```text
+? 🎫 Enter issue title (use Tab for autocomplete):
+> scripts/helper.R
+  scripts/model-fit.R
+```
+
+#### 3. Provide a Reason
+
+Unapproval requires an explicit reason.
+
+- Empty input is rejected
+- The provided reason is included directly in the unapproval comment body
+
+```text
+? 📝 Enter reason for unapproval: Found more changes to be made
+```
+
+### Summary
+
+Before posting, interactive mode prints a short summary of the unapproval configuration.
+
+- milestone
+- issue number and title
+- reason
+
+## Non-interactive
+
+To skip interactive mode, you must provide all three:
+
+- `--milestone`
+- `--file`
+- `--reason`
+
+Any partial combination fails fast instead of dropping into a mixed prompt mode.
+
+```bash
+ghqc issue unapprove \
+  --milestone "PK Review" \
+  --file scripts/helper.R \
+  --reason "Follow-up changes are required after the latest update."
+```
+
+### Options
+| Flag | Description |
+|---|---|
+| `-m, --milestone` | Milestone name for the QC issue. |
+| `-f, --file` | Repository-relative file path of the issue to unapprove. |
+| `-r, --reason` | Reason for reopening the issue. |
+
+### Validation and Defaults
+
+- The provided milestone and file must resolve to an existing GHQC issue
+- Interactive mode only offers closed issues for selection
+- `--reason` is required in non-interactive mode
+- The reason must be non-empty in interactive mode
+
+After the unapproval comment is posted, `ghqc` reopens the issue automatically.
+
+## Impacted Issues
+
+After reopening the issue, `ghqc` may also print downstream QCs that could be affected by the unapproval.
+
+- If no downstream dependencies are found, only the reopen result is shown
+- If dependency information is available, `ghqc` prints a tree of impacted issues
+- If the hosting API does not support the necessary dependency queries, `ghqc` prints a warning instead
+
+This is especially useful when the issue being unapproved was marked as a gating or previous QC for later work.
+
+### Example Impact Tree
+```text
+🚫 Issue unapproved and reopened!
+https://github.com/org/repo/issues/42#issuecomment-192837465
+
+The following QCs may be impacted by this unapproval:
+#57 scripts/model-fit.R (Round 2) (gating QC)
+└── #63 reports/final-report.qmd (Round 2) (previous QC)
+```
+
+## What Gets Captured
+
+The posted comment is a QC unapproval comment, not a generic GitHub comment.
+
+- The comment starts with `# QC Un-Approval`
+- The reason is repeated near the top of the comment body
+- The metadata block records the issue number and unapproval reason
+- After posting the comment, `ghqc` reopens the GitHub issue
+
+### Example
+```md
+# QC Un-Approval
+
+Follow-up changes are required after the latest update.
+
+## Metadata
+* issue: #42
+* unapproval reason: Follow-up changes are required after the latest update.
+```

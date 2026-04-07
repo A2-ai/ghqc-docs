@@ -1,0 +1,135 @@
+---
+title: Milestone Archive
+description: Generate an archive of milestone QC artifacts and files
+---
+
+`ghqc milestone archive` bundles milestone artifacts into a `.tar.gz` archive for storage or delivery.
+It can include milestone-derived files, the generated record content, and optional extra files selected from the repository.
+
+```bash
+ghqc milestone archive
+```
+
+## Interactive
+Run `ghqc milestone archive` with no milestone or archive arguments to enter the full prompt flow.
+
+```bash
+ghqc milestone archive
+```
+
+### Steps
+
+#### 1. Choose How to Select Milestones
+
+Interactive archive generation starts by asking how milestones should be selected.
+
+- `Select All Milestones` includes all milestones after an open/closed filter step
+- `Choose Specific Milestones` filters first, then opens a multi-select picker
+- `Select No Milestones` lets you build an archive from manually selected files only
+
+```text
+📦 Welcome to GHQC Milestone Archive Mode!
+? 📦 How would you like to select milestones for the archive?
+  📋 Select All Milestones
+> 🎯 Choose Specific Milestones
+  🚫 Select No Milestones
+```
+
+#### 2. Filter and Select Milestones
+
+If you include milestones, `ghqc` asks whether open milestones should be included.
+
+- Default behavior is to include only closed milestones
+- If open milestones are included, all milestones become eligible
+- At least one milestone must be selected unless you explicitly chose `Select No Milestones`
+
+If milestones are selected, `ghqc` then asks:
+
+- whether to include only approved issues
+- whether to add extra repository files beyond the milestone-derived set
+
+#### 3. Select Additional Files
+
+When extra files are enabled, `ghqc` lets you choose repository files and pin them to specific commits.
+
+- This is useful for including non-QC reference files or extra deliverables
+- Additional files can be included even when no milestones are selected
+
+#### 4. Choose Archive Layout
+
+Before writing the archive, `ghqc` asks whether to flatten the directory structure.
+
+- Default behavior preserves repository paths
+- Flattening moves all included files into the archive root
+
+#### 5. Name the Output File
+
+Interactive mode prompts for the archive path and suggests a default.
+
+- The default path is `archive/<repo>-<milestones>.tar.gz`
+- You can accept it with `Enter` or provide a custom path
+
+```text
+? 📁 Enter archive path:
+```
+
+#### 6. Archive Generated
+
+When archiving succeeds, `ghqc` prints the final output path.
+
+```text
+✅ Archive successfully created at /path/to/project/archive/pk-review.tar.gz
+```
+
+## Non-interactive
+
+To skip interactive mode, you can:
+
+- provide one or more milestone names as positional arguments
+- use `--all-milestones`
+- use `--all-closed-milestones`
+- or build an archive from `--additional-file` values alone
+
+```bash
+ghqc milestone archive "PK Review" --archive-path archive/pk-review.tar.gz
+```
+
+```bash
+ghqc milestone archive --all-closed-milestones --flatten
+```
+
+```bash
+ghqc milestone archive \
+  --additional-file scripts/helper.R:00eadb9b \
+  --archive-path archive/extra-files.tar.gz
+```
+
+### Options
+| Argument / Flag | Description |
+|---|---|
+| `[milestones...]` | Milestone names to include. |
+| `--all-milestones` | Include all milestones. |
+| `--all-closed-milestones` | Include only closed milestones. |
+| `--include-unapproved` | Include issues without an approved commit. |
+| `--flatten` | Flatten archive paths into the archive root. |
+| `-a, --archive-path` | Output path for the archive. |
+| `--additional-file` | Extra file and commit pair in `file:commit` format. Repeatable. |
+
+### Validation and Defaults
+
+- `--all-milestones` cannot be combined with milestone names or `--all-closed-milestones`
+- `--all-closed-milestones` cannot be combined with milestone names
+- If no milestones are provided, `--additional-file` can still be used to build a file-only archive
+- If no archive path is supplied, `ghqc` generates one under `archive/`
+- Relative archive paths are resolved under the selected project directory
+- Unless `--include-unapproved` is used, milestone-derived files are limited to issues with approved commits
+
+## What the Archive Can Include
+
+Depending on the options chosen, the archive can contain:
+
+- milestone-derived QC artifacts
+- files from approved issues
+- files from unapproved issues when explicitly requested
+- manually selected additional files pinned to specific commits
+- either preserved repository structure or a flattened layout

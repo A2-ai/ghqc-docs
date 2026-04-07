@@ -1,0 +1,216 @@
+---
+title: Caching
+description: How ghqc uses a persistent on-disk cache to avoid unnecessary GitHub re-fetching between commands and UI loads
+---
+
+`ghqc` uses a persistent **disk cache** to avoid re-fetching the same GitHub-backed data every time you run a command, refresh the UI, or revisit a repository.
+
+This page focuses only on the on-disk cache.
+It explains why the cache exists, where it lives on disk, and what kinds of repeated fetches it is meant to reduce.
+
+## 1. Overview
+
+### 1.1. Why A Disk Cache Exists
+
+Many `ghqc` workflows repeatedly ask for the same remote data over a short period of time.
+Examples include:
+
+- loading milestone lists
+- reading issue metadata
+- re-opening the same QC issue details
+- refreshing status views that depend on repository and issue state
+- revisiting a local project that was already inspected earlier
+
+Without a disk cache, each of those actions would have to go back to GitHub again, even when the data was just fetched moments earlier.
+
+The disk cache reduces that churn by storing previously fetched results locally and reusing them when they are still acceptable for the current operation.
+
+### 1.2. What Problem It Solves
+
+The main goals are:
+
+- reduce repeated network requests
+- improve responsiveness for repeated local workflows
+- avoid unnecessary GitHub API traffic
+- keep the same fetched data available across separate `ghqc` runs
+
+The last point is what makes this specifically a **disk** cache.
+Because it is written to persistent local storage, it can still help after the current process exits.
+
+## 2. Mental Model
+
+### 2.1. Cache As A Local Reuse Layer
+
+Conceptually, the disk cache sits between `ghqc` and GitHub:
+
+1. `ghqc` needs remote data
+2. it checks whether a reusable local cached copy already exists
+3. if a suitable cached copy exists, that result can be reused
+4. otherwise, `ghqc` fetches from GitHub and stores the result on disk for later reuse
+
+That means the cache is not a separate source of truth.
+GitHub remains the authoritative source.
+The cache is a local reuse layer that helps `ghqc` avoid doing the same fetch repeatedly.
+
+### 2.2. What "Reducing Re-Fetching" Means In Practice
+
+In practice, reducing re-fetching means `ghqc` can often avoid another full remote read when:
+
+- you repeat the same command shortly after running it
+- the UI asks for the same resource again during normal navigation
+- multiple views depend on overlapping GitHub data
+- you leave and return to the same repository on the same machine
+
+This is especially useful for issue-heavy and milestone-heavy repositories, where many screens depend on the same underlying API responses.
+
+## 3. Placement
+
+### 3.1. Why The Cache Lives On Disk
+
+The cache is intentionally local and persistent.
+That gives it two important properties:
+
+- it survives process restarts
+- it can be reused by later commands and later UI sessions
+
+If the cached data only existed for the lifetime of one process, `ghqc` would still have to re-fetch the same data the next time you launched the tool.
+
+### 3.2. Cache Location
+
+The cache follows the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/latest/) on Unix-like systems and the [Known Folder Locations](https://learn.microsoft.com/en-us/windows/win32/shell/known-folders) conventions on Windows.
+
+Within the cache root, `ghqc` stores its cache inside a dedicated `ghqc/` subdirectory.
+
+The cache root can be tuned by setting:
+
+- `XDG_CACHE_HOME` on Unix-like systems
+- `%LOCALAPPDATA%` on Windows
+
+### 3.3. How The Cache Is Namespaced Per Repository
+
+Within that `ghqc` cache root, `ghqc` further separates entries by repository owner and repository name.
+
+Conceptually, the layout is:
+
+```text
+<platform-cache-dir>/ghqc/<owner>/<repo>/
+```
+
+So if `ghqc` is working against `owner/repo`, its disk cache lives under that repository-specific subtree rather than in one flat global directory.
+
+This matters because it prevents cached GitHub data from different repositories from colliding with each other.
+It also makes the cache match the same repository identity model that `ghqc` already uses elsewhere.
+
+### 3.4. What Lives Under That Repository Cache Directory
+
+Inside the repository-specific subtree, `ghqc` stores different cache categories in separate subdirectories.
+The exact set may grow over time, but the current implementation includes paths such as:
+
+- `users/assignees.json`
+- `users/details/<username>.json`
+- `labels/names.json`
+- `issues/comments/issue_<number>.json`
+- `issues/events/issue_<number>.json`
+- `commits/<branch-or-HEAD>.json`
+
+So the cache is not one opaque blob.
+It is a small file tree of JSON entries grouped by data type.
+
+### 3.5. Why The Cache Should Be Separate From Project Content
+
+The disk cache is operational state, not project content.
+So it should be thought of as separate from:
+
+- the Git working tree
+- the `ghqc` configuration directory
+- QC issue content stored on GitHub
+
+That separation matters because cached API data is:
+
+- machine-local
+- disposable
+- derived from remote data rather than authored by a user
+
+In other words, the cache should help a local machine work faster, but it is not something teams should normally version-control, review, or treat as shared configuration.
+
+### 3.6. Why Placement Matters
+
+Putting the cache in an application-managed local location gives `ghqc` a stable place to reuse remote results without polluting:
+
+- the repository checkout
+- user-authored configuration files
+- generated QC artifacts
+
+That keeps cache behavior predictable while also making it clear that cached data is a local implementation detail rather than part of the QC record itself.
+
+## 4. What Gets Reused
+
+The disk cache is most useful for GitHub-backed data that is read often relative to how often it changes.
+Typical examples include:
+
+- assignee lists and user details
+- label lists
+- issue metadata and issue thread content
+- milestone listings
+- commit walks and file-change lookups
+- repository-level QC summaries derived from remote reads
+- other API responses that multiple `ghqc` views may need repeatedly
+
+The exact value of caching depends on the workflow, but the pattern is consistent:
+if the same remote object is likely to be requested again, a disk cache can prevent another unnecessary fetch.
+
+## 5. Workflow Effects
+
+### 5.1. CLI
+
+For CLI usage, the disk cache helps when commands are repeated or when several commands inspect the same repository and issue set in sequence.
+
+That means operations like:
+
+- checking status
+- inspecting milestones
+- reading issue details
+- generating outputs that depend on already-fetched issue data
+
+can often avoid repeating the full remote read path every time.
+
+### 5.2. Web UI
+
+For the local web UI, the disk cache helps when:
+
+- pages are refreshed
+- the same issue or milestone data is revisited
+- multiple panels depend on the same remote objects
+
+This does not eliminate all refetching.
+It reduces unnecessary refetching by giving the UI layer a persistent local copy that can be reused instead of starting from an empty state on every load.
+
+## 6. Freshness And Tradeoffs
+
+Caching always creates a balance between reuse and freshness.
+
+The benefit is fewer redundant network requests.
+The tradeoff is that cached data may eventually need to be refreshed so `ghqc` does not keep showing stale remote state.
+
+In the current implementation, some entries use a time-based TTL and some do not.
+For example, label lists and assignee lists expire on a timeout, while other entries are reused until a stronger validity check says they are stale.
+The default timeout is one hour and can be overridden with `GHQC_CACHE_TIMEOUT`.
+
+So the right mental model is:
+
+- use the disk cache to avoid obviously redundant fetches
+- refresh remote data when the cached copy should no longer be trusted
+
+That balance is what makes the disk cache useful rather than misleading.
+
+## 7. Practical Guidance
+
+The simplest way to think about the disk cache is:
+
+- it is local
+- it is persistent
+- it exists to reduce repeated GitHub fetches
+- it is separate from both repository content and shared configuration
+- it improves repeated CLI and UI workflows on the same machine
+
+If you are trying to understand why `ghqc` does not need to hit GitHub for every repeated read, the disk cache is the main reason.

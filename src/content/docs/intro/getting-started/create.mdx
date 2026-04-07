@@ -1,0 +1,86 @@
+---
+title: Assign Files for QC
+description: Walkthrough of creating your first QC issues
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+import createMilestone from '../../../../assets/intro/getting-started/create/new-milestone.png';
+import createFileSelect from '../../../../assets/intro/getting-started/create/file-select.png';
+import createChecklistSelect from '../../../../assets/intro/getting-started/create/checklist-select.png';
+import createRelFileSelect from '../../../../assets/intro/getting-started/create/rel-file-select.png';
+import createRelFilePopUp from '../../../../assets/intro/getting-started/create/rel-file-popup.png';
+import createReviewSelect from '../../../../assets/intro/getting-started/create/reviewer-select.png';
+import createCollaboratorSelect from '../../../../assets/intro/getting-started/create/collaborator-select.png';
+import createQueued from '../../../../assets/intro/getting-started/create/queued.png';
+import createCreated from '../../../../assets/intro/getting-started/create/created.png';
+
+Now that the repository is up to date and the configuration is set up, we can create our first QC issues. Open the _Create_ tab to either select an existing
+milestone and add more files to it, or create a new milestone. Since this example project does not have any existing milestones, we will choose _New_.
+
+<div style="display: flex; justify-content: center;">
+  <img src={createMilestone.src} style="width: 75%;" />
+</div>
+
+When creating a new milestone, you must provide a name and can optionally include a description. This page also lets you add files for QC.
+Clicking _Create New QC_ opens a modal with the core create workflow tabs:
+
+<Steps>
+    1. **Select a File**
+
+        The first tab contains a file tree for selecting the file to review. Each QC issue is tied to exactly one file, so you must select one file here.
+        <div style="display: flex; justify-content: center;">
+            <img src={createFileSelect.src} style="width: 75%;" />
+        </div>
+
+    2. **Select a Checklist**
+
+        The second tab asks you to choose the checklist that will be used for the review. These checklist templates can be edited directly in the tab before
+        creating the QC issue.
+        <div style="display: flex; justify-content: center;">
+            <img src={createChecklistSelect.src} style="width: 75%;" />
+        </div>
+
+    3. **Select Relevant Files**
+
+        In many projects, a file does not stand alone. It may depend on other files, build on earlier work, or relate to a previous QC. This tab lets you attach
+        those related files so the reviewer has the right context.
+
+        `ghqc` supports several types of relevant files, including previous QC issues, gating QC issues, related QC issues, and related files without a QC issue.
+        For more detail on how each type affects approval, see the [Relevant Files concept page](../../../concepts/relevant-files).
+
+        To add a relevant file, select _Add Relevant File_. This opens a pop-up with a file tree. Files that already have QC issues will also show their issue number.
+
+        <div style="display: flex; justify-content: center;">
+            <img src={createRelFileSelect.src} style="width: 75%;" />
+        </div>
+        <div style="display: flex; justify-content: center;">
+            <img src={createRelFilePopUp.src} style="width: 75%;" />
+        </div>
+
+    4. **Assign Reviewer**
+
+        Optionally, you can assign one or more reviewers in this tab. If you do not know who will review the QC issue yet, that is fine. A reviewer can add themselves
+        to the GitHub issue later and `ghqc` will treat it the same way.
+
+        <div style="display: flex; justify-content: center;">
+            <img src={createReviewSelect.src} style="width: 75%;" />
+        </div>
+
+    5. **Review Collaborators**
+
+        When collaborator support is enabled, the modal also includes a collaborator tab. `ghqc` detects collaborators from the selected file's git history, shows the
+        file author separately, and lets you adjust the collaborator list before queueing the issue.
+
+        <div style="display: flex; justify-content: center;">
+            <img src={createCollaboratorSelect.src} style="width: 75%;" />
+        </div>
+</Steps>
+
+After the file and checklist are selected, you can queue the QC issue for creation. This lets you prepare multiple QC issues together and adjust them before creating them.
+
+<div style="display: flex; justify-content: center;">
+    <img src={createQueued.src} style="width: 75%;" />
+</div>
+
+After all files you want to create together are queued, select _Create QC Issues_. This creates the milestone and QC issues, then returns a pop-up with links to the new issues.

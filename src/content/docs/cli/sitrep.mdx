@@ -1,0 +1,103 @@
+---
+title: Sitrep
+description: Print a situation report covering the ghqc binary, repository, and configuration
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc sitrep` prints a compact environment report for the current `ghqc` session.
+It combines binary information, repository status, authentication details, and configuration details in one command, which makes it useful for troubleshooting or sharing setup context in a bug report.
+
+```bash
+ghqc sitrep
+```
+
+## Non-interactive
+
+`ghqc sitrep` does not have an interactive mode.
+Run it directly against the current working directory, or combine it with `-d` and `--config-dir` to inspect a different project or configuration path.
+
+```bash
+ghqc sitrep
+```
+
+```bash
+ghqc sitrep -d /path/to/project --config-dir /path/to/config
+```
+
+## What It Reports
+
+The text report is divided into four sections:
+
+- `Binary`, with the installed `ghqc` version and resolved executable path
+- `Repository`, with the resolved project directory, GitHub remote, current branch, and milestone counts
+- `Auth`, with the local auth store, repository host when it can be determined, and auth sources in priority order
+- `Configuration`, with the resolved config directory, config repo details when available, loaded checklists, and active option values
+
+If repository inspection fails, `sitrep` still prints the other sections and replaces the repository block with an error message.
+In that case, the auth section may show `repository host: not determined` and `available auth sources: unknown`.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Print the same report as pretty-printed JSON instead of text. |
+| `-d, --directory` | Set the project directory to inspect. |
+| `--config-dir` | Override the configuration directory to inspect. |
+
+## Validation and Defaults
+
+- `sitrep` uses the same repository directory default as the rest of the CLI: `.` unless `-d` is supplied
+- configuration directory resolution follows the normal precedence: `--config-dir`, `GHQC_CONFIG_REPO`, `GHQC_CONFIG_DIR`, then the default XDG path
+- if `ghqc` can determine a repository host, auth sources are listed in the same priority order used for normal API requests
+- if the configuration directory does not exist, `sitrep` still prints the resolved path and marks it as not found
+- if the configuration directory is not a Git repository, `sitrep` still loads local configuration and reports `Repository: Not determined to be git repository`
+- the built-in `Custom` checklist still appears when no repository-backed checklists can be loaded
+- milestones are sorted by open issue count descending, then alphabetically by name
+
+## Example
+
+```text
+=== Binary =========================
+Version: 0.2.0
+Path: /usr/local/bin/ghqc
+
+=== Repository =====================
+Directory: /projects/myrepo
+Repository: owner/repo (https://github.com/owner/repo)
+Branch: main
+Milestones: 2
+  - v1.0 [open]: 4 open | 8 closed
+  - v2.0 [open]: 2 open | 3 closed
+
+=== Auth ===========================
+store directory: /home/user/.local/share/ghqc/auth
+stored tokens:
+  ▶ github.com (ghp_abcd...wxyz)
+
+repository host: github.com
+available auth sources
+  ▶ ✓ ghqc auth store            (ghp_abcd...wxyz)
+    ✓ GITHUB_TOKEN               (ghp_1234...7890)
+    ✗ gh auth token
+    ✗ gh stored auth
+    ✗ git credential manager
+    ✗ .netrc
+
+=== Configuration ==================
+Directory: /config/path    ❌ Directory not found
+Repository: owner/repo (https://github.com/owner/repo)
+Checklists: 1
+  - Custom: 1 items
+Options:
+  - Checklist Display Name:  checklists
+  - Logo Path: logo.png
+  - Checklist Directory: checklists
+  - Record Template Path: record.typ
+```
+
+---
+
+<LinkCard title="Auth Status" href="../auth/status" description="Use the narrower auth-only report when you want to inspect token source resolution directly"/>
+
+<LinkCard title="Configuration Status" href="../configuration/status" description="Use the narrower configuration-only report when you do not need repository, binary, or auth details"/>

@@ -1,0 +1,130 @@
+---
+title: Review Stashes
+description: How ghqc stores local review edits in Git stashes and how to restore them later
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+When you post a review from `ghqc`, you are often reviewing by making temporary local edits to the file itself.
+Those edits might be inline comments, notes, or small markup changes that help explain your feedback.
+
+A **review stash** is how `ghqc` can preserve those local review edits while still returning the file in your working tree to a clean state.
+
+## 1. What a Review Stash Is
+
+A review stash is a normal Git stash entry created by `ghqc` after a successful review post when auto-stash is enabled.
+
+`ghqc` creates it with a message containing:
+
+- the QC issue number
+- the reviewed file path
+
+In practice, the stash message includes text like:
+
+```text
+ghqc review #12 path/to/file.R
+```
+
+## 2. What It Does
+
+When the stash is created successfully:
+
+- your review comment is posted to GitHub
+- the local edits for that reviewed file are removed from the working copy
+- the edits are still saved inside Git's stash list
+
+This is useful because it lets the QC issue move forward without leaving the reviewed file dirty in your local repository.
+
+## 3. When It Happens
+
+In the UI Review tab, the checkbox is labeled `Stash file changes from review`.
+
+In the CLI review flow, the stash prompt defaults to **Yes**, and non-interactive review also stashes by default unless you use `--no-stash-after-review`.
+
+A review stash is only relevant when the reviewed file actually has local changes.
+
+That means:
+
+- if there are no local changes, there is nothing to stash
+- if you disable auto-stash, no review stash is created
+- if stashing fails, the review post can still succeed, but `ghqc` reports the stash failure
+
+## 4. Why This Helps
+
+For many reviewers, local review edits are temporary working notes rather than changes that belong in the repository.
+
+The review stash gives you both of these benefits at once:
+
+- the repository returns to a cleaner local state
+- the review edits are still recoverable later if you need them
+
+## 5. How To Get the Review Back
+
+If you want to restore the stashed review edits later, use normal Git stash commands.
+
+### 5.1. List Your Stashes
+
+```bash
+git stash list
+```
+
+Look for the entry whose message includes `ghqc review #...` and the reviewed file path.
+
+### 5.2. Preview the Stash
+
+```bash
+git stash show -p stash@{0}
+```
+
+Replace `stash@{0}` with the correct stash reference from your own stash list.
+
+This lets you confirm that you found the right review stash before restoring it.
+
+### 5.3. Restore the Review Edits
+
+To restore the edits and keep the stash entry:
+
+```bash
+git stash apply stash@{0}
+```
+
+To restore the edits and remove the stash entry afterward:
+
+```bash
+git stash pop stash@{0}
+```
+
+Use `apply` when you want to be more cautious.
+Use `pop` when you are done with the stash and want Git to remove it automatically after applying.
+
+## 6. Practical Guidance
+
+If you are not comfortable with Git, the safest recovery flow is:
+
+1. run `git stash list`
+2. identify the `ghqc review #...` entry you want
+3. run `git stash show -p stash@{N}` to inspect it
+4. run `git stash apply stash@{N}`
+
+That sequence restores the review without deleting the stash entry first.
+
+## 7. What This Does Not Mean
+
+A review stash is not:
+
+- a Git commit
+- a GitHub comment draft
+- a permanent archive of the review
+
+It is just a local Git stash entry on your machine.
+
+## 8. If You Prefer Not To Use It
+
+You can disable review stashing:
+
+- in the UI, by clearing `Stash file changes from review`
+- in the CLI, by answering `No` to the stash prompt or using `--no-stash-after-review`
+
+When you do that, the review edits stay in your working copy after posting the review.
+
+<LinkCard title="Comments Feature" href="../../features/comments" description="See how review posting works in the issue detail panel"/>

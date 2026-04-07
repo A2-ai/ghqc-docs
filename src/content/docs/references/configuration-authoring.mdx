@@ -1,0 +1,167 @@
+---
+title: Configuration Authoring
+description: How to author options, checklists, and a maintainable ghqc configuration repository
+---
+
+import { FileTree } from '@astrojs/starlight/components';
+
+This page focuses on writing and maintaining a configuration repository.
+If you need the resolution rules first, start with [Configuration Concepts](../../concepts/configuration).
+
+## 1. Recommended Repository Shape
+
+For most teams, a configuration repo should look something like:
+
+<FileTree>
+- ghqc-config/
+    - checklists/
+        - `` `General Script`.txt``
+        - Report.yaml
+    - logo.png
+    - options.yaml
+    - record.typ
+</FileTree>
+
+That is not the only valid layout, but it aligns with the default paths and keeps the repository easy to understand.
+
+## 2. Authoring `options.yaml`
+
+`options.yaml` is optional.
+Use it when you want to override defaults or rename key paths.
+
+Example:
+
+```yaml
+prepended_checklist_note: "Note: edit checklist items as needed."
+checklist_display_name: "review checklist"
+include_collaborators: true
+logo_path: "branding/ghqc-logo.png"
+checklist_directory: "review-checklists"
+record_path: "templates/record.typ"
+ui_repo_refresh_rate_seconds: 20
+```
+
+All path-like values are interpreted relative to the configuration directory, not relative to the current project using `ghqc`.
+
+Use `options.yaml` sparingly.
+The more you move away from the default layout, the more important it becomes to document that structure for your team.
+
+### 2.1. Current Option Keys
+
+The supported `options.yaml` keys are:
+
+| Option | Purpose |
+|---|---|
+| `prepended_checklist_note` | Prepends a shared note to every loaded checklist |
+| `checklist_display_name` | Renames checklist-like content across the UI |
+| `include_collaborators` | Enables or disables collaborator detection in create flows |
+| `logo_path` | Changes the relative logo path |
+| `checklist_directory` | Changes the relative checklist directory |
+| `record_path` | Changes the relative Typst record template path |
+| `ui_repo_refresh_rate_seconds` | Sets the repository refresh interval used by the web UI |
+
+## 3. Authoring Checklist Files
+
+### 3.1. Plain Text Checklists
+
+`.txt` checklists are the simplest format.
+The filename becomes the checklist name and the file contents are used directly as 
+[GitHub-Flavored Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+
+Example:
+
+```text
+- [ ] data inputs are documented
+- [ ] all sourced files use relative paths
+- [ ] naming and style are consistent
+```
+
+If you want spaces or punctuation in the checklist name, it is recommended to wrap the file name in backticks (`` ` ``), i.e.
+```text
+`Plain Checklist`.txt
+```
+
+### 3.2. YAML Checklists
+
+YAML checklists are useful when you want sections and nested structure.
+
+At the top level, the YAML file should contain exactly one key.
+That key becomes the checklist name.
+
+Example:
+
+```yaml
+Report:
+  Structure:
+    - title and objective are clear
+    - outputs are labeled clearly
+  Methods:
+    Programming:
+      - code is reproducible
+      - paths are relative
+    Statistics:
+      - model assumptions are discussed
+      - outputs are interpreted correctly
+```
+
+`ghqc` converts those nested mappings into markdown headers and checklist items when it loads the file.
+
+### 3.3. Checklist Notes
+
+If `prepended_checklist_note` is set in `options.yaml`, that note is inserted at the top of every loaded checklist.
+
+This is useful for reminders such as:
+
+- telling authors to tailor generic checklist items
+- explaining local review conventions
+- reminding reviewers how to interpret the checklist
+
+Use this for short shared instructions, not for large policy documents.
+
+## 4. Naming Guidance
+
+Try to keep checklist names:
+
+- short enough to scan in dropdowns
+- specific enough to distinguish different review types
+- stable over time so historical issues remain understandable
+
+If you use `.txt` files, the filename is the checklist name.
+If you use YAML, the top-level key is the checklist name.
+
+That means naming changes affect what users see in both the CLI and the UI.
+
+## 5. Authoring For Maintainability
+
+A few patterns tend to work well:
+
+1. keep the default root layout unless there is a strong reason not to
+2. use `.txt` for simple linear checklists
+3. keep `prepended_checklist_note` short and reusable
+4. version-control the repo and review checklist changes like code
+
+If multiple teams share a config repo, prefer adding new checklist files over heavily mutating a single generic checklist.
+
+## 6. Record Template And Branding
+
+If you provide a custom `record.typ`, keep it in the config repo alongside the rest of the configuration rather than distributing it separately.
+
+Likewise, if you use a custom logo path, keep the logo file in the repository and treat it as part of the versioned configuration state.
+
+That keeps record generation reproducible across users and machines.
+
+## 7. Testing Your Configuration
+
+After changing the config repo, the quickest validation loop is:
+
+1. run `ghqc configuration status`
+2. open the Configuration tab in the UI
+3. confirm that checklists, paths, and logo state match what you intended
+4. create or preview a QC issue using one of the updated checklists
+
+That catches most authoring mistakes early, especially:
+
+- misspelled checklist directory paths
+- malformed YAML checklist files
+- missing logo or template files
+- unexpected checklist names

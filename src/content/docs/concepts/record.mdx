@@ -1,0 +1,337 @@
+---
+title: QC Record
+description: How ghqc renders QC records and which Tera values and functions are available to custom record templates
+---
+
+`ghqc` generates QC records as a traceable, exportable record of the QC process.
+That matters when the QC history needs to move outside GitHub itself, for example for FDA-facing submission packages, client communication, or other formal deliverables where a standalone PDF record is easier to review and archive.
+
+Under the hood, `ghqc` renders the core QC record by passing a [Typst](https://typst.app/docs/) document through the [Tera](https://keats.github.io/tera/docs/) template engine.
+If you want to provide your own `record.typ`, the important question is not just "what does the built-in template look like?" but "what values and functions does the template actually receive?"
+
+This page is the source-of-truth for the custom record template surface exposed by `ghqc`.
+
+## 1. Overview
+
+### 1.1. How Record Rendering Works
+
+At a high level, record generation works like this:
+
+1. `ghqc` gathers milestone and issue data
+2. it builds a Tera context with a fixed set of values
+3. it loads `record.typ` from the configuration directory, or falls back to the built-in template
+4. it renders that template with Tera
+5. it passes the rendered Typst document to Typst to create the QC record PDF
+6. it optionally merges prepend and append context PDFs around that rendered QC record
+
+So when you customize the record, you are writing a **Typst document with Tera placeholders**.
+
+The final PDF may therefore contain:
+
+- prepended context PDFs
+- the rendered QC record itself
+- appended context PDFs
+
+Those context documents are not rendered through Tera.
+They are merged as whole PDFs before the final output is written.
+
+### 1.2. Template Source Resolution
+
+The record template path comes from configuration as `record_path`.
+By default that is:
+
+```text
+record.typ
+```
+
+If the configured file exists, `ghqc` uses it.
+If it does not exist, `ghqc` falls back to the built-in template bundled with the toolkit.
+
+### 1.3. Scope Of This Page
+
+This page focuses on the **Tera + Typst template surface for the QC record portion** of the final output.
+
+That means:
+
+- it documents the values and helper functions available inside `record.typ`
+- it does not treat prepend and append context PDFs as template-driven content
+
+Context PDFs are simply merged before or after the rendered QC record in the final combined PDF.
+
+## 2. Tera Surface
+
+### 2.1. What Is Registered
+
+For custom record templates, `ghqc` registers:
+
+- a single template named `record.typ`
+- two custom Tera functions
+
+Those functions are:
+
+- `render_milestone_table_rows`
+- `render_issue_summary_table_rows`
+
+No custom filters are registered by `ghqc` for record templates.
+
+### 2.2. What This Means For Template Authors
+
+You can rely on:
+
+- normal Tera syntax such as `{{ ... }}`, `{% if ... %}`, and `{% for ... %}`
+- the context variables listed below
+- the two helper functions listed below
+
+You should not assume any additional ghqc-specific helpers exist beyond what is documented here.
+
+### 2.3. Top-Level Context Values
+
+These are the top-level values inserted into the Tera context for `record.typ`.
+
+#### 2.3.1. Scalar Values
+
+| Name | Type | Meaning |
+|---|---|---|
+| `repository_name` | string | Repository name, escaped for Typst |
+| `checklist_name` | string | Configured checklist display name, escaped for Typst |
+| `author` | string, optional | Value of `USER` if present |
+| `date` | string | Record date; uses `GHQC_RECORD_DATE` if set, otherwise the current local date |
+| `logo_path` | path-like string, optional | Filename of the copied logo in the staging directory |
+| `milestone_names` | string | Comma-separated milestone names, escaped for Typst |
+| `only_tables` | boolean | Whether the record should render only summary tables |
+
+Important behavior:
+
+- `author` is absent if the `USER` environment variable is not available
+- `logo_path` is absent if no logo file is found
+- `date` is always present
+
+#### 2.3.2. Collection Values
+
+| Name | Type | Meaning |
+|---|---|---|
+| `milestone_data` | array of `MilestoneRow` | Precomputed summary rows for the milestone summary table |
+| `milestone_sections` | array of `MilestoneSection` | Per-milestone sections containing fully expanded issue data |
+
+These two collections are the main structured inputs for custom templates.
+
+### 2.4. Structured Data Shapes
+
+#### 2.4.1. `MilestoneRow`
+
+`milestone_data` is an array of objects with this shape:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `name` | string | Milestone title, with Typst escaping and inserted line breaks |
+| `description` | string | Milestone description, formatted for Typst |
+| `status` | string | Milestone state |
+| `issues` | string | Preformatted Typst content summarizing milestone issues |
+
+This structure is mainly intended for the `render_milestone_table_rows` helper.
+
+#### 2.4.2. `MilestoneSection`
+
+`milestone_sections` is an array of objects with this shape:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `name` | string | Milestone name |
+| `issues` | array of `IssueInformation` | Fully expanded issues for that milestone |
+
+This is the collection you will usually loop over for custom section-by-section templates.
+
+#### 2.4.3. `IssueInformation`
+
+Each `section.issues` entry has this shape:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `title` | string | Issue title |
+| `number` | integer | GitHub issue number |
+| `milestone` | string | Milestone title |
+| `created_by` | string | Display name for issue creator |
+| `created_at` | string | Creation timestamp |
+| `qcer` | array of strings | Assigned QCers / reviewers |
+| `qc_status` | string | Rendered QC status |
+| `checklist_summary` | string | Summary string for checklist completion |
+| `git_status` | string | File-specific git status summary |
+| `initial_qc_commit` | string | Initial QC commit hash |
+| `latest_qc_commit` | string | Latest commit hash seen by the issue thread |
+| `issue_url` | string | GitHub issue URL |
+| `state` | string | `Open` or `Closed` |
+| `closed_by` | string, optional | Display name for issue closer |
+| `closed_at` | string, optional | Close timestamp |
+| `body` | string | Issue body already converted into Typst-friendly content |
+| `comments` | array of 2-tuples | `(header, body)` pairs for comments |
+| `events` | array of strings | Formatted event lines |
+| `timeline` | array of strings | Combined timeline lines |
+
+#### 2.4.4. Notes About Preformatted Fields
+
+Several values are already processed for direct insertion into a Typst template:
+
+- most strings are already escaped for Typst
+- `body` is already converted from Markdown into Typst-friendly output
+- `comments` bodies are already formatted for Typst
+- `events` and `timeline` are already formatted strings
+
+That means a custom template usually should **render these values directly**, not try to re-escape or re-parse them.
+
+### 2.5. Custom Tera Functions
+
+`ghqc` exposes two custom Tera functions for generating Typst table rows.
+
+#### 2.5.1. `render_milestone_table_rows`
+
+Signature:
+
+```jinja
+{{ render_milestone_table_rows(data=milestone_data) }}
+```
+
+Arguments:
+
+- `data`: required, expected to be `milestone_data`
+
+Returns:
+
+- a string containing Typst table row cells
+
+Use this when you want the same row formatting logic as the built-in milestone summary table.
+
+#### 2.5.2. `render_issue_summary_table_rows`
+
+Signature:
+
+```jinja
+{{ render_issue_summary_table_rows(data=section.issues) }}
+```
+
+Arguments:
+
+- `data`: required, expected to be a list of `IssueInformation`
+
+Returns:
+
+- a string containing Typst table row cells
+
+Use this when you want the same row formatting logic as the built-in per-milestone issue summary table.
+
+#### 2.5.3. What These Functions Actually Do
+
+These helpers return **already formatted Typst fragments**.
+They are not generic data transformation utilities.
+
+In practice:
+
+- `render_milestone_table_rows` expects milestone-row objects
+- `render_issue_summary_table_rows` expects issue-information objects
+- both are specialized for table rendering
+
+If you want a completely different layout, it is usually better to loop over the raw data yourself instead of forcing these helpers into a new shape.
+
+## 3. Authoring Guidance
+
+### 3.1. Common Template Patterns
+
+#### 3.1.1. Loop Over Milestones
+
+```jinja
+{% for section in milestone_sections %}
+= {{ section.name }}
+
+{% for issue in section.issues %}
+== {{ issue.title }}
+{% endfor %}
+{% endfor %}
+```
+
+#### 3.1.2. Render a Simple Issue Detail Block
+
+```jinja
+{% for section in milestone_sections %}
+{% for issue in section.issues %}
+== {{ issue.title }}
+
+- *Issue Number:* {{ issue.number }}
+- *QC Status:* {{ issue.qc_status }}
+- *Issue URL:* {{ issue.issue_url }}
+
+{{ issue.body }}
+{% endfor %}
+{% endfor %}
+```
+
+#### 3.1.3. Render Comments
+
+```jinja
+{% if issue.comments %}
+{% for comment in issue.comments %}
+=== {{ comment.0 }}
+
+{{ comment.1 }}
+{% endfor %}
+{% endif %}
+```
+
+The important detail here is that `comments` is a tuple-like structure, so the built-in template accesses it with `comment.0` and `comment.1`.
+
+### 3.2. Built-In Template as a Reference
+
+The [built-in template](https://github.com/A2-ai/ghqctoolkit/blob/main/src/templates/record.typ) is a good starting point because it demonstrates:
+
+- conditional use of `author`
+- conditional use of `logo_path`
+- milestone summary rendering
+- issue summary rendering
+- direct iteration over issues, comments, events, and timeline items
+
+If you are authoring a custom template, the safest workflow is:
+
+1. start from the built-in `record.typ`
+2. make small structural changes
+3. keep the existing data access patterns until you intentionally replace them
+
+### 3.3. Constraints and Gotchas
+
+#### 3.3.1. `logo_path` Uses the Staging Directory
+
+If a logo exists, `ghqc` copies it into the staging directory and inserts only the filename into `logo_path`.
+That means your Typst template should use `logo_path` as a relative file reference, just like the built-in template does.
+
+#### 3.3.2. `body`, `comments`, `events`, and `timeline` Are Display-Oriented
+
+These fields are prepared for rendering, not for deep data manipulation.
+If you need a radically different information model, the current template surface may feel restrictive.
+
+#### 3.3.3. `only_tables` Is Just a Flag
+
+`only_tables` does not automatically suppress content.
+Your template has to decide what to do with it.
+
+The built-in template uses it like this:
+
+```jinja
+{% if not only_tables %}
+  ...
+{% endif %}
+```
+
+#### 3.3.4. Missing Template File Does Not Fail Rendering
+
+If your configured custom template file is missing, `ghqc` silently falls back to the built-in template.
+That is useful operationally, but it also means a mistaken path can make it look like your custom template changes were ignored.
+
+### 3.4. Recommended Authoring Approach
+
+If your goal is to write your own `record.typ`, the practical path is:
+
+1. copy the built-in template structure
+2. keep `milestone_sections` as your main iteration source
+3. use the helper functions only for table sections
+4. render `body`, `comments`, `events`, and `timeline` directly
+5. treat `logo_path` and `author` as optional
+6. use `only_tables` explicitly if you want a condensed mode
+
+That gives you the most control while staying inside the currently supported Tera surface.

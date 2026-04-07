@@ -1,0 +1,299 @@
+---
+title: Relevant Files and Issues
+description: How ghqc models supporting files, blocking QC references, and informational issue links
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+`ghqc` lets a QC issue point to other files and other QC issues so reviewers can see the surrounding context.
+In the codebase and UI, these are modeled as **relevant files**.
+
+This page explains the underlying relationship model.
+If you want the step-by-step UI walkthrough, see [Create](../../features/create).
+
+## 1. Overview
+
+### 1.1. Why These Relationships Exist
+
+A QC issue rarely stands alone.
+The file under review may depend on:
+
+- a prior QC on related work
+- another QC that must finish first
+- a separate QC issue that is useful context
+- a plain repository file that has no QC issue of its own
+
+Relevant files let `ghqc` record those connections explicitly instead of leaving them buried in comments or tribal knowledge.
+
+### 1.2. The Four Relationship Types
+
+`ghqc` supports four relationship types:
+
+<CardGrid>
+  <Card title="Previous QC" icon="seti:git">
+    Points to another QC issue.
+
+    **Blocks approval.**
+
+    Use it for prior QC work that the current issue builds on or revisits.
+  </Card>
+  <Card title="Gating QC" icon="warning">
+    Points to another QC issue.
+
+    **Blocks approval.**
+    
+    Use it for upstream QC work that must be approved first.
+  </Card>
+  <Card title="Relevant QC" icon="information">
+    Points to another QC issue.
+
+    Does not block approval.
+    
+    Use it for related QC context that should stay informational.
+  </Card>
+  <Card title="File" icon="seti:folder">
+    Points to a plain repository file.
+    
+    Does not block approval.
+    
+    Use it for supporting files that do not have their own QC issue.
+  </Card>
+</CardGrid>
+
+This distinction matters because not every related item changes workflow behavior.
+
+### 1.3. One Concept, Two Kinds Of Target
+
+Conceptually, relevant files can point at either:
+
+- a QC issue
+- a plain file path
+
+Issue-backed references carry both the file path and the issue link.
+Plain file references carry only the file path plus a justification.
+
+That is why the Create flow asks slightly different questions depending on whether a selected file already has a QC issue.
+
+## 2. Relationship Semantics
+
+### 2.1. Blocking Vs Informational Relationships
+
+The most important split is:
+
+- **blocking** relationships: `Previous QC` and `Gating QC`
+- **informational** relationships: `Relevant QC` and `File`
+
+Blocking relationships affect workflow state.
+Informational relationships only provide context.
+
+### 2.2. What Blocking Relationships Do
+
+`Previous QC` and `Gating QC` both mean the current issue should not be approved until the referenced QC issue is approved.
+
+In practice, `ghqc` uses them in two ways:
+
+1. they are recorded in the issue body under the Relevant Files section
+2. when supported by the GitHub deployment, `ghqc` also tries to create GitHub issue dependency links
+
+This is why the docs and UI sometimes refer to these as **blocking QCs**.
+
+### 2.3. `Previous QC` Vs `Gating QC`
+
+Both are blocking, but they communicate different intent:
+
+- use **Previous QC** when the current QC is meaningfully tied to a prior round of QC on the same or closely related work
+- use **Gating QC** when another QC issue must be completed first because it is upstream or prerequisite work
+
+The approval rule is the same, but the semantics are different.
+That distinction is useful later when reading issue history or explaining why an issue was blocked.
+
+### 2.4. What `Relevant QC` Means
+
+`Relevant QC` links to another QC issue without making it a gate.
+
+Use it when the reviewer should know about related work, but the approval state of that other issue should not stop progress on the current one.
+
+This is the lightest-weight issue-backed relationship.
+
+### 2.5. What `File` Means
+
+`File` is for a repository file that matters to the review but does not have its own QC issue attached.
+
+Because there is no issue to inspect, `ghqc` requires a justification for this relationship.
+That justification explains why the file is relevant and why it is being referenced directly instead of through another QC issue.
+
+This helps keep plain file references intentional rather than vague.
+
+## 3. Storage and Creation Behavior
+
+### 3.1. How These Relationships Are Stored
+
+Inside the GitHub issue body, `ghqc` writes a `## Relevant Files` section.
+That section is split into subsections such as:
+
+- `### Previous QC`
+- `### Gating QC`
+- `### Relevant QC`
+- `### Relevant File`
+
+Issue-backed entries are stored as links to the related issue.
+Plain file entries are stored as bolded file paths plus justification text.
+
+So the issue body is the durable record, even if GitHub dependency APIs are unavailable.
+
+### 3.2. Existing Issues Vs New Issues
+
+Issue-backed relationships can point to either:
+
+- an already-existing QC issue
+- a QC issue that will be created in the current batch
+
+This distinction changes creation behavior:
+
+- existing issues can be linked immediately
+- new issues require dependency ordering so referenced issues are created first
+
+From the reviewer’s perspective both appear as related QC entries, but from the creation engine’s perspective they are different cases.
+
+### 3.3. Why Batch Creation Cares About These Relationships
+
+When you create multiple QC issues in one batch, `ghqc` resolves an internal dependency order before posting them.
+
+The important detail is that any relationship to a **new issue in the same batch** creates an ordering dependency.
+That includes:
+
+- `Previous QC`
+- `Gating QC`
+- `Relevant QC`
+
+The reason is simple: if issue A references issue B, issue B has to exist first so `ghqc` can write the correct issue link into A.
+
+Plain `File` references do not create that dependency because there is no issue to create first.
+
+### 3.4. Circular Relationships
+
+Because batch creation builds an ordering graph, circular relationships are invalid.
+
+For example, if:
+
+- `analysis.qmd` references `helpers.R` as a new QC issue
+- `helpers.R` also references `analysis.qmd` as a new QC issue
+
+then neither issue can be created first without breaking the reference model.
+
+`ghqc` detects these cycles and rejects the batch.
+
+## 4. Workflow Effects
+
+### 4.1. How Approval Uses These Relationships
+
+Approval logic only treats blocking relationships as hard gates.
+
+That means:
+
+- `Previous QC` can block approval
+- `Gating QC` can block approval
+- `Relevant QC` does not block approval
+- `File` does not block approval
+
+This is why it is important to choose the relationship type based on intended workflow behavior, not just on whether something feels "related."
+
+### 4.2. How Unapproval Uses These Relationships
+
+Unapproval is where the downstream side of these relationships becomes visible.
+
+If issue A blocks issue B, then unapproving A may also affect B, because B was approved with a dependency on A being approved.
+
+That means the relationship graph is not only used to prevent premature approval.
+It can also be used to reason about which later approvals may no longer be trustworthy once an upstream approval is reversed.
+
+#### 4.2.1. Two Unapproval Flows
+
+There are two practical unapproval flows in `ghqc`:
+
+- a simple unapproval flow
+- an impact-aware unapproval flow
+
+##### 4.2.1.1. Simple Unapproval
+
+The baseline behavior is straightforward:
+
+1. post an unapproval comment with a required reason
+2. reopen the current issue
+
+This works even without dependency discovery.
+Conceptually, it only changes the approval state of the issue you are acting on.
+
+##### 4.2.1.2. Impact-Aware Unapproval
+
+When blocked-issue discovery is available, `ghqc` can also inspect downstream QC issues that depend on the issue being unapproved.
+
+In that mode, `ghqc` treats unapproval as a graph question:
+
+- which approved issues depend on this one?
+- which of those depend on other issues in turn?
+- which approvals may need to be reconsidered because an upstream blocker was reopened?
+
+This does not change what the relationships mean.
+It just uses the existing blocking graph in the reverse direction.
+
+#### 4.2.2. What Counts As Impact
+
+Only blocking relationships matter for unapproval impact analysis:
+
+- `Previous QC`
+- `Gating QC`
+
+`Relevant QC` and plain `File` references do not create approval dependencies, so they are not part of unapproval propagation logic.
+
+That is an important modeling boundary:
+
+- blocking relationships affect both approval validation and downstream unapproval impact
+- informational relationships provide context only
+
+#### 4.2.3. Mental Model For Cascading Unapproval
+
+The clean way to think about it is:
+
+- approval checks flow upstream
+- unapproval impact flows downstream
+
+Upstream means "what must already be approved before I can approve this issue?"
+Downstream means "which later approvals relied on this issue still being approved?"
+
+The same blocking edges support both interpretations.
+
+#### 4.2.4. Why This Matters
+
+Without this model, an approval can look valid in isolation while silently depending on a QC that has since been reopened.
+
+By tying unapproval to the blocking relationship graph, `ghqc` can make those downstream consequences visible instead of treating every approval as independent.
+
+That is the main reason to be disciplined about when to use `Gating QC` or `Previous QC` instead of `Relevant QC`.
+
+## 5. Downstream Uses and Guidance
+
+### 5.1. How Archive And Status Use Them
+
+These relationships are not just for creation-time context.
+Other parts of `ghqc` also use them:
+
+- status and comment views can surface blocking QC state
+- archive generation can pull in relevant files attached to issues
+- issue parsing reads the Relevant Files section back out of the issue body
+
+So the relationship model is part of the durable QC record, not just a temporary UI convenience.
+
+### 5.2. Recommended Usage
+
+Use these heuristics:
+
+- choose **Gating QC** for true upstream prerequisites
+- choose **Previous QC** for prior rounds or antecedent QC on closely related work
+- choose **Relevant QC** for cross-links that are useful but non-blocking
+- choose **File** only when there is no issue-backed reference to use
+
+If a relationship should change approval behavior, make it blocking.
+If it should only help orientation, make it informational.
+
+That keeps issue graphs easier to understand and avoids accidental workflow coupling.

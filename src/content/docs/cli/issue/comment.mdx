@@ -1,0 +1,169 @@
+---
+title: Issue Comment
+description: Comment about file changes from the terminal to notify the reviewer
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+:::note
+The CLI uses `comment` instead of [notify](../../../features/comments/#notify) to document a change into the QC Issue. 
+:::
+
+The notify step is handled by `ghqc issue comment`.
+It is the CLI counterpart to the UI's [Comments](../../../features/comments/#notify) flow when the author needs to post an update showing what changed between commits.
+
+```bash
+ghqc issue comment
+```
+
+## Interactive
+Run `ghqc issue comment` with no issue-specific arguments to enter the full prompt flow.
+
+```bash
+ghqc issue comment
+```
+
+### Steps
+
+#### 1. Select a Milestone
+
+The interactive flow starts by selecting an existing open milestone.
+
+- Only open milestones are shown
+- If there are no open milestones, the command stops and asks you to create one first
+
+```text
+💬 Welcome to GHQC Comment Mode!
+? Select a milestone:
+> 🎯 PK Review
+  🎯 Round 2
+```
+
+#### 2. Select an Issue
+
+After choosing the milestone, `ghqc` loads the issues in that milestone and prompts by issue title.
+
+- The prompt uses autocomplete, so typing part of the file path is usually enough
+- The selected issue title becomes the file path used for the diff
+- If the milestone has no issues, the command stops rather than continuing with an empty prompt
+
+```text
+? 🎫 Enter issue title (use Tab for autocomplete):
+> scripts/helper.R
+  scripts/model-fit.R
+```
+
+#### 3. Select Commits
+
+The notify flow compares two commits from the issue's tracked branch.
+
+- If the file has only one commit, `ghqc` skips the commit picker and uses that commit automatically
+- Otherwise, the first selection defaults to the most recent commit that changed the file
+- The second selection defaults to the next most recent file-changing commit when one exists
+- You can explicitly skip the second commit, which produces a notification without a commit comparison
+
+The commit picker includes status markers:
+
+```text
+📋 Commit Status Legend:
+   🌱 Initial commit  💬 Has comments  ✅ Approved  📍 Latest  📝 File changed
+```
+
+```text
+📝 Select first commit (press Enter for latest file change):
+? Pick commit:
+>   📍📝 00eadb9b - update helper output
+    💬📝 bf8e8730 - address review findings
+    🌱📝 32cf8fd6 - initial version
+```
+
+```text
+📝 Select second commit for comparison (press Enter for second file change):
+? Pick commit:
+    ⏭️  Skip second commit (compare with nothing)
+>   💬📝 bf8e8730 - address review findings
+    🌱📝 32cf8fd6 - initial version
+```
+
+#### 4. Add Context
+
+After selecting commits, `ghqc` prompts for two optional inputs:
+
+- a free-text note to add above the metadata
+- whether to include the file diff in the posted comment
+
+The diff prompt defaults to **Yes**.
+
+```text
+? 📝 Enter optional note for this comment (Enter to skip):
+? 📊 Include commit diff in comment? (Y/n)
+```
+
+## Non-interactive
+
+To skip interactive mode, you must provide both:
+
+- `--milestone`
+- `--file`
+
+Any partial combination fails fast instead of dropping into a mixed prompt mode.
+
+```bash
+ghqc issue comment \
+  --milestone "PK Review" \
+  --file scripts/helper.R \
+  --current-commit 00eadb9b \
+  --previous-commit bf8e8730 \
+  --note "Addressed the requested changes to summary output."
+```
+
+### Options
+| Flag | Description |
+|---|---|
+| `-m, --milestone` | Milestone name for the QC issue. |
+| `-f, --file` | Repository-relative file path of the issue to notify on. |
+| `-c, --current-commit` | Newer commit in the comparison. Defaults to the most recent file commit. |
+| `-p, --previous-commit` | Older commit in the comparison. Defaults to the second most recent file commit, if available. |
+| `-n, --note` | Optional note to include in the notification comment. |
+| `--no-diff` | Skip embedding the file diff in the posted comment. |
+
+### Validation and Defaults
+
+- The provided milestone and file must resolve to an existing GHQC issue
+- `--current-commit` and `--previous-commit` must match commits that actually edited the file
+- Commit matching accepts abbreviated hashes as long as they match one of the file's commits
+- If no `--current-commit` is supplied, `ghqc` uses the most recent commit for that file
+- If no `--previous-commit` is supplied, `ghqc` uses the second most recent file commit when one exists
+- If the file only has one commit, the notification is still allowed, but there is no previous commit to compare against
+
+One interactive/non-interactive difference is the diff toggle: interactive mode asks whether to include the diff, while CLI mode includes it by default unless `--no-diff` is provided.
+
+## What Gets Captured
+
+The posted comment is a QC notification, not a generic free-form GitHub comment.
+
+- The comment starts with `# QC Notification`
+- Assigned reviewers are tagged automatically when the issue has assignees
+- Your optional note is inserted above the metadata block
+- The metadata block records the current commit and, when available, the previous commit plus a GitHub comparison link
+- If diff generation succeeds and diff output is enabled, the comment includes a `## File Difference` section
+
+### Example
+```md
+# QC Notification
+@reviewer
+
+## Metadata
+* current commit: b038c3c41bdebddaceb25b6d9c4469abea990491
+* previous commit: a2b0f6336fba9c822335c290163e806f2aaf3ce5
+* [commit comparison](https://github.com/org/repo/compare/a2b0f6336fba9c822335c290163e806f2aaf3ce5..b038c3c41bdebddaceb25b6d9c4469abea990491)
+
+## File Difference
+```diff
+@@ previous script: lines 1-3 @@
+@@  current script: lines 1-3 @@
+  1 add2 <- function(a, b) {
+- 2     return(a + b)
++ 2     a + b
+  3 }
+```

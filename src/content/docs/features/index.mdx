@@ -1,0 +1,53 @@
+---
+title: ghqc UI Features
+description: Overview of the ghqc web UI and a guide to its functionality
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+The `ghqc` web UI is launched with `ghqc ui` from the terminal or `ghqc::ghqc()` in R. It provides a browser-based interface for 
+managing the full QC lifecycle — from creating issues to generating final records — without leaving your project environment.
+
+The UI has 7 core features to explore.
+
+<Card title="Create" icon="add-document">
+A step-by-step wizard for creating new QC issues. Select a milestone, pick a file, choose a checklist, attach relevant files, and optionally assign a reviewer — all before submitting.
+
+[Explore Create →](./create)
+</Card>
+
+<Card title="QC Status" icon="list-format">
+A Kanban board showing QC issues, grouped by status. See an overview of the milestone's progress and perform actions on the QC issue.
+
+[Explore QC Status →](./qc_status)
+</Card>
+
+<Card title="Comments" icon="comment-alt">
+Click any issue in the QC Status tab to open a detail view for posting change, review, and approval comments to the GitHub issue. 
+
+[Explore Comments →](./comments)
+</Card>
+
+<Card title="Record" icon="document">
+Generate a PDF QC record for a completed milestone(s). Upload optional context pages to prepend or append, then preview and download the finished document.
+
+[Explore Record →](./record)
+</Card>
+
+<Card title="Archive" icon="seti:folder">
+Bundle a milestone's QC records and files into a zip archive. Specify a filename and generate the archive for storage or delivery.
+
+[Explore Archive →](./archive)
+</Card>
+
+<Card title="Configuration" icon="setting">
+Set up and inspect the configuration repository for the current project. Displays the available checklists and any project-level options drawn from your team's config repo.
+
+[Explore Configuration →](./configuration)
+</Card>
+
+<Card title="Git Status" icon="seti:git">
+Always shown in the upper-right corner, it displays if the project is up to date with the remote to keep in-sync with the project.
+
+[Explore Git Status →](./git_status)
+</Card>

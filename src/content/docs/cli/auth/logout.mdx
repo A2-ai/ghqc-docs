@@ -1,0 +1,39 @@
+---
+title: Auth Logout
+description: Remove the stored ghqc token for a GitHub host
+---
+
+`ghqc auth logout` removes the token stored by `ghqc` for the selected host.
+
+```bash
+ghqc auth logout
+```
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--host` | GitHub host to use, such as `github.com` or `ghe.example.com`. |
+
+## Examples
+
+```bash
+ghqc auth logout
+```
+
+```bash
+ghqc auth logout --host github.com
+```
+
+---
+
+:::note
+`ghqc auth logout` only clears the local `ghqc` auth store for that host.
+
+It does not:
+
+- log you out of GitHub CLI
+- clear `GITHUB_TOKEN`
+- remove Git credential helper entries
+- edit `.netrc`
+:::

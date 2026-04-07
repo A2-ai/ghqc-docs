@@ -1,0 +1,108 @@
+---
+title: Milestone Status
+description: Check the status of QC issues across one or more milestones
+---
+
+`ghqc milestone status` prints a table summarizing all QC issues across one or more milestones.
+It is the milestone-level companion to [Issue Status](../../issue/status), trading single-issue detail for a cross-milestone overview.
+
+```bash
+ghqc milestone status
+```
+
+## Interactive
+Run `ghqc milestone status` with no milestone arguments to enter the full prompt flow.
+
+```bash
+ghqc milestone status
+```
+
+### Steps
+
+#### 1. Choose How to Select Milestones
+
+Interactive status starts by asking whether to inspect all milestones or pick a subset.
+
+- `Select All Milestones` includes every milestone returned by the repository
+- `Choose Specific Milestones` opens a multi-select picker
+- At least one milestone must be selected
+
+```text
+📊 Welcome to GHQC Milestone Status Mode!
+? 📊 How would you like to select milestones?
+  📋 Select All Milestones
+> 🎯 Choose Specific Milestones
+```
+
+```text
+? 📊 Select milestones to check:
+> [x] PK Review (12)
+  [x] Round 2 (18)
+  [ ] Final Report (24)
+```
+
+#### 2. Read the Summary Table
+
+Once the milestones are selected, `ghqc` prints a table with one row per issue.
+
+The table includes:
+
+- file path
+- milestone
+- branch
+- open/closed issue state
+- QC status
+- file-aware git status
+- checklist summary
+- blocking QC summary
+
+## Non-interactive
+
+To skip interactive mode, either:
+
+- provide one or more milestone names as positional arguments
+- use `--all-milestones`
+
+```bash
+ghqc milestone status "PK Review" "Round 2"
+```
+
+```bash
+ghqc milestone status --all-milestones
+```
+
+### Options
+| Argument / Flag | Description |
+|---|---|
+| `[milestones...]` | Milestone names to inspect. |
+| `--all-milestones` | Include all milestones. |
+
+### Validation and Defaults
+
+- `--all-milestones` cannot be combined with milestone names
+- If specific milestone names are supplied, at least one must match the repository's milestone list
+- Interactive mode requires at least one milestone selection
+- The table reuses the same QC, git, checklist, and blocking-QC calculations as `ghqc issue status`
+
+## Columns
+
+| Column | Meaning |
+|---|---|
+| `File` | Repository-relative file path for the QC issue. |
+| `Milestone` | Milestone containing the issue. |
+| `Branch` | Git branch recorded in the issue metadata. |
+| `Issue State` | Whether the issue is `open` or `closed`. |
+| `QC Status` | Current QC state for the issue. |
+| `Git Status` | File-aware git status summary. |
+| `Checklist` | Completed checklist items out of total. |
+| `Blocking QCs` | Approved/total blocking dependencies, with optional error suffix. |
+
+
+### Example
+```text
+File                   | Milestone | Branch   | Issue State | QC Status          | Git Status | Checklist   | Blocking QCs
+-----------------------+-----------+----------+-------------+--------------------+------------+-------------+-------------
+scripts/helper.R       | PK Review | analysis | open        | Changes to comment | Up to date | 3/5 (60.0%) | 1/2 (50.0%)
+scripts/model-fit.R    | PK Review | analysis | open        | Awaiting review    | Ahead      | 8/8 (100.0%)| -
+reports/final.qmd      | Round 2   | qc       | closed      | Approved           | Up to date | 9/9 (100.0%)| 2/2 (100.0%)
+```

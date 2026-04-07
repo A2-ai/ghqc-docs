@@ -1,0 +1,109 @@
+---
+title: UI
+description: Start the embedded ghqc web UI and API server together
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc ui` starts the ghqc API and serves the embedded React frontend from the same port.
+It is the quickest way to run the full local app without a separate frontend dev server.
+
+```bash
+ghqc ui
+```
+
+## Non-interactive
+
+`ghqc ui` does not have an interactive prompt mode.
+It starts the server, optionally opens your browser, and keeps running until you stop it.
+
+```bash
+ghqc ui
+```
+
+```bash
+ghqc ui --port 8080 --no-open
+```
+
+```bash
+ghqc ui url
+```
+
+## What Opens
+
+If `--port` is omitted, `ghqc ui` binds a random available port.
+
+After startup, it opens the exact loopback URL selected on the current machine:
+
+- `http://127.0.0.1:<port>` when using IPv4
+- `http://[::1]:<port>` when using IPv6
+
+This avoids mismatches between the listener address and the browser URL.
+
+Use `--no-open` when you want to:
+
+- keep startup fully terminal-only
+- launch the browser yourself
+- run the UI in remote shells, CI, or headless environments
+
+## URL Mode
+
+`ghqc ui url` prints the exact URL the embedded UI would use and exits without starting the app.
+
+```bash
+ghqc ui url
+```
+
+```bash
+ghqc ui url --port 8080
+```
+
+This is useful when another tool needs to know the UI address ahead of time.
+
+Like `ghqc ui`, omitting `--port` lets the OS choose an available port.
+
+## Routes
+
+The embedded UI uses route-based navigation.
+Each main screen has its own URL path, so you can reload or open the app directly to a specific screen.
+
+| Route | Screen |
+|---|---|
+| `/status` | QC status board |
+| `/create` | Create workflow |
+| `/record` | Record generation |
+| `/archive` | Archive generation |
+| `/configuration` | Configuration tab |
+
+Opening `/` redirects to `/status`.
+
+<LinkCard
+    title="User Interface Features"
+    href="../../features"
+    description="Visit the Features section for more information about the user interface"
+/>
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `[url]` | Print the exact UI URL and exit instead of starting the server. |
+| `-p, --port` | Port to listen on. Omit it to bind a random available port. |
+| `--no-open` | Start the server without opening a browser tab. |
+| `--ipv4-only` | Force an IPv4-only listener and `127.0.0.1` loopback URL. |
+| `-d, --directory` | Set the git project directory the UI should operate on. |
+| `--config-dir` | Override the configuration directory used by the UI. |
+
+## Build Features
+
+`ghqc ui` is available when the binary is built with the `ui` feature.
+That feature also pulls in the API server automatically.
+
+```bash
+cargo build --features cli,ui --release
+./target/release/ghqc ui
+```
+
+---
+
+<LinkCard title="Serve Command" href="../serve" description="Run the REST API without the embedded frontend when you only need backend access"/>

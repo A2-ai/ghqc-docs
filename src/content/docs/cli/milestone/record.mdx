@@ -1,0 +1,137 @@
+---
+title: Milestone Record
+description: Generate a QC record PDF for one or more milestones
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc milestone record` generates a PDF QC record for one or more milestones.
+The record summarizes issue history, approvals, comments, and checklist progress in a document suitable for review packages or handoff.
+
+```bash
+ghqc milestone record
+```
+
+## Interactive
+Run `ghqc milestone record` with no milestone or output arguments to enter the full prompt flow.
+
+```bash
+ghqc milestone record
+```
+
+### Steps
+
+#### 1. Choose How to Select Milestones
+
+Interactive record generation starts by asking whether to include all milestones or pick a subset.
+
+- `Select All Milestones` includes every milestone returned by the repository
+- `Choose Specific Milestones` opens a multi-select picker
+- At least one milestone must be selected
+
+```text
+📄 Welcome to GHQC Milestone Record Mode!
+? 📄 How would you like to select milestones for the record?
+  📋 Select All Milestones
+> 🎯 Choose Specific Milestones
+```
+
+```text
+? 📄 Select milestones for the record:
+> [x] PK Review (12)
+  [ ] Round 2 (18)
+  [ ] Final Report (24)
+```
+
+#### 2. Choose Record Detail Level
+
+Before naming the file, `ghqc` asks whether to generate only the summary tables.
+
+- The default is **No**, which includes the full detailed issue content
+- Choosing **Yes** creates a lighter-weight record focused on summary tables
+
+```text
+? 📋 Generate only tables without detailed issue content? (y/N)
+```
+
+#### 3. Name the Output File
+
+You can provide an explicit output name or press `Enter` to accept the default.
+
+- Interactive output names are turned into `.pdf` files automatically
+- If no path is provided, the default is `<repo>-<milestones>.pdf`
+- Relative paths are resolved from the selected project directory
+
+```text
+? 📁 Enter record file name (Enter for default):
+```
+
+#### 4. Add Context PDFs
+
+After milestone selection, interactive mode scans the current project directory for `.pdf` files that can be prepended or appended to the record.
+
+- If no PDFs are found, `ghqc` skips this step
+- Each selected PDF is marked as `prepend` or `append`
+- Files are rendered in the order you add them
+
+#### 5. Record Generated
+
+When rendering succeeds, `ghqc` prints the final output path.
+
+```text
+✅ Record successfully generated at /path/to/project/my-analysis-PK-Review.pdf
+```
+
+## Non-interactive
+
+To skip interactive mode, either:
+
+- provide one or more milestone names as positional arguments
+- use `--all-milestones`
+
+```bash
+ghqc milestone record "PK Review" --record-path pk-review.pdf
+```
+
+```bash
+ghqc milestone record \
+  --all-milestones \
+  --prepended-context cover.pdf \
+  --appended-context appendix.pdf
+```
+
+### Options
+| Argument / Flag | Description |
+|---|---|
+| `[milestones...]` | Milestone names to include. |
+| `--all-milestones` | Include all milestones. |
+| `-r, --record-path` | Output path for the record PDF. |
+| `--only-tables` | Include only summary tables. |
+| `--prepended-context` | PDF to prepend before the record content. Repeatable. |
+| `--appended-context` | PDF to append after the record content. Repeatable. |
+
+### Validation and Defaults
+
+- `--all-milestones` cannot be combined with milestone names
+- If context PDFs are supplied in CLI mode, you must also provide milestone selection
+- `record_path` always ends with `.pdf`, even if you omit the extension
+- Relative output paths are resolved under the selected project directory
+- If no output path is supplied, `ghqc` generates one from the repo name and milestone names
+
+## What the Record Includes
+
+The generated PDF can include:
+
+- repository and milestone metadata
+- issue-level QC history
+- approval commit information
+- checklists and checklist summaries
+- reviewer and comment history
+- optional prepended or appended PDF context
+- configuration-driven assets such as the project logo
+
+<LinkCard 
+  title="QC Record Preview" 
+  href="../../../features/record/#preview" 
+  description="Visit the Record Feature page for a preview"
+/>

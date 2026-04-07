@@ -1,0 +1,245 @@
+---
+title: Authentication
+description: How ghqc resolves GitHub credentials, how the local auth store fits in, and what changes when no authentication is available
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc` talks to GitHub through the repository remote configured for the current project.
+That means authentication is not configured in a `ghqc`-specific file.
+Instead, `ghqc` inspects the current repository's Git remote, determines which GitHub host it belongs to, and then tries to find credentials that work for that host.
+
+This page explains that model, the credential lookup order, the local auth store, and the practical effects of running with or without authentication.
+
+## 1. Overview
+
+### 1.1. Where Authentication Starts
+
+When `ghqc` starts in a project directory, it first opens the Git repository and reads the default fetch remote.
+From that remote URL, it derives:
+
+- the repository owner
+- the repository name
+- the GitHub base URL
+
+Authentication is then resolved against that host.
+For `github.com`, `ghqc` uses the standard GitHub API.
+For GitHub Enterprise, it targets that server's API instead.
+
+You can also override host detection for auth-specific CLI commands with `--host`.
+That is mainly useful when you want to manage credentials outside a repository checkout.
+
+### 1.2. What Authentication Is Used For
+
+Authentication matters for any feature that needs to read from or write to GitHub, including:
+
+- `ghqc auth status` and `ghqc auth token`
+- listing milestones and issues
+- creating issues
+- posting comments, reviews, approvals, and unapprovals
+- loading assignees and issue dependencies
+- reading issue threads for status, record generation, and archive generation
+- using the local API or embedded UI against private repositories
+
+If the repository is public, some read operations may still work without authentication.
+If the repository is private, authentication is normally required for almost everything beyond local Git inspection.
+
+## 2. Credential Resolution Order
+
+`ghqc` tries credential sources in a fixed order and stops at the first valid token it finds.
+
+### 2.1. `ghqc` Auth Store
+
+The highest-priority source is the local `ghqc` auth store.
+
+This store is populated by the `ghqc auth login` flow when you provide a token directly or when `ghqc` imports a token after a successful `gh auth login`.
+
+This gives `ghqc` one host-scoped place where it can keep a token independent of:
+
+- your current shell environment
+- whether `gh auth token` is active in the current shell
+- whether Git credential helpers are available
+
+If the auth store contains a usable token for the selected host, `ghqc` uses it first.
+
+### 2.2. `GITHUB_TOKEN`
+
+If the local auth store does not have a token for the selected host, `ghqc` next checks the `GITHUB_TOKEN` environment variable.
+
+Use this when you want the most explicit and predictable behavior, especially in:
+
+- CI
+- remote shells
+- scripted workflows
+- environments where multiple GitHub accounts may be present
+
+If `GITHUB_TOKEN` is set and looks like a valid token, `ghqc` uses it directly.
+
+### 2.3. Active GitHub CLI Authentication
+
+If `GITHUB_TOKEN` is not available, `ghqc` tries the GitHub CLI active session via:
+
+```bash
+gh auth token --hostname <host>
+```
+
+This is often the easiest setup for interactive local use because it reuses the same authentication you may already use for `gh`.
+
+### 2.4. Stored GitHub CLI Credentials
+
+If an active `gh auth token` lookup does not succeed, `ghqc` then checks the GitHub CLI config files and looks for a token for the resolved host.
+
+This means `ghqc` can still reuse GitHub CLI authentication even when the active token command is unavailable in the current shell environment.
+
+### 2.5. Git Credential Manager
+
+If GitHub CLI credentials are not available, `ghqc` tries Git's credential system via:
+
+```text
+git credential fill
+```
+
+This is useful when your machine already has Git credentials stored for HTTPS operations and you want `ghqc` to follow the same setup that `git fetch` and `git push` use.
+
+### 2.6. `.netrc`
+
+As a final fallback, `ghqc` checks `.netrc` for credentials matching the resolved GitHub host.
+
+This is a compatibility path for environments that still use `.netrc`-style credential storage.
+
+## 3. Token Validation
+
+`ghqc` does not blindly accept every string returned by those sources.
+It validates tokens before using them.
+
+In practice, that means:
+
+- empty values are ignored
+- values containing whitespace are ignored
+- standard GitHub token prefixes are accepted
+- long non-prefixed tokens are also accepted for GitHub Enterprise style setups
+
+If a source returns something that does not look like a usable token, `ghqc` keeps searching the next source instead of failing immediately.
+
+## 3.1. Source Priority Summary
+
+The full priority order is:
+
+1. `ghqc` auth store
+2. `GITHUB_TOKEN`
+3. active `gh auth token`
+4. stored GitHub CLI credentials
+5. Git credential manager
+6. `.netrc`
+
+<LinkCard
+  title="Authentication Commands"
+  href="../../cli/auth"
+  description="See the CLI auth reference for login, logout, status, and token command details"
+/>
+
+## 4. Behavior Without Authentication
+
+If no token can be found, `ghqc` falls back to an unauthenticated API client rather than crashing.
+
+This is useful for:
+
+- public repositories
+- local experimentation
+- diagnosing setup problems
+
+But it comes with important limits.
+
+### 4.1. Public Repositories
+
+For public repositories, some read-only operations may still work, such as:
+
+- reading public issues and milestones
+- loading public metadata into the UI
+- testing parts of the local server
+
+Even there, unauthenticated requests are more limited and may hit rate limits sooner.
+
+### 4.2. Private Repositories
+
+For private repositories, missing authentication usually blocks GitHub-backed workflows entirely.
+
+Typical failures include:
+
+- milestones or issues not loading
+- assignee lists failing to populate
+- issue creation or comment posting failing
+- record and archive generation failing when they need to fetch issue thread data
+
+The local Git repository can still be inspected, but the GitHub-backed QC workflow cannot function normally.
+
+## 5. Host-Specific Behavior
+
+Authentication is resolved against the host extracted from the repository remote, not against a hard-coded global GitHub setting.
+
+That matters when:
+
+- you use GitHub Enterprise
+- you work with both `github.com` and enterprise hosts
+- your `gh` configuration stores credentials for multiple hosts
+
+In those cases, `ghqc` looks for credentials matching the repository's actual host and uses that host's API base path.
+
+## 6. Recommended Setups
+
+### 6.1. Local Interactive Use
+
+For normal workstation use, the simplest setup is usually:
+
+1. authenticate with `gh auth login`
+2. optionally import or store the token with `ghqc auth login`
+3. confirm the repository remote points at the expected GitHub host
+4. run `ghqc`
+
+This keeps authentication aligned with the rest of your GitHub CLI usage.
+
+### 6.2. CI or Explicit Automation
+
+For CI or scripted automation, prefer:
+
+```bash
+export GITHUB_TOKEN=...
+```
+
+This is the most predictable option because it does not depend on local CLI state, GUI keychains, or interactive credential helpers.
+
+### 6.3. Shared Systems
+
+On shared systems, avoid relying on another user's interactive CLI session.
+Use a service token or an explicitly managed environment variable instead.
+
+## 7. Troubleshooting
+
+If `ghqc` can open the local Git repository but GitHub-backed features fail, check these in order:
+
+1. confirm the project has a valid GitHub remote
+2. confirm the remote points at the host you expect
+3. run `ghqc auth status` to inspect source availability and priority
+4. check whether `GITHUB_TOKEN` is set
+5. run `gh auth status` for that host
+6. verify that Git or `.netrc` credentials exist if you expect those fallback paths to be used
+
+Common symptoms and likely causes:
+
+| Symptom | Likely Cause |
+|---|---|
+| Local repo opens, but milestones/issues do not load | Missing or invalid GitHub credentials |
+| Works on a public repo, fails on a private repo | Running unauthenticated |
+| `gh` works, but `ghqc` does not | A higher-priority source is winning, the host is wrong, or the repository remote differs from what you expected |
+| CI works locally but not in automation | Local machine is using stored or CLI auth; CI is missing `GITHUB_TOKEN` or another explicit credential source |
+
+## 8. Practical Guidance
+
+The main rule is simple:
+
+- if you want the most explicit machine-local behavior, use `ghqc auth login`
+- if you want predictable automation, use `GITHUB_TOKEN`
+- if you want convenient local usage, use `gh auth login` and let `ghqc` reuse or import that credential
+- if neither is available, `ghqc` will still try Git and `.netrc` credentials before falling back to unauthenticated mode
+
+Authentication is therefore best understood as host-aware credential discovery layered on top of your repository's Git remote.

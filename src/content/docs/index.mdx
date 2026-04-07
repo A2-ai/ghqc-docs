@@ -1,6 +1,6 @@
 ---
 title: Welcome to ghqc
-description: GitHub-centric Quality Control facilitation through Shiny apps.
+description: GitHub-centric Quality Control
 template: doc
 tableOfContents: false
 hero:
@@ -8,12 +8,12 @@ hero:
   image:
     file: ../../assets/logo.png
   actions:
-    - text: Visit ghqc
+    - text: Visit the R package
       link: https://github.com/a2-ai/ghqc
-      icon: github
-    - text: Visit ghqc.app
-      link: https://github.com/a2-ai/ghqc.app
-      icon: github
+      icon: seti:R
+    - text: Visit the Rust toolkit
+      link: https://github.com/a2-ai/ghqctoolkit
+      icon: seti:rust
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
@@ -22,9 +22,9 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
 	<Card title="Install ghqc" icon="download">
-		[Install ghqc](./installation) using base R and [`rv`](https://a2-ai.github.io/rv-docs)
+		[Install ghqc](./intro/installation) as both a cli tool and an R package
 	</Card>
-	<Card title="First ghqc project" icon = "open-book">
-		Get familiar with `ghqc` by completing your [first ghqc project](./intro/introduction)
+	<Card title="The ghqc Workflow" icon = "open-book">
+		Familiarize yourself with [ghqc's workflow](./intro/workflow)
 	</Card>
 </CardGrid>

@@ -1,0 +1,170 @@
+---
+title: Unapproval Impact Analysis
+description: How ghqc identifies downstream approvals affected by an unapproval and why that matters
+---
+
+`ghqc` treats approval as a claim about a file at a specific commit.
+When that approval depends on other approved QC issues, unapproving one upstream issue can make those downstream approvals questionable too.
+
+Unapproval impact analysis is the part of `ghqc` that helps you see that dependency chain before you reopen an issue.
+
+This page explains what impact analysis is, how it is derived, and why it matters for the integrity of the QC trail.
+
+## 1. The Core Problem
+
+Suppose issue `B` was approved while depending on issue `A`.
+If issue `A` is later unapproved, issue `B` may still be closed and marked approved even though one of the assumptions behind that approval is no longer stable.
+
+That creates a traceability problem:
+
+- the downstream issue still looks approved
+- the upstream issue is no longer approved
+- the overall QC state can appear stronger than it really is
+
+Impact analysis exists to surface that mismatch.
+
+## 2. "Impact" Definition
+
+In `ghqc`, impact is about downstream approval relationships.
+
+An issue is considered impacted when:
+
+- it is approved
+- it depends on the issue being unapproved, directly or indirectly
+
+The dependency path usually comes from [blocking relationships](../relevant-files/#22-what-blocking-relationships-do) such as:
+
+- `Gating QC`
+- `Previous QC`
+
+Those are the relationships that say one QC must remain valid before another approval can be trusted.
+
+Informational links such as `Relevant QC` are not the main driver of unapproval impact analysis because they do not assert the same blocking dependency.
+
+## 3. Analysis Product
+
+When impact analysis is available, `ghqc` builds a view of downstream issues in three broad buckets:
+
+- issues that are already not approved
+- approved issues that may be impacted
+- issues selected to be unapproved now
+
+The root issue is always included in the unapproval action.
+Downstream issues are candidates because their approvals may no longer be defensible once the upstream approval is removed.
+
+The key point is that `ghqc` is not saying every downstream issue must always be reopened.
+It is saying those issues deserve review because the dependency structure says their approval may no longer rest on an approved base.
+
+## 4. Why This Matters
+
+### 4.1. It Prevents False Confidence
+
+Without impact analysis, a repository can end up with a chain like this:
+
+- upstream data-preparation QC is reopened
+- downstream analysis QC still shows as approved
+- downstream reporting QC still shows as approved
+
+That can make the milestone or project look complete when a foundational part of the QC has already been put back in play.
+
+Impact analysis makes that visible before the inconsistency spreads further.
+
+### 4.2. It Preserves The Meaning Of Approval
+
+Approval is valuable only if it remains tied to the assumptions in force when it was granted.
+
+If those assumptions change, keeping all downstream approvals untouched can blur the meaning of what "approved" actually means.
+
+Impact analysis protects that meaning by asking:
+
+> Which other approvals were relying on this one still being valid?
+
+### 4.3. It Improves Human Review
+
+The goal is not blind automation.
+The goal is better human judgment with the right dependency context in front of you.
+
+When you can see impacted approvals explicitly, it becomes easier to decide:
+
+- which approvals truly need to be reopened
+- which downstream files need another pass
+- which issue reasons should be documented together
+
+## 5. Direct Vs Indirect Impact
+
+Impact can be:
+
+- **direct** - 
+  An approved issue depends immediately on the issue you are unapproving
+- **indirect** - 
+  An approved issue depends on another approved issue that depends on the issue you are unapproving
+
+This is why impact analysis is better understood as a dependency tree than as a single list.
+The important question is not just "what blocks what" but "what approvals sit downstream from this approval chain".
+
+## 6. User Optionality
+
+In the UI, impacted approvals appear as candidates rather than being silently unapproved automatically.
+
+That design matters because dependency structure tells you where impact may exist, but it does not replace reviewer judgment.
+
+For example:
+
+- some downstream issues may obviously need reopening
+- some may only need a quick verification
+- some may be safe to leave approved if the upstream change does not alter the relevant result
+
+The impact analysis gives you the map.
+You still decide which impacted approvals to include in the unapproval action.
+
+## 7. Required Reasons
+
+Each issue selected for unapproval requires a reason.
+
+That matters because cascading unapproval is not just a mechanical graph operation.
+It is a documented QC event.
+
+Requiring a reason ensures that later readers can answer:
+
+- why was this approval reversed
+- why were these downstream issues included
+- what changed in the QC chain
+
+Without that explanation, the repository history would show the state change but not the rationale.
+
+## 8. Unavailable Impact Analysis
+
+Impact analysis depends on the GitHub issue dependency capability being available on the host.
+
+When that capability is unavailable, `ghqc` falls back to a simpler model:
+
+- only the current issue is unapproved
+- downstream impact cannot be checked automatically
+
+That does not mean downstream impact does not exist.
+It only means `ghqc` cannot discover it from the host automatically.
+
+In that case, teams need to be more deliberate about checking related approvals manually.
+
+## 9. Result Interpretation
+
+A good way to read impact analysis is:
+
+- the root issue is definitely being reopened
+- downstream approved issues are potentially affected
+- already unapproved issues are context, not new action
+
+So the analysis is best understood as a QC integrity tool, not just a convenience feature.
+
+It helps keep the visible approval state aligned with the actual dependency state of the work.
+
+## 10. Practical Guidance
+
+When using impact-aware unapproval, a useful approach is:
+
+1. start from the upstream issue being reopened
+2. review the impacted approvals as a dependency tree, not just a count
+3. include downstream issues whose approvals are no longer trustworthy without the upstream approval
+4. write reasons that explain the dependency break clearly
+
+That keeps the milestone's approval trail honest and makes later re-review work much easier to understand.

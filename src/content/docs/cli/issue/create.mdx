@@ -1,0 +1,218 @@
+---
+title: Issue Create
+description: Create QC issues from the terminal with ghqc issue create
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc issue create` opens a new QC issue for a repository file. 
+It is the CLI counterpart to the UI's [Create](../../../features/create) flow: choose a milestone, select a file, attach a checklist, 
+optionally assign reviewers, review collaborators, and add any relevant file or QC references before posting the issue to GitHub.
+
+```bash
+ghqc issue create
+```
+
+## Interactive
+Run `ghqc issue create` with no create-specific arguments to enter the full prompt flow.
+
+```bash
+ghqc issue create
+```
+
+### Steps
+
+#### 1. Select or Create a Milestone
+
+The first prompt offers all open milestones plus a **Create new milestone** option.
+
+- If there are no open milestones, `ghqc` says so and immediately pushes you toward creating one
+- New milestone names are trimmed and must be unique across existing milestone names
+- The milestone description is optional and is only used when a new milestone is created
+
+```text
+🚀 Welcome to GHQC Interactive Mode!
+? Select or create a milestone:
+  📝 Create new milestone
+> 🎯 PK Review
+  🎯 Round 2
+```
+
+#### 2. Select a File
+
+The file prompt is repository-relative and supports `Tab` autocomplete.
+
+- Hidden files and directories are omitted from suggestions
+- Directories are shown with a trailing `/` so you can drill down further
+- Files that already have an issue in the selected milestone are shown as unavailable and cannot be selected
+- Validation rejects empty input, directories, and files that are already claimed in that milestone
+
+```text
+? 📁 Enter file path (Tab for autocomplete, directories shown with /):
+  scripts/
+> scripts/helper.R
+  🚫 scripts/old-helper.R (already has issue)
+```
+
+#### 3. Select a Checklist
+
+Checklist choices come from the resolved configuration repository.
+
+- The list is sorted alphabetically
+- If your config includes the built-in `Custom` checklist, it appears alongside the others
+- If no checklists can be loaded, the command stops instead of guessing
+
+```text
+? Select a checklist:
+> 📋 Code Review
+  📋 Custom
+  📋 Report
+```
+
+#### 4. Assign Reviewers
+
+Reviewer assignment is optional.
+
+- Autocomplete matches both GitHub login and display name
+- Press `Enter` on an empty prompt to skip assignment entirely
+- After the first assignee, pressing `Enter` finishes the list
+- Duplicate usernames are ignored instead of being added twice
+
+```text
+? 👥 Enter assignee username (use Tab for autocomplete, Enter for none):
+? 👥 Enter another assignee (current: reviewer1, use Tab for autocomplete, Enter to finish):
+```
+
+Before relevant files, `ghqc` may open a collaborator step for the selected file.
+
+#### 5. Review Collaborators
+
+`ghqc` always records the issue creator as the `author` metadata entry.
+It also detects collaborator entries from the git author history of the selected file, filters them, and lets you keep, remove, or add `Name <email>` entries before the issue is created.
+
+- The author is shown separately from collaborators
+- Collaborator entries default from the selected file's git history
+- You can remove detected entries or add your own normalized `Name <email>` entry
+
+```text
+? 🤝 Select collaborators to keep:
+> Jane Doe <jane@example.com>
+  John Smith <john@example.com>
+? 🤝 Add collaborator (Name <email>, Enter to finish):
+> Analyst Two <analyst@example.com>
+```
+
+#### 6. Add Relevant Files or QC References
+
+After collaborators, `ghqc` asks whether you want to add [relevant files](../../../concepts/relevant-files). The default is **No**.
+
+If you opt in:
+
+- The relevant-file picker also uses repository-relative autocomplete
+- Suggestions show linked issue numbers when the selected file already has GHQC issues elsewhere
+- When matching issues exist, `ghqc` lets you choose between a plain file reference and an issue-backed QC reference
+- Issue-backed references are ordered with issues from the current milestone first, then newer issue numbers first
+
+For each relevant entry:
+
+- `File` requires a justification
+- `Gating QC`, `Previous QC`, and `Relevant QC` allow an optional description
+- `Previous QC` also defaults to posting an automatic diff comment comparing the previous QC commit to the new issue's starting commit
+- After each entry, `ghqc` asks whether to add another; the default is **No**
+
+```text
+? Do you want to add any relevant files? (y/N)
+? 📁 Select a relevant file:
+? Select the source for 'data/adsl.csv':
+  📄 File (not linked to an issue)
+> 🔗 #82 (PK Review)
+  🔗 #61 (Round 1)
+? Select the relationship type:
+> 🚦 Gating QC - This issue must be approved before the current issue
+```
+
+## Non-interactive
+
+To skip interactive mode, you must provide all three required fields together:
+
+- `--milestone`
+- `--file`
+- `--checklist-name`
+
+Any partial combination fails fast instead of mixing prompts with flags.
+
+```bash
+ghqc issue create \
+  --milestone "PK Review" \
+  --file scripts/helper.R \
+  --checklist-name "Code Review" \
+  --assignees reviewer1 reviewer2 \
+  --gating-qc https://github.com/org/repo/issues/82::Upstream dataset validation \
+  --relevant-file data/adsl.csv::Input dataset for the report
+```
+
+### Options
+| Flag | Description |
+|---|---|
+| `-m, --milestone` | Milestone name. Reuses an existing milestone or creates a new one. |
+| `-f, --file` | Repository-relative file path to QC. |
+| `-c, --checklist-name` | Checklist name from the configuration repo. |
+| `-a, --assignees` | Reviewer GitHub usernames. |
+| `--add-collaborator` | Add collaborator metadata entry, format: `Name <email>`. |
+| `--remove-collaborator` | Remove a detected collaborator metadata entry, format: `Name <email>`. |
+| `-D, --description` | Optional milestone description when a new milestone must be created. |
+| `--previous-qc` | Previous QC issue URL, with optional `::description` and optional `::no_diff`. |
+| `--gating-qc` | Blocking QC issue URL, with optional `::description`. |
+| `--relevant-qc` | Informational QC issue URL, with optional `::description`. |
+| `--relevant-file` | Plain file reference in `file_path::justification` format. |
+
+### Validation and Defaults
+
+- Invalid assignees are filtered out against the repository user list instead of aborting the whole command
+- `--checklist-name` must match a loaded checklist exactly
+- Relevant issue URLs must point at the same repository that `ghqc` is running against
+- `--relevant-file` paths must exist locally
+- collaborator metadata defaults from cleaned git author history for the selected file and can be adjusted with `--add-collaborator` and `--remove-collaborator`
+- If the target file already has an issue in the milestone, creation is rejected
+- If the milestone does not exist, `ghqc` creates it before posting the issue
+
+One detail that differs from interactive mode: CLI issue references are validated from the supplied URL, so blocking relationships are attached after the issue is created rather than selected from an in-session picker.
+For `--previous-qc`, automatic diff comments are enabled by default; add `::no_diff` to suppress them for a specific reference.
+
+## Relevant Reference Types
+
+| Type | Meaning |
+|---|---|
+| `Gating QC` | Another QC that must be approved before this issue can be approved. |
+| `Previous QC` | A prior QC for the same or related work. It is also treated as blocking, and by default posts an automatic diff comment unless `::no_diff` is used. |
+| `Relevant QC` | A related QC included for context only. |
+| `File` | A plain file reference that is not linked to a GHQC issue and therefore requires justification. |
+
+<LinkCard title="Relevant Files" href="../../../concepts/relevant-files" description="Visit the Relevant Files Concept page for more information"/>
+
+## What Gets Captured
+
+When the issue is created, `ghqc` adds metadata beyond the plain checklist body:
+
+- the current commit at creation time
+- the current git branch
+- the detected file author, plus collaborators when available
+- a GitHub link to the file contents at the initial QC commit
+- the relevant-files section, if supplied
+
+### Example
+```md
+## Metadata
+* initial qc commit: b038c3c41bdebddaceb25b6d9c4469abea990491
+* git branch: main
+* author: author (author@email.com)
+* [file contents at initial qc commit](https://github.com/org/repo/blob/b038c3c/scripts/helper.R)
+
+# General Script
+
+Note: edit checklist items as needed
+
+- [ ] good documentation
+- [ ] only relative paths to sourced files
+- [ ] consistent style and naming conventions
+```

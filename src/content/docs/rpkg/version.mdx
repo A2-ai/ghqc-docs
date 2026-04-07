@@ -1,0 +1,63 @@
+---
+title: Version Functions
+description: Check the installed ghqc version or the latest released version from R
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+The `ghqc` R package exposes two version helpers:
+
+- `ghqc::ghqc_version()`
+- `ghqc::ghqc_remote_version()`
+
+Use them together to compare what is installed locally with the latest published release.
+
+## `ghqc::ghqc_version()`
+
+`ghqc::ghqc_version()` returns the version of the installed `ghqc` binary.
+
+```r
+ghqc::ghqc_version()
+```
+
+Behavior:
+
+- it runs `ghqc --version`
+- it strips either `ghqctoolkit ` or `ghqc ` from the command output
+- it returns a plain version string such as `"0.4.2"` without a leading `v`
+
+If the `ghqc` binary is not installed, the function errors and tells you to run `ghqc::ghqc_install()`.
+
+## `ghqc::ghqc_remote_version()`
+
+`ghqc::ghqc_remote_version()` returns the tag of the latest GitHub release for `a2-ai/ghqctoolkit`.
+
+```r
+ghqc::ghqc_remote_version()
+```
+
+Behavior:
+
+- it queries the GitHub Releases API with `curl`
+- it extracts the latest release `tag_name`
+- it returns a tag such as `"v0.4.2"` with the leading `v` preserved
+
+If the request fails, the function prints a warning and returns `NULL` invisibly instead of erroring.
+
+## Example
+
+```r
+local_version <- ghqc::ghqc_version()
+remote_version <- ghqc::ghqc_remote_version()
+
+local_version
+remote_version
+```
+
+## Common Use
+
+These helpers are mainly useful for:
+
+- checking whether the CLI is installed correctly
+- confirming which version the R package is launching
+- deciding whether to run `ghqc::ghqc_install()` again

@@ -1,0 +1,76 @@
+---
+title: First ghqc project
+description: Brief walkthrough of the standard ghqc workflow
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+import gitBehind from '../../../../assets/intro/getting-started/git-behind.png';
+
+import configSettingUp from '../../../../assets/intro/getting-started/config-setting-up.png';
+import configSetUp from '../../../../assets/intro/getting-started/config-set-up.png';
+
+This section walks through a simple end-to-end `ghqc` workflow. By the end, you will have seen how to:
+* [Create a QC](./create)
+* [See the QC Status](./status)
+* [Post a review](./review)
+* [Address findings and notify the reviewer](./findings)
+* [Approve the QC](./approve)
+
+We will use a small example file, `scripts/helper.R`, to show what each step looks like in practice.
+
+Before we get to that workflow, we will start `ghqc` and set up the project configuration.
+
+:::caution
+To follow along in your own project, please ensure:
+* The [installation instructions](../installation) have been completed
+* You are in the project root of a project with a GitHub git remote
+:::
+
+## Starting ghqc
+
+Use one of the following commands to launch the user interface:
+
+<Tabs>
+    <TabItem label = "Terminal">
+        This opens the user interface in a browser tab.
+        ```bash
+        ghqc ui
+        ```
+    </TabItem>
+    <TabItem label = "R">
+        This opens the user interface in the viewer panel of RStudio or Positron.
+        ```r
+        ghqc::ghqc()
+        ```
+    </TabItem>
+</Tabs>
+
+Once the server starts and the user interface opens, you will see an interface similar to the following.
+
+![](../../../../assets/intro/getting-started/opening.png)
+
+## Git Status
+The first feature on this page is the Git status box in the upper-right corner.
+When the project is up to date with the remote, the status is green. If it is ahead, behind, or diverged, the status changes to yellow or red.
+
+<div style="display: flex; justify-content: center;">
+  <img src={gitBehind.src} style="width: 75%;" />
+</div>
+
+## Configuration
+Once the interface is open, the next step is to set up the configuration. To make `ghqc` flexible across teams, we recommend using a
+[configuration repository](../../concepts/configuration).
+
+To set up the configuration repository for a project, enter your group's Git repository URL and click _Set up_. For reference, an example repository is available at
+`https://github.com/a2-ai/ghqc.example_config_repo`.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configSettingUp.src} style="width: 75%;" />
+</div>
+
+Once the configuration is set up, the Configuration tab displays the checklists and options available for the project.
+
+<div style="display: flex; justify-content: center;">
+  <img src={configSetUp.src} style="width: 75%;" />
+</div>

@@ -1,0 +1,48 @@
+---
+title: Address and Notify Findings
+description: Walkthrough of addressing findings and notifying the reviewer
+---
+
+import findingsSwimLane from '../../../../assets/intro/getting-started/findings/swimlanes.png';
+import findingsPopUp from '../../../../assets/intro/getting-started/findings/popup.png';
+import findingsPreview from '../../../../assets/intro/getting-started/findings/preview.png';
+
+Once the reviewer has left comments on the latest commit, the author can address them. In this step, we update the file, commit the changes, and notify the reviewer that the issue is ready to be checked again.
+
+## Address Findings
+
+Continuing with the `scripts/helper.R` example, we remove the `return()` call and leave only `a + b`.
+
+```r ins={3} del={4}
+//helper.R 
+add2 <- function(a, b) {
+    a + b
+    return(a + b)
+}
+```
+
+After making the updates, we commit the changes.
+
+## Notify Changes
+
+Returning to the `ghqc` UI, `scripts/helper.R` has moved from _Findings to Address_ to _Changes to Notify_.
+
+<div style="display: flex; justify-content: center;">
+    <img src={findingsSwimLane.src} style="width: 75%;" />
+</div>
+
+In the card, the last commit referenced in the review no longer matches the latest commit that changed the file. In this state, the author should use the notify workflow
+to explain what changed and let the reviewer know there is an update. To open this workflow, click the issue card.
+
+<div style="display: flex; justify-content: center;">
+    <img src={findingsPopUp.src} style="width: 75%;" />
+</div>
+
+In the _Notify_ tab, you can select the commit range to reference, include a comment, and preview the comment that will be posted.
+
+<div style="display: flex; justify-content: center;">
+    <img src={findingsPreview.src} style="width: 75%;" />
+</div>
+
+Clicking _Post_ posts the comment and updates the issue status to _Ready for Review_.
+

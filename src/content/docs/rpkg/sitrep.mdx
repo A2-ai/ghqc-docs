@@ -1,0 +1,137 @@
+---
+title: ghqc::ghqc_sitrep()
+description: Print a diagnostic report for ghqc, the current repository, and optional configuration
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc::ghqc_sitrep()` prints a situation report for the installed `ghqc` binary, the ghqc process tracked by the current R session, the target repository, and repository-host authentication state when available.
+It is a higher-level R wrapper around `ghqc sitrep --json`.
+
+```r
+ghqc::ghqc_sitrep()
+```
+
+## What It Reports
+
+The printed report includes:
+
+- binary path and local version
+- latest remote release version when it can be determined
+- the ghqc process state tracked by the current R session
+- repository directory, GitHub remote, branch, and milestone counts
+- auth store location, stored token previews, repository host, and available auth sources when present in the CLI response
+- optional configuration details when `with_configuration = TRUE`
+
+The function invisibly returns the parsed sitrep data structure from the CLI.
+
+## Arguments
+
+<table>
+  <colgroup>
+    <col style={{ width: '28%' }} />
+    <col style={{ width: '72%' }} />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Argument</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>directory</code></td>
+      <td>Project directory to inspect. Defaults to <code>here::here()</code>.</td>
+    </tr>
+    <tr>
+      <td><code>config_dir</code></td>
+      <td>Optional ghqc configuration directory override.</td>
+    </tr>
+    <tr>
+      <td><code>with_configuration</code></td>
+      <td>Whether to include a configuration section with checklists and options. Defaults to <code>FALSE</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Version Requirement
+
+`ghqc::ghqc_sitrep()` requires `ghqc` version `0.2.0` or newer.
+If the installed binary is older, the function errors and tells you to upgrade.
+
+## Examples
+
+```r
+# Basic sitrep
+ghqc::ghqc_sitrep()
+```
+
+```r
+# Include configuration details
+ghqc::ghqc_sitrep(with_configuration = TRUE)
+```
+
+```r
+# Inspect a specific project and config directory
+ghqc::ghqc_sitrep(
+  directory = "analysis",
+  config_dir = "~/.config/ghqc",
+  with_configuration = TRUE
+)
+```
+
+## Output
+
+```txt
+── Binary ──────────────────────────────────────────────────────────────────────────────────────────
+Path: /Users/user/.local/bin/ghqc
+Version: 0.2.0
+Remote Version: 0.2.1
+
+── Process ─────────────────────────────────────────────────────────────────────────────────────────
+Status: Not running
+
+── Repository ──────────────────────────────────────────────────────────────────────────────────────
+Directory: /Users/user/projects/ghqc-docs
+Repository: org/repo (https://github.com/org/repo)
+Branch: main
+
+── Milestones ──────────────────────────────────────────────────────────────────────────────────────
+Open Milestones: 6
+• PK: 6 open | 1 closed
+• Round 2: 3 open | 3 closed
+
+Closed Milestones: 1
+• Round 1: 0 open | 10 closed 
+
+── Auth ──────────────────────────────────────────────────────────────────────────────────────
+Store Directory: /Users/user/.local/share/ghqc/auth
+Repository Host: github.com
+
+── Available Auth Sources ──
+→ ✔ ghqc auth store (ghp_...1234)
+  ✖ GITHUB_TOKEN
+  ✔ gh auth token (gho_...5678)
+  ✖ gh stored auth
+  ✔ git credential manager (gho_...4321)
+  ✖ .netrc
+```
+
+## R-Specific Additions
+
+Compared with calling the CLI directly, the R wrapper also adds the status of the background process tracked in the current R session:
+
+- `Not running` if no ghqc process has been started
+- `Running at http://localhost:<port>` if the tracked process is alive
+- `Stopped (was running at http://localhost:<port>)` if the tracked process has exited
+
+## Failure Modes
+
+- if `ghqc sitrep --json` fails, `ghqc::ghqc_sitrep()` aborts and includes stderr when available
+- if the remote release version cannot be determined, the report still prints and only that remote-version line degrades to a warning
+- if repository inspection fails, the report still prints the available error information from the CLI response
+- if auth details are unavailable, the report still prints the rest of the sitrep output
+
+---
+
+<LinkCard title="CLI Sitrep" href="../../cli/sitrep" description="See the underlying CLI command that powers the R wrapper"/>

@@ -1,0 +1,52 @@
+---
+title: Concepts
+description: Core ideas behind how ghqc is organized and configured
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Concept pages explain how `ghqc` is structured behind the UI and CLI.
+They focus on the model and conventions that shape the rest of the workflow.
+
+<CardGrid>
+  <Card title="Configuration" icon="setting">
+    How `ghqc` finds its configuration directory, what belongs in it, which defaults apply, and which environment variables change the result.
+
+    [Explore Configuration →](./configuration)
+  </Card>
+  <Card title="Relevant Files and Related Issues" icon="seti:git">
+    How `ghqc` models supporting file references, blocking QC links, informational QC links, and batch creation dependencies.
+
+    [Explore Relevant Files and Related Issues →](./relevant-files)
+  </Card>
+  <Card title="Record Template" icon="document">
+    How QC record generation works, which Tera values and functions are available, and how to author a custom `record.typ`.
+
+    [Explore Record Template →](./record)
+  </Card>
+    <Card title="Authentication" icon="seti:lock">
+    How `ghqc` discovers GitHub credentials from your environment, CLI tools, and credential stores, and what changes when no auth is available.
+
+    [Explore Authentication →](./authentication)
+  </Card>
+  <Card title="QC Status" icon="list-format">
+    How `ghqc` derives workflow state from issue history, file commits, and approvals, and how those states map into swimlanes.
+
+    [Explore QC Status →](./qc-status)
+  </Card>
+  <Card title="Review Stashes" icon="seti:git">
+    How `ghqc` stores local review edits in Git stashes, what that changes in your working tree, and how to restore the review later.
+
+    [Explore Review Stashes →](./review-stashes)
+  </Card>
+  <Card title="Disk Cache" icon="database">
+    How `ghqc` uses a persistent local disk cache to reuse GitHub-backed data and reduce unnecessary re-fetching across commands and UI sessions.
+
+    [Explore Disk Cache →](./cache)
+  </Card>
+  <Card title="Unapproval Impact Analysis" icon="warning">
+    How `ghqc` identifies downstream approvals affected by an unapproval and why that matters for QC traceability.
+
+    [Explore Unapproval Impact Analysis →](./unapproval-impact)
+  </Card>
+</CardGrid>

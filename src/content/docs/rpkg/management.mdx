@@ -1,0 +1,64 @@
+---
+title: Server Management
+description: Check, reconnect to, or stop the ghqc background server from R
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+The `ghqc` R package keeps track of the background process started by `ghqc::ghqc()` in the current R session.
+Three helper functions manage that process lifecycle:
+
+- `ghqc::ghqc_status()`
+- `ghqc::ghqc_reconnect()`
+- `ghqc::ghqc_stop()`
+
+## `ghqc::ghqc_status()`
+
+`ghqc::ghqc_status()` reports whether the background server is still running.
+
+```r
+ghqc::ghqc_status()
+```
+
+Behavior:
+
+- if no ghqc server has been started in the current R session, it prints a message and returns `NULL` invisibly
+- if the tracked process is still alive, it prints the stored ghqc server URL
+- if the tracked process has stopped, it reports that stopped state and still returns the last known URL invisibly
+
+## `ghqc::ghqc_reconnect()`
+
+`ghqc::ghqc_reconnect()` reopens the browser tab for an already running ghqc server without restarting it.
+
+```r
+ghqc::ghqc_reconnect()
+```
+
+Behavior:
+
+- if no server has been started in the current session, it prints a message and returns `NULL` invisibly
+- if the tracked process is no longer alive, it tells you to start a new one with `ghqc::ghqc()`
+- if the server is still running, it reopens the stored URL in the RStudio viewer or system browser and returns that URL invisibly
+
+This is useful when you closed the browser tab but want to keep using the same running backend process.
+
+## `ghqc::ghqc_stop()`
+
+`ghqc::ghqc_stop()` stops the background process started by `ghqc::ghqc()`.
+
+```r
+ghqc::ghqc_stop()
+```
+
+Behavior:
+
+- if no background server is tracked, it prints a message and returns silently
+- if the process has already stopped, it clears the stored process handle and reports that state
+- if the process is alive, it kills the process, clears the stored handle, and reports success
+
+The function returns `NULL` invisibly.
+
+## Scope
+
+These helpers only know about the ghqc process tracked by the current R session.
+They do not discover or manage unrelated `ghqc` processes started elsewhere from the terminal or another R session.
