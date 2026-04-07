@@ -22,9 +22,21 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
 	<Card title="Install ghqc" icon="download">
-		[Install ghqc](./intro/installation) as both a cli tool and an R package
+		[Install ghqc as both a cli tool and an R package](./intro/installation)
 	</Card>
 	<Card title="The ghqc Workflow" icon = "open-book">
-		Familiarize yourself with [ghqc's workflow](./intro/workflow)
+		[Familiarize yourself with ghqc's workflow](./intro/workflow)
 	</Card>
+  <Card title = "My first `ghqc` project" icon = "magnifier">
+    [An initial walkthrough to see `ghqc` in action](./intro/getting-started)
+  </Card>
+  <Card title = "User Interface Features" icon = "laptop" >
+    [Explore the features exposed through the user interface.](./features)
+  </Card>
+  <Card title = "Command Line Interface" icon = "seti:shell">
+    [Commands exposed through the `ghqc` CLI](./cli)
+  </Card>
+  <Card title = "ghqc the R package" icon = "seti:R">
+    [Functions to manage your ghqc interface within R](./rpkg)
+  </Card>
 </CardGrid>
