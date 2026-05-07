@@ -1,0 +1,39 @@
+---
+title: Cache Commands
+description: Inspect and manage the on-disk ghqc cache
+---
+
+`ghqc` keeps a small on-disk cache of GitHub data and per-commit file-change records to speed up repeated operations. The `cache` command group lets you inspect that cache, locate it on disk, and remove entries when needed.
+
+These commands are useful when you want to:
+
+- see what `ghqc` has cached for the current repo
+- locate the cache directory for piping into other shell tools
+- drop stale entries after a force-push, rebase, or `ghqc` upgrade
+
+## Commands
+
+* [`ghqc cache status`](./status) - Show the cache root, total size, configured TTL, and per-element table.
+* [`ghqc cache dir`](./dir) - Print the cache directory for the current repo or the global cache root.
+* [`ghqc cache remove`](./remove) - Remove cached data for the current repo, a specific element, or globally.
+
+## Cache Location
+
+The cache lives under the system cache directory (typically `~/.cache/ghqc` on Linux/macOS via XDG; honors `XDG_CACHE_HOME`) and is namespaced per repository as `<root>/<owner>/<repo>/`.
+
+## Elements
+
+Within a repository's cache directory, data is grouped by **element**:
+
+| Element | Contents |
+|---|---|
+| `commits` | Per-commit file-change records (drives the "commits that changed file X" list) |
+| `issues` | Issue comments and events |
+| `users` | Repo assignees and user details |
+| `labels` | Repo labels |
+
+## TTL
+
+The default TTL is one hour (3600s). Override with the `GHQC_CACHE_TIMEOUT` environment variable (in seconds). Some entries (issue comments/events, user details) are stored without a TTL and refresh based on GitHub-side timestamps instead.
+
+See the [Caching concept page](../../concepts/cache) for a deeper explanation of how the cache fits into `ghqc` workflows.

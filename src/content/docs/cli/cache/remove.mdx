@@ -1,0 +1,55 @@
+---
+title: Cache Remove
+description: Remove cached ghqc data for the current repo, a specific element, or every repo on the machine
+---
+
+`ghqc cache remove` removes cached data from disk. The cache is reconstructible — entries are re-fetched on next use — so deletion is safe. The command prints what was removed and exits 0 even if no matching entries existed.
+
+```bash
+ghqc cache remove [ELEMENT] [--global]
+```
+
+Aliases: `ghqc cache rm`.
+
+## Behavior
+
+| Invocation | Effect |
+|---|---|
+| `ghqc cache remove` | Remove the entire per-repo cache for the current repo |
+| `ghqc cache remove <element>` | Remove just `<element>` for the current repo |
+| `ghqc cache remove --global` | Wipe the entire `ghqc` cache directory (all repos, all elements) |
+| `ghqc cache remove <element> --global` | Remove `<element>` for **every** repo under the cache root |
+
+Valid elements: `commits`, `issues`, `users`, `labels`.
+
+When run outside a git repository, the repo-scoped forms error; use `--global` instead.
+
+## Examples
+
+```bash
+# Drop just the commits cache for this repo (e.g. after a force-push or rebase)
+ghqc cache remove commits
+
+# Drop everything cached for this repo
+ghqc cache remove
+
+# Drop the labels cache for every repo on this machine
+ghqc cache remove labels --global
+
+# Wipe the entire ghqc cache
+ghqc cache remove --global
+```
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--global` | Operate on the entire cache root rather than the current repo's subdirectory. |
+
+## When to Clear
+
+In normal use the cache refreshes itself on TTL expiry or when GitHub-side timestamps change. You typically only need to clear it when:
+
+- A `ghqc` upgrade changes how something is cached and you want the new logic applied immediately to already-cached commits/issues.
+- A force-push or rebase rewrote history and the per-commit cache no longer reflects the branch.
+- You're debugging unexpected behavior and want to rule out a stale cache.

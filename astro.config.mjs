@@ -72,6 +72,7 @@ export default defineConfig({
 								{ label: 'Review', slug: 'cli/issue/review' },
 								{ label: 'Approve', slug: 'cli/issue/approve' },
 								{ label: 'Unapprove', slug: 'cli/issue/unapprove' },
+								{ label: 'Rename', slug: 'cli/issue/rename' },
 								{ label: 'Status', slug: 'cli/issue/status' },
 							]
 						},
@@ -90,6 +91,16 @@ export default defineConfig({
 							items: [
 								{ label: 'Setup', slug: 'cli/configuration/setup' },
 								{ label: 'Status', slug: 'cli/configuration/status' },
+							]
+						},
+						{
+							label: 'Cache',
+							collapsed: true,
+							items: [
+								{ label: 'Introduction', slug: 'cli/cache' },
+								{ label: 'Status', slug: 'cli/cache/status' },
+								{ label: 'Directory', slug: 'cli/cache/dir' },
+								{ label: 'Remove', slug: 'cli/cache/remove' },
 							]
 						},
 						{ label: 'Situation Report', slug: 'cli/sitrep' },

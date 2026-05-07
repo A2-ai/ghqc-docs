@@ -26,6 +26,7 @@ Commands for issue management from creation, to iteration, to approval.
 * [`ghqc issue review`](./issue/review) - Review the current working directory against a tracked commit and post reviewer feedback.
 * [`ghqc issue approve`](./issue/approve) - Approve a QC issue at a selected commit and close it.
 * [`ghqc issue unapprove`](./issue/unapprove) - Reopen an approved QC issue when additional changes are needed.
+* [`ghqc issue rename`](./issue/rename) - Confirm a detected file rename and record it in the issue body.
 * [`ghqc issue status`](./issue/status) - Print detailed QC, git, checklist, and dependency status for a single issue.
 
 ### Milestone Management
@@ -40,6 +41,13 @@ Commands for cloning, inspecting, and verifying the shared configuration used by
 
 * [`ghqc configuration setup`](./configuration/setup) - Clone the configuration repository into the resolved local config directory.
 * [`ghqc configuration status`](./configuration/status) - Print the resolved config directory, git state, and loaded checklist summary.
+
+### Cache Management
+Commands for inspecting and clearing the on-disk cache of GitHub data and per-commit file-change records.
+
+* [`ghqc cache status`](./cache/status) - Show the cache root, total size, configured TTL, and per-element table.
+* [`ghqc cache dir`](./cache/dir) - Print the cache directory for the current repo or the global cache root.
+* [`ghqc cache remove`](./cache/remove) - Remove cached data for the current repo, a specific element, or globally.
 
 ### Diagnostics
 Commands for capturing the current CLI, repository, and configuration environment.

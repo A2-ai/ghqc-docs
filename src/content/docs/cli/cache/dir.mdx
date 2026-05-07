@@ -1,0 +1,37 @@
+---
+title: Cache Directory
+description: Print the on-disk path to the per-repo cache or the global cache root
+---
+
+`ghqc cache dir` prints the cache directory for the current repo (default) or the cache root (`--global`). Useful for piping into other tools.
+
+```bash
+ghqc cache dir [--global]
+```
+
+Aliases: `ghqc cache directory`.
+
+## Examples
+
+```bash
+# Per-repo cache directory
+ghqc cache dir
+# /home/user/.cache/ghqc/A2-ai/ghqctoolkit
+
+# Cache root
+ghqc cache dir --global
+# /home/user/.cache/ghqc
+
+# Pipe into other tools
+du -sh "$(ghqc cache dir)"
+```
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--global` | Print the cache root rather than the per-repo subdirectory. |
+
+## Notes
+
+- When run outside a git repository, the per-repo form errors; pass `--global` instead.

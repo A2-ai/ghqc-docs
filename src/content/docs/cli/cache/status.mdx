@@ -1,0 +1,43 @@
+---
+title: Cache Status
+description: Show the cache root, total size, configured TTL, and per-element breakdown for the current repo
+---
+
+`ghqc cache status` shows the cache root, total size, configured TTL, and a per-element table for the current repo.
+
+```bash
+ghqc cache status
+```
+
+## What It Shows
+
+The output is split into two sections:
+
+- `Cache`, showing the cache root, total size on disk, and the configured TTL
+- `Repository`, showing the resolved repo, its cache path, and a per-element size and file count table
+
+When run outside a git repository, only the global section is shown.
+
+## Example
+
+```text
+── Cache ─────────────────────────────────────
+root:     /home/user/.cache/ghqc
+size:     1.4 MB (87 files)
+ttl:      3600s (default; override with GHQC_CACHE_TIMEOUT)
+── Repository ────────────────────────────────
+repo:     A2-ai/ghqctoolkit
+path:     /home/user/.cache/ghqc/A2-ai/ghqctoolkit
+
+  element          size    files
+  -------          ----    -----
+  commits      612.4 KB       12
+  issues       780.2 KB       64
+  users          3.1 KB        2
+  labels             —        —
+```
+
+## Notes
+
+- The TTL line reflects either the default (3600s) or the value set in `GHQC_CACHE_TIMEOUT`.
+- Some elements show `—` when nothing has been cached yet for that element.
