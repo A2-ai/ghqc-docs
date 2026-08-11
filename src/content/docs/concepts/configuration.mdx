@@ -47,6 +47,7 @@ Some are optional, some have built-in fallbacks, and some only matter when you o
 | `checklist_directory` | Changes the relative path where checklists are loaded from |
 | `record_path` | Changes the relative path to a custom Typst record template |
 | `ui_repo_refresh_rate_seconds` | Sets the repository refresh interval used by the web UI |
+| `allow_ui_config_update` | Allows or forbids the web UI fast-forwarding the configuration repository |
 
 All paths are relative to the resolved configuration directory.
 
@@ -64,6 +65,7 @@ Instead, it falls back to built-in defaults.
 | `checklist_directory` | `checklists` |
 | `record_path` | `record.typ` |
 | `ui_repo_refresh_rate_seconds` | `15` |
+| `allow_ui_config_update` | `true` |
 
 `ui_repo_refresh_rate_seconds` resolves in this order:
 
@@ -72,6 +74,15 @@ Instead, it falls back to built-in defaults.
 3. built-in default `15`
 
 Missing, invalid, zero, and negative values fall back to the next source.
+
+`allow_ui_config_update` resolves the same way:
+
+1. `options.yaml` `allow_ui_config_update`
+2. `GHQC_ALLOW_CONFIG_UPDATE`
+3. built-in default `true`
+
+Missing and unrecognized values fall back to the next source, so a typo cannot silently disable updates.
+The option governs only the web UI's Update button and its endpoint; `ghqc configuration update` is never gated by it.
 
 ### 2.2. Checklists
 
@@ -173,12 +184,16 @@ For most teams:
 2. Set `GHQC_CONFIG_REPO` to that repo URL.
 3. Run configuration setup once so the repo is cloned locally.
 4. Keep checklists and options version-controlled there.
+5. Run `ghqc configuration update`, or use the Configuration tab's **Update** button, to pick up later changes.
 
 Use `GHQC_CONFIG_DIR` mainly for local development, experimentation, or situations where configuration is intentionally not backed by a Git remote.
 
 :::note[HPC]
 For groups using a shared HPC, it is recommended to set `GHQC_CONFIG_DIR` to a shared, readable location.
 The group's admin can set up one configuration directory for all users, ensuring everyone has the most up-to-date configuration.
+
+In that arrangement, set `allow_ui_config_update: false` (or `GHQC_ALLOW_CONFIG_UPDATE=false`) so individual users cannot fast-forward a directory they share with colleagues.
+The admin keeps updating it with `ghqc configuration update`, which is never gated by that option.
 :::
 
 ---

@@ -1,6 +1,6 @@
 ---
 title: Configuration Status
-description: Inspect the resolved configuration directory, git state, loaded checklists, and active repository options
+description: Inspect the resolved configuration directory, git state, and loaded checklists
 ---
 
 import { LinkCard } from '@astrojs/starlight/components';
@@ -20,9 +20,13 @@ Status loads configuration from the resolved directory and reports:
 - Git repository owner/repo when the directory is a Git clone
 - git status details, including dirty files when present
 - the configured checklist directory and the number of loaded checklists
-- the active repository options currently applied from `options.yaml` and defaults
 - whether the configured logo file exists
+- the prepended checklist note, when one is configured
 - a checklist-by-checklist item count summary
+
+Status does not dump the full resolved `options.yaml` values.
+Option values that do surface here do so indirectly — the checklist display name in the section headings, the checklist directory in the summary line, and the logo path in the logo line.
+For a complete view of the resolved options, use the UI's [Configuration](../../../features/configuration) tab or `ghqc sitrep`.
 
 ## Non-interactive
 
@@ -50,7 +54,9 @@ ghqc configuration status --config-dir /path/to/config
 - The built-in `Custom` checklist is always present, even if the configured checklist directory is missing
 - If the directory is not a Git repository, status still prints configuration details but omits Git repo metadata
 - If a custom `logo_path` is configured but the file is missing, status prints a warning
-- The options section includes the resolved values for display name, collaborator policy, checklist directory, record path, refresh rate, and optional checklist note
+- If `logo_path` is left at its default `logo.png` and the file is absent, no warning is printed
+- A configured `checklist_display_name` is title-cased in the report headings, so a custom name such as `review checklist` prints as `Review Checklist`
+- Status is read-only: it never fetches from or writes to the configuration repository, so a `behind` state it reports stays until you run [`ghqc configuration update`](./update)
 
 ## Example
 
@@ -59,12 +65,6 @@ ghqc configuration status --config-dir /path/to/config
 📁 directory: /Users/you/.local/share/ghqc/ghqc-config.git
 📦 git repository: org/ghqc-config
 Repository is up to date!
-⚙️ active options:
-  - display name: checklists
-  - include collaborators: yes
-  - checklist directory: checklists
-  - record path: record.typ
-  - ui refresh rate: 15s
 📋 Checklists available in 'checklists': 4
 ✅ Logo found at logo.png
 
@@ -78,4 +78,18 @@ Repository is up to date!
 - Report: 7 checklist items
 ```
 
+When the clone has fallen behind its remote, or has local edits, those appear on the git repository lines.
+
+```text
+== Directory Information ==
+📁 directory: /Users/you/.local/share/ghqc/ghqc-config.git
+📦 git repository: org/ghqc-config
+Repository is behind by 3 commits
+⚠️ 1 files with uncommitted changes:
+  - options.yaml
+📋 Checklists available in 'checklists': 4
+```
+
+<LinkCard title="Configuration Update" href="./update" description="Fast-forward the configuration repository when status reports it is behind"/>
+<LinkCard title="Configuration Path" href="./path" description="Print only the resolved configuration directory, for shell use"/>
 <LinkCard title="Configuration Feature" href="../../../features/configuration" description="See how the same configuration state appears in the web UI"/>

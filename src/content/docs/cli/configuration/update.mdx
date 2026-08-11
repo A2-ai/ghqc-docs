@@ -1,0 +1,110 @@
+---
+title: Configuration Update
+description: Fast-forward the configuration repository onto its remote without merging, stashing, or leaving conflicts
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc configuration update` brings the local configuration repository up to date with its remote, then reloads checklists from the refreshed clone.
+
+```bash
+ghqc configuration update
+```
+
+It is intentionally the most conservative update possible: a fetch followed by `git pull --ff-only`.
+`ghqc` never merges, never stashes, never rebases, and never leaves the configuration repository in a conflicted state.
+If the pull cannot be a pure fast-forward, the command refuses instead.
+
+## Works From Any Directory
+
+Update resolves the configuration directory exactly the way `ghqc configuration status` does, so it never operates on the project repository you happen to be standing in.
+
+```bash
+cd ~/projects/my-analysis
+ghqc configuration update
+```
+
+There is no need to `cd` into the configuration repository first.
+If you do want to inspect or edit it by hand, use [`ghqc configuration path`](./path) to get the directory.
+
+## Refusal Conditions
+
+Every refusal is decided **before** the repository is touched.
+A refused update exits with a non-zero status and leaves the configuration repository byte-for-byte unchanged — no fetch side effects to undo, no partial state to clean up.
+
+`ghqc` refuses when:
+
+- the working tree has uncommitted (staged or unstaged) changes
+- there are local commits that are not on the remote ("ahead")
+- local and remote history have diverged
+
+### Uncommitted Changes
+
+```text
+Error: Cannot update: 2 uncommitted change(s) in /Users/you/.local/share/ghqc/ghqc-config:
+  - checklists/code-review.yaml
+  - options.yaml
+Commit or stash them, then retry.
+```
+
+### Local Commits Not On The Remote
+
+```text
+Error: Cannot update: 2 local commit(s) not on the remote in /Users/you/.local/share/ghqc/ghqc-config. Push or reset them, then retry.
+```
+
+### Diverged History
+
+```text
+Error: Cannot update: /Users/you/.local/share/ghqc/ghqc-config has diverged from its remote (1 ahead, 3 behind). Resolve manually.
+```
+
+Divergence is the one case `ghqc` will not try to reason about for you.
+Resolve it with `git` directly inside the configuration directory.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--config-dir` | Override the configuration directory to update. |
+
+## Validation and Defaults
+
+- Update uses the same configuration-directory resolution order as the rest of `ghqc`
+- The current working directory never affects which repository is updated
+- If the resolved directory is not a Git repository, update fails with an explanatory error instead of attempting a pull
+- All refusal checks run before any mutation, so a refusal cannot leave the repository modified
+- A clean repository still runs the pull; it simply reports that nothing changed
+- On success, checklists are reloaded from disk so the new counts are reported immediately
+
+## Example
+
+When remote commits are available, `ghqc` fast-forwards and reports the commit range and refreshed checklist count.
+
+```text
+✅ Updated configuration repository: 3 commits (a1b2c3d -> e4f5a6b)
+📋 checklists available in 'checklists': 4
+```
+
+When the clone already matches its remote, update is a no-op that says so.
+
+```text
+✅ Configuration repository is already up to date
+```
+
+## Web UI Equivalent
+
+The Configuration tab exposes the same operation as an **Update** button, backed by `POST /api/configuration/update`.
+The button applies the identical refusal rules and reports the identical wording.
+
+Deployments that manage the configuration repository centrally can turn the UI affordance off with the `allow_ui_config_update` option in `options.yaml`, or the `GHQC_ALLOW_CONFIG_UPDATE` environment variable.
+When updates are disabled, the button is not rendered and the endpoint returns `403`.
+
+:::note[The CLI is never gated]
+`allow_ui_config_update` only affects the web UI and its endpoint.
+`ghqc configuration update` is deliberately **not** gated — the administrator maintaining a shared configuration repository is exactly the person who needs it, and ordinary Git and filesystem permissions already govern who can write to the repository.
+:::
+
+<LinkCard title="Configuration Path" href="./path" description="Print the resolved configuration directory for shell use"/>
+<LinkCard title="Configuration Status" href="./status" description="Inspect the resolved directory, git state, and loaded checklists"/>
+<LinkCard title="Configuration Feature" href="../../../features/configuration" description="See the Update button and staleness warnings in the web UI"/>

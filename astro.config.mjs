@@ -89,7 +89,9 @@ export default defineConfig({
 							collapsed: true,
 							items: [
 								{ label: 'Setup', slug: 'cli/configuration/setup' },
+								{ label: 'Update', slug: 'cli/configuration/update' },
 								{ label: 'Status', slug: 'cli/configuration/status' },
+								{ label: 'Path', slug: 'cli/configuration/path' },
 							]
 						},
 						{ label: 'Situation Report', slug: 'cli/sitrep' },

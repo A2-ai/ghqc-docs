@@ -58,11 +58,11 @@ In that case, the auth section may show `repository host: not determined` and `a
 ## Example
 
 ```text
-=== Binary =========================
-Version: 0.2.0
+── Binary ────────────────────────────────────
+Version: 0.8.0
 Path: /usr/local/bin/ghqc
 
-=== Repository =====================
+── Repository ────────────────────────────────
 Directory: /projects/myrepo
 Repository: owner/repo (https://github.com/owner/repo)
 Branch: main
@@ -70,7 +70,7 @@ Milestones: 2
   - v1.0 [open]: 4 open | 8 closed
   - v2.0 [open]: 2 open | 3 closed
 
-=== Auth ===========================
+── Auth ──────────────────────────────────────
 store directory: /home/user/.local/share/ghqc/auth
 stored tokens:
   ▶ github.com (ghp_abcd...wxyz)
@@ -84,17 +84,33 @@ available auth sources
     ✗ git credential manager
     ✗ .netrc
 
-=== Configuration ==================
+── Configuration ─────────────────────────────
 Directory: /config/path    ❌ Directory not found
 Repository: owner/repo (https://github.com/owner/repo)
 Checklists: 1
   - Custom: 1 items
 Options:
-  - Checklist Display Name:  checklists
+  - Prepended Checklist Note: (none)
+  - Checklist Display Name: checklists
+  - Include Collaborators: yes
   - Logo Path: logo.png
   - Checklist Directory: checklists
   - Record Template Path: record.typ
+  - UI Repo Refresh Rate: 15s
+  - Allow Config Update From UI: yes
 ```
+
+Every configuration option is listed, so the report is a complete picture of what
+`ghqc` resolved. `Prepended Checklist Note` prints `(none)` when it is unset.
+
+`UI Repo Refresh Rate` and `Allow Config Update From UI` show the *effective*
+value after resolution — resolved in order from the value in `options.yaml`, 
+their respective environment variables (`GHQC_UI_REFRESH_RATE` and `GHQC_ALLOW_CONFIG_UPDATE`),
+the the built-in default.
+
+In `--json` output these two appear as `resolved_ui_repo_refresh_rate_seconds`
+and `resolved_allow_ui_config_update`, distinct from the raw (possibly null)
+values under `configuration.options`.
 
 ---
 

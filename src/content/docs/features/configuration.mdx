@@ -20,6 +20,7 @@ At a high level, the configuration repository provides the shared review setup u
 In the UI, the Configuration tab surfaces the most immediately useful parts of that setup:
 
 - whether the configuration repository is connected
+- whether it has fallen behind its remote, and a one-click way to catch it up
 - which checklists are available
 - how checklists are named in the UI
 - whether collaborator detection is enabled for issue creation
@@ -41,19 +42,46 @@ This makes it visible from anywhere in the app that the shared checklist/configu
   <img src={configTabWarning.src} style="width: 75%;" />
 </div>
 
+### Stale Configuration Warning
+
+The same yellow badge and tooltip also fire when the configuration repository *is* set up but has fallen out of sync with its remote.
+This exists because a silently stale configuration is easy to miss: your checklists quietly differ from your colleagues' and nothing else in the app complains.
+
+When the configuration repository is `behind`, the tooltip reads:
+
+`Configuration repository is 3 commits behind org/ghqc-config. Your checklists may be out of date — update it on the Configuration tab.`
+
+When it has `diverged`, the tooltip reads:
+
+`Configuration repository has diverged from its remote (1 ahead, 3 behind). Resolve it manually — see the Configuration tab.`
+
+The commit counts are live, and the repository is named as `owner/repo`.
+An `ahead` state does not raise the badge — local commits that have not been pushed do not make your checklists stale.
+
+:::note[Suppressed for centrally-managed deployments]
+When updates are disabled for the deployment (`allow_ui_config_update: false` in `options.yaml`, or `GHQC_ALLOW_CONFIG_UPDATE=false`), the staleness badge is **not** shown in the nav.
+There is nothing the user can do about it from there, so the signal would only be noise.
+The stale state is still reported inside the Configuration tab, pointing at the administrator.
+
+The not-set-up warning is unaffected: it always fires, regardless of whether updates are allowed.
+:::
+
 ## Layout
 
-The Configuration tab has three collapsible sections:
+The Configuration tab has two layers:
 
-- **Git Repository**
-- **Checklists**
-- **Options**
+- an always-visible **status strip** at the very top, shown once a configuration repository is connected
+- collapsible sections below it:
+  - **Git Repository** — only when no configuration repository is connected yet
+  - **Checklists**
+  - **Options**
 
-Each section can be expanded or collapsed independently.
+Each collapsible section can be expanded or collapsed independently.
+The status strip is not collapsible, by design: it is the one piece of configuration state that must not be hidden behind a click.
 
 ## Git Repository
 
-The **Git Repository** section has two modes depending on whether configuration has already been set up.
+Repository state is presented in one of two ways depending on whether configuration has already been set up: a setup form in a collapsible **Git Repository** section, or the always-visible status strip.
 
 ### Not Yet Configured
 
@@ -88,15 +116,61 @@ This is especially import when using `GHQC_CONFIG_DIR`.
 
 ### Configured State
 
-Once configuration is available, the setup form is replaced by a repository summary showing:
+Once configuration is available, the collapsible **Git Repository** section is replaced entirely by a status strip pinned to the top of the tab, above the **Checklists** and **Options** sections.
+The strip is always visible — there is nothing to expand — so a stale configuration repository cannot be missed.
 
-- repository owner and name
-- git sync state: `clean`, `ahead`, `behind`, or `diverged`
-- the local configuration directory path
-- any dirty files in the configuration repository
+The strip shows:
 
-This section is mainly a health check. It lets you confirm that the app is pointed at the expected repository and whether that repository itself is in a clean git state.
+- repository `owner / repo`
+- a colored status pill: `clean`, `ahead`, `behind`, or `diverged`
+- a **refresh** control for re-checking the repository, with the tooltip `Re-check the configuration repository`
+- an **Update** button (see below)
+- the human-readable status detail, e.g. `Repository is behind by 3 commits`
+- the local configuration directory path, in monospace
+- `Dirty: <files>` when the configuration repository has uncommitted changes
+
+The strip's left border and background tint take the status color, so a repository that needs attention is visible at a glance.
 The displayed directory is the fully resolved config location, so it reflects custom resolution sources such as `GHQC_CONFIG_DIR` when that env var is being used.
+
+### The Update Button
+
+**Update** performs the same fast-forward-only operation as [`ghqc configuration update`](../cli/configuration/update): it fetches the remote and runs `git pull --ff-only`, then reloads checklists.
+It never merges, stashes, or leaves conflicts, and it refuses under exactly the same conditions as the CLI.
+
+On success the strip reports:
+
+`Configuration repository updated`
+
+Because the checklists are reloaded, the **Checklists** and **Options** sections refresh in place — no page reload needed.
+If the update is refused or fails, the error message from the server is shown in red inside the strip, using the same wording as the CLI.
+
+**Enabled** only when the repository is `behind` — that is the one state a fast-forward can fix.
+
+**Disabled**, with a tooltip explaining why, in every other state:
+
+| Situation | Tooltip |
+|---|---|
+| Uncommitted changes present | `The configuration repository has uncommitted changes. Commit or discard them before updating.` |
+| Status `clean` | `The configuration repository is already up to date.` |
+| Status `ahead` | `The configuration repository has local commits that are not on the remote. Push them before updating.` |
+| Status `diverged` | `The configuration repository has diverged from its remote. Resolve it manually with git.` |
+
+The dirty-files check takes precedence: uncommitted changes block the update regardless of sync state.
+
+**Absent entirely** when updates are disabled for the deployment via `allow_ui_config_update: false` in `options.yaml` or `GHQC_ALLOW_CONFIG_UPDATE=false`.
+No disabled button is rendered — a disabled control would only invite a hunt for how to enable it.
+In its place, the strip shows muted text:
+
+`Updates are managed centrally for this deployment.`
+
+If the repository is also `behind` or `diverged` in that case, the strip adds a yellow line so the staleness is still explained:
+
+`Your checklists may be out of date. This deployment's configuration is managed centrally — contact your administrator.`
+
+### Refresh Control
+
+The refresh icon next to the status pill re-checks the configuration repository on demand, showing a loading state while the request is in flight.
+Use it after pushing a change to the configuration repository from elsewhere, to confirm the UI now sees the new commits.
 
 <div style="display: flex; justify-content: center;">
   <img src={configGitSetup.src} style="width: 60%;" />
@@ -139,10 +213,17 @@ The section shows:
 - **Checklist directory** — where checklist files are expected inside the config repo
 - **Logo path** — the configured logo location, plus whether the file was found
 - **Record path** — the configured records directory
-- **UI refresh rate** — the repository refresh interval used by the web UI
-- **Checklist note** — shown only when a prepended checklist note is configured
+- **UI repo refresh rate** — the repository refresh interval used by the web UI
+- **Allow updates from UI** — whether this deployment permits updating the configuration repository from the web UI
+- **Checklist note** — the prepended checklist note, or `Not set` when none is configured
 
-These values are read-only status information. They are intended to help you verify what the application resolved from configuration, not to edit the config in place.
+Every option is listed, so this section is a complete picture of what the application resolved. These values are read-only status information, not an editor for changing the configuration in place.
+
+:::note[Allow updates from UI]
+This row is the resolved value of `allow_ui_config_update` in `options.yaml`, or the `GHQC_ALLOW_CONFIG_UPDATE` environment variable, defaulting to **Yes**.
+
+When it reads **No**, the **Update** button is not rendered in the status strip and the nav tab raises no staleness badge. This row is therefore where you confirm *why* those controls are absent instead of guessing. `ghqc sitrep` reports the same value as `Allow Config Update From UI`.
+:::
 
 <div style="display: flex; justify-content: center;">
   <img src={configOptions.src} style="width: 75%;" />
@@ -171,6 +252,7 @@ When it is disabled, collaborator detection is skipped and the collaborator edit
 The Configuration tab is most useful when you need to:
 
 - set up the configuration repository for the first time
+- pull down configuration changes a colleague pushed, using **Update**
 - confirm that the expected config repo is connected
 - confirm that a custom directory override such as `GHQC_CONFIG_DIR` resolved to the expected path
 - inspect whether checklist files were loaded correctly

@@ -70,6 +70,7 @@ If not set, `ghqc` falls back to the platform default (`~/.cache` on Linux and m
 | Variable | Type | Default |
 |---|---|---|
 | `GHQC_UI_REFRESH_RATE` | Positive integer (seconds) | `15` |
+| `GHQC_ALLOW_CONFIG_UPDATE` | Boolean | `true` |
 
 ### `GHQC_UI_REFRESH_RATE`
 
@@ -82,6 +83,24 @@ This variable is the middle step in a three-level resolution chain:
 3. Built-in default `15`
 
 Invalid, zero, and negative values fall back to the next source.
+
+### `GHQC_ALLOW_CONFIG_UPDATE`
+
+Whether the web UI may fast-forward the configuration repository onto its remote.
+
+This variable is the middle step in a three-level resolution chain:
+
+1. `options.yaml` `allow_ui_config_update`
+2. `GHQC_ALLOW_CONFIG_UPDATE`
+3. Built-in default `true`
+
+Accepted spellings are case-insensitive: `true`/`false`, `1`/`0`, `yes`/`no`, `on`/`off`.
+
+Unrecognized values fall back to the next source — and therefore to the default `true` — rather than disabling updates.
+A typo such as `GHQC_ALLOW_CONFIG_UPDATE=flase` can never silently switch updates off.
+
+When the resolved value is `false`, the Configuration tab renders no **Update** button, the nav tab's staleness badge is suppressed, and `POST /api/configuration/update` returns `403`.
+The `ghqc configuration update` CLI command is deliberately unaffected.
 
 ## Record Generation
 

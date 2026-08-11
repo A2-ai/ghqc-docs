@@ -39,6 +39,7 @@ logo_path: "branding/ghqc-logo.png"
 checklist_directory: "review-checklists"
 record_path: "templates/record.typ"
 ui_repo_refresh_rate_seconds: 20
+allow_ui_config_update: true
 ```
 
 All path-like values are interpreted relative to the configuration directory, not relative to the current project using `ghqc`.
@@ -59,6 +60,39 @@ The supported `options.yaml` keys are:
 | `checklist_directory` | Changes the relative checklist directory |
 | `record_path` | Changes the relative Typst record template path |
 | `ui_repo_refresh_rate_seconds` | Sets the repository refresh interval used by the web UI |
+| `allow_ui_config_update` | Allows or forbids the web UI fast-forwarding this configuration repository |
+
+### 2.2. `allow_ui_config_update`
+
+By default, the web UI's Configuration tab offers an **Update** button that fast-forwards the configuration repository onto its remote.
+Setting `allow_ui_config_update: false` removes that affordance.
+
+```yaml
+allow_ui_config_update: false
+```
+
+The value resolves in this order:
+
+1. `options.yaml` `allow_ui_config_update`
+2. `GHQC_ALLOW_CONFIG_UPDATE`
+3. built-in default `true`
+
+Because the option is read from the configuration repository itself, committing `allow_ui_config_update: false` there applies the policy to every user of that repository without asking each of them to set an environment variable.
+
+When updates are disabled:
+
+- the **Update** button is not rendered in the Configuration tab at all — it is replaced by `Updates are managed centrally for this deployment.`
+- the yellow staleness badge on the **Configuration** nav tab is suppressed, since the user cannot act on it
+- the Configuration tab still reports a stale repository, pointing the user at their administrator
+- `POST /api/configuration/update` returns `403`
+
+`ghqc configuration update` on the command line is deliberately **not** gated by this option.
+The administrator maintaining a shared configuration repository is precisely the person who needs to update it, and Git and filesystem permissions already decide who is able to.
+
+:::caution[Centrally-managed and shared directories]
+This option is aimed at deployments where one directory serves many users — for example a shared HPC location set with `GHQC_CONFIG_DIR`, or a read-only clone maintained by an administrator.
+Letting individual users fast-forward a directory they share with colleagues invites surprise changes, so disable the UI affordance there and update the repository from the CLI as part of your normal administration.
+:::
 
 ## 3. Authoring Checklist Files
 
@@ -154,10 +188,11 @@ That keeps record generation reproducible across users and machines.
 
 After changing the config repo, the quickest validation loop is:
 
-1. run `ghqc configuration status`
-2. open the Configuration tab in the UI
-3. confirm that checklists, paths, and logo state match what you intended
-4. create or preview a QC issue using one of the updated checklists
+1. push the change, then run `ghqc configuration update` to fast-forward your local clone
+2. run `ghqc configuration status`
+3. open the Configuration tab in the UI
+4. confirm that checklists, paths, and logo state match what you intended
+5. create or preview a QC issue using one of the updated checklists
 
 That catches most authoring mistakes early, especially:
 

@@ -36,10 +36,12 @@ Commands for summarizing, exporting, and archiving groups of QC issues.
 * [`ghqc milestone archive`](./milestone/archive) - Bundle milestone artifacts into an archive for storage or delivery.
 
 ### Configuration Management
-Commands for cloning, inspecting, and verifying the shared configuration used by `ghqc`.
+Commands for cloning, updating, inspecting, and verifying the shared configuration used by `ghqc`.
 
 * [`ghqc configuration setup`](./configuration/setup) - Clone the configuration repository into the resolved local config directory.
+* [`ghqc configuration update`](./configuration/update) - Fast-forward the configuration repository onto its remote and reload checklists.
 * [`ghqc configuration status`](./configuration/status) - Print the resolved config directory, git state, and loaded checklist summary.
+* [`ghqc configuration path`](./configuration/path) - Print only the resolved config directory, for use in shell substitution.
 
 ### Diagnostics
 Commands for capturing the current CLI, repository, and configuration environment.

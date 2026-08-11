@@ -1,0 +1,54 @@
+---
+title: Configuration Path
+description: Print only the resolved configuration directory, suitable for shell substitution
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+`ghqc configuration path` prints the resolved configuration directory and nothing else.
+
+```bash
+ghqc configuration path
+```
+
+`ghqc configuration status` also reports the directory, but surrounded by git state, checklist summaries, and logo notes.
+This command exists so you do not have to run status and copy the path out of the report by hand.
+
+## Shell Use
+
+Because the output is a bare path on a single line, it composes directly with shell substitution.
+
+```bash
+cd $(ghqc configuration path)
+```
+
+```bash
+ls $(ghqc configuration path)/checklists
+```
+
+```bash
+git -C "$(ghqc configuration path)" log --oneline -5
+```
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--config-dir` | Override the configuration directory to resolve and print. |
+
+## Validation and Defaults
+
+- Path uses the same configuration-directory resolution order as the rest of `ghqc`: `--config-dir`, `GHQC_CONFIG_REPO`, `GHQC_CONFIG_DIR`, then the default XDG path
+- The path is printed whether or not the directory exists yet, so it is also the answer to "where *would* setup clone to?"
+- No configuration is loaded and no git commands are run, so the command works on a non-Git directory and on a directory that has never been set up
+- Nothing but the path is written to stdout, which is what makes command substitution safe
+
+## Example
+
+```text
+/Users/you/.local/share/ghqc/ghqc-config.git
+```
+
+<LinkCard title="Configuration Update" href="./update" description="Fast-forward the configuration repository onto its remote"/>
+<LinkCard title="Configuration Status" href="./status" description="Inspect the resolved directory, git state, and loaded checklists"/>
+<LinkCard title="Configuration Concepts" href="../../../concepts/configuration" description="See how ghqc resolves configuration directories"/>
